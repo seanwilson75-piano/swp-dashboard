@@ -115,6 +115,12 @@
       font-weight: 700;
       box-shadow: 0 1px 4px rgba(0,0,0,0.12);
     }
+    @media (max-width: 900px) {
+      .tab-btn { font-size: 11px; padding: 7px 10px; min-width: 72px; }
+    }
+    @media (max-width: 600px) {
+      .tab-btn { font-size: 10px; padding: 6px 8px; min-width: 64px; }
+    }
 
     /* ── Cards ── */
     .card {
@@ -365,10 +371,17 @@
   <!-- ══════════ SUBSCRIPTIONS ══════════ -->
   <div id="panel-subs" class="tab-panel">
     <div id="subs-scores" class="score-row"></div>
-    <div class="card section-gap">
-      <div class="card-title">Subscription Trends</div>
-      <div class="card-subtitle">Active, New, and Churned — day by day</div>
-      <div class="chart-wrap"><canvas id="subsChart"></canvas></div>
+    <div class="two-col section-gap">
+      <div class="card">
+        <div class="card-title">New vs Churned — Daily</div>
+        <div class="card-subtitle">Members gained and lost each day this week</div>
+        <div class="chart-wrap"><canvas id="subsChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Weekly Net Flow</div>
+        <div class="card-subtitle">Total new members vs total churned this week</div>
+        <div class="chart-wrap"><canvas id="subsDonutChart"></canvas></div>
+      </div>
     </div>
   </div>
 
@@ -404,10 +417,17 @@
   <!-- ══════════ TRIALS ══════════ -->
   <div id="panel-trials" class="tab-panel">
     <div id="trials-scores" class="score-row"></div>
-    <div class="card section-gap">
-      <div class="card-title">Trial Activity</div>
-      <div class="card-subtitle">Active trials and daily conversions</div>
-      <div class="chart-wrap"><canvas id="trialsChart"></canvas></div>
+    <div class="two-col section-gap">
+      <div class="card">
+        <div class="card-title">Daily Conversions</div>
+        <div class="card-subtitle">Trials converted to paid each day this week</div>
+        <div class="chart-wrap"><canvas id="trialsChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Trial Outcome</div>
+        <div class="card-subtitle">Converted vs still in trial this week</div>
+        <div class="chart-wrap"><canvas id="trialsDonutChart"></canvas></div>
+      </div>
     </div>
   </div>
 
@@ -854,23 +874,51 @@ document.getElementById("footer").textContent        =
     <div class="score-value">${s.value}</div>
   </div>`).join("");
 
-  const ctx = document.getElementById("subsChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
+  // Grouped bar: New vs Churned per day
+  const ctxBar = document.getElementById("subsChart").getContext("2d");
+  new Chart(ctxBar, {
+    type: "bar",
     data: {
       labels: d.labels,
       datasets: [
-        { label: "Active",  data: d.active,  borderColor: "#2563eb", backgroundColor: "rgba(37,99,235,0.08)", fill: true, tension: 0.35, pointRadius: 4, pointHoverRadius: 6 },
-        { label: "New",     data: d.new,     borderColor: "#16a34a", backgroundColor: "transparent",          fill: false, tension: 0.35, pointRadius: 4, borderDash: [4,3] },
-        { label: "Churned", data: d.churned, borderColor: "#ef4444", backgroundColor: "transparent",          fill: false, tension: 0.35, pointRadius: 4, borderDash: [4,3] }
+        { label: "New",     data: d.new,     backgroundColor: "#16a34a", borderRadius: 5 },
+        { label: "Churned", data: d.churned, backgroundColor: "#ef4444", borderRadius: 5 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: "top", labels: { usePointStyle: true, pointStyleWidth: 8, padding: 16 } } },
       scales: {
-        y: { beginAtZero: false, grid: { color: GRID_COLOR } },
+        y: { beginAtZero: true, grid: { color: GRID_COLOR }, ticks: { stepSize: 1 } },
         x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Doughnut: total new vs total churned
+  const ctxDonut = document.getElementById("subsDonutChart").getContext("2d");
+  new Chart(ctxDonut, {
+    type: "doughnut",
+    data: {
+      labels: ["New Members", "Churned"],
+      datasets: [{
+        data: [totalNew, totalChurned],
+        backgroundColor: ["#16a34a", "#ef4444"],
+        borderWidth: 3,
+        borderColor: "white",
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: "62%",
+      plugins: {
+        legend: { position: "right", labels: { usePointStyle: true, pointStyleWidth: 8, padding: 14 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed} (net ${net >= 0 ? "+" : ""}${net})`
+          }
+        }
       }
     }
   });
@@ -965,39 +1013,60 @@ document.getElementById("footer").textContent        =
 (function buildTrials() {
   const d = DATA.trials;
   const cur = DATA.kpis.current;
-  const totalWon  = d.won.reduce((a,b)=>a+b,0);
-  const totalLost = cur.activeTrials > totalWon ? cur.activeTrials - totalWon : 0;
-  const winRate   = cur.activeTrials > 0 ? ((totalWon / cur.activeTrials) * 100).toFixed(1) : "0";
+  const totalWon   = d.won.reduce((a,b)=>a+b,0);
+  const stillActive = cur.activeTrials;
+  const winRate    = (stillActive + totalWon) > 0 ? ((totalWon / (stillActive + totalWon)) * 100).toFixed(1) : "0";
+  const newStarted = totalWon + (d.active[0] - d.active[d.active.length-1]);
 
   document.getElementById("trials-scores").innerHTML = [
-    { label: "Active Trials",       value: cur.activeTrials                  },
-    { label: "Won This Week",       value: "+" + totalWon                    },
-    { label: "Conversion Rate",     value: winRate + "%"                     },
-    { label: "New Trials Started",  value: d.active[0] - d.active[d.active.length-1] >= 0
-        ? d.won.reduce((a,b)=>a+b,0)
-        : "—"
-    }
+    { label: "Active Trials",      value: stillActive               },
+    { label: "Won This Week",      value: "+" + totalWon            },
+    { label: "Conversion Rate",    value: winRate + "%"             },
+    { label: "New Trials Started", value: newStarted > 0 ? newStarted : totalWon }
   ].map(s => `<div class="score-card">
     <div class="score-label">${s.label}</div>
     <div class="score-value">${s.value}</div>
   </div>`).join("");
 
-  const ctx = document.getElementById("trialsChart").getContext("2d");
-  new Chart(ctx, {
-    type: "line",
+  // Bar chart: daily conversions (Won per day)
+  const ctxBar = document.getElementById("trialsChart").getContext("2d");
+  new Chart(ctxBar, {
+    type: "bar",
     data: {
       labels: d.labels,
       datasets: [
-        { label: "Active Trials", data: d.active, borderColor: "#7c3aed", backgroundColor: "rgba(124,58,237,0.08)", fill: true, tension: 0.35, pointRadius: 4, pointHoverRadius: 6 },
-        { label: "Won",           data: d.won,    borderColor: "#16a34a", backgroundColor: "transparent",           fill: false, tension: 0.35, pointRadius: 5, borderDash: [4,3] }
+        { label: "Converted to Paid", data: d.won, backgroundColor: "#7c3aed", borderRadius: 6 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: "top", labels: { usePointStyle: true, pointStyleWidth: 8, padding: 16 } } },
       scales: {
-        y: { beginAtZero: true, grid: { color: GRID_COLOR } },
+        y: { beginAtZero: true, grid: { color: GRID_COLOR }, ticks: { stepSize: 1 } },
         x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Doughnut: Won vs Still Active this week
+  const ctxDonut = document.getElementById("trialsDonutChart").getContext("2d");
+  new Chart(ctxDonut, {
+    type: "doughnut",
+    data: {
+      labels: ["Converted to Paid", "Still in Trial"],
+      datasets: [{
+        data: [totalWon, stillActive],
+        backgroundColor: ["#16a34a", "#7c3aed"],
+        borderWidth: 3,
+        borderColor: "white",
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: "62%",
+      plugins: {
+        legend: { position: "right", labels: { usePointStyle: true, pointStyleWidth: 8, padding: 14 } }
       }
     }
   });
