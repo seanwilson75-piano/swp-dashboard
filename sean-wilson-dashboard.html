@@ -331,6 +331,114 @@
       color: #1d4ed8;
       font-weight: 500;
     }
+
+    /* ── MTD Overview ── */
+    .mtd-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      margin-bottom: 0;
+    }
+    .mtd-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .mtd-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151;
+    }
+    .mtd-period {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .mtd-big {
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.5px;
+    }
+    .mtd-chg {
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+      display: block;
+      margin-top: 2px;
+    }
+    .mtd-stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mtd-stat-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .mtd-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.5px;
+    }
+    .mtd-3col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) { .mtd-3col { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .mtd-3col { grid-template-columns: 1fr; } }
+    .mtd-bd-section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ca3af;
+      margin: 10px 0 6px;
+    }
+    .mtd-bd-section-label:first-child { margin-top: 0; }
+    .mtd-bd-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 13px;
+    }
+    .mtd-bd-row:last-of-type { border-bottom: none; }
+    .mtd-bd-label { display: flex; align-items: center; gap: 8px; color: #374151; }
+    .mtd-bd-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mtd-bd-val { font-weight: 700; color: #111827; }
+    .mtd-bd-subtotal {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      border-top: 2px solid #e5e7eb;
+      border-bottom: 1px solid #f3f4f6;
+      margin-top: 2px;
+    }
+    .mtd-bd-grand {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #111827;
+      border-top: 2px solid #111827;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -358,6 +466,7 @@
   <!-- Tabs -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="kpi">📊 KPI Overview</button>
+    <button class="tab-btn" data-tab="mtd">📈 MTD Overview</button>
     <button class="tab-btn" data-tab="subs">👥 Subscriptions</button>
     <button class="tab-btn" data-tab="cancel">⚠️ Cancellations</button>
     <button class="tab-btn" data-tab="abandoned">🛒 Abandoned</button>
@@ -380,6 +489,88 @@
       <div class="card-subtitle" id="rev-subtitle"></div>
       <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
     </div>
+  </div>
+
+
+  <!-- ══════════ MTD OVERVIEW ══════════ -->
+  <div id="panel-mtd" class="tab-panel">
+
+    <!-- Row 1: MRR sparkline + Combined Revenue bar -->
+    <div class="two-col" style="margin-bottom:16px;">
+      <div class="mtd-card">
+        <div class="mtd-header">
+          <div>
+            <div class="mtd-title">MRR</div>
+            <div class="mtd-period">Month to date · March 2026</div>
+          </div>
+          <div>
+            <div class="mtd-big" id="mtd-mrr-val"></div>
+            <span class="mtd-chg" id="mtd-mrr-chg"></span>
+          </div>
+        </div>
+        <div style="height:80px;position:relative"><canvas id="mtdMrrChart"></canvas></div>
+      </div>
+      <div class="mtd-card">
+        <div class="mtd-header">
+          <div>
+            <div class="mtd-title">Combined Revenue MTD</div>
+            <div class="mtd-period">SureCart + MemberPress · March 2026</div>
+          </div>
+          <div>
+            <div class="mtd-big" id="mtd-rev-val"></div>
+            <span class="mtd-chg" id="mtd-rev-chg"></span>
+          </div>
+        </div>
+        <div style="height:80px;position:relative"><canvas id="mtdRevChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Row 2: Revenue breakdown table + Split donut -->
+    <div class="two-col" style="margin-bottom:16px;">
+      <div class="mtd-card">
+        <div class="mtd-title" style="margin-bottom:2px;">Revenue Breakdown</div>
+        <div class="mtd-period" style="margin-bottom:14px;">Subscription vs non-subscription · Month to date</div>
+        <div id="mtd-breakdown"></div>
+      </div>
+      <div class="mtd-card">
+        <div class="mtd-title" style="margin-bottom:2px;">Revenue Split</div>
+        <div class="mtd-period" style="margin-bottom:14px;">Subscription vs non-subscription this month</div>
+        <div style="height:230px;position:relative"><canvas id="mtdSplitChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Row 3: ARR · Churn Rate · AOV — three stat cards -->
+    <div class="mtd-3col">
+      <div class="mtd-stat-card">
+        <span class="mtd-stat-label">Annual Run Rate</span>
+        <div style="text-align:right">
+          <div class="mtd-stat-val" id="mtd-arr-val"></div>
+          <span class="mtd-chg" id="mtd-arr-chg"></span>
+        </div>
+      </div>
+      <div class="mtd-stat-card">
+        <span class="mtd-stat-label">Subscription Churn Rate</span>
+        <div style="text-align:right">
+          <div class="mtd-stat-val" id="mtd-churn-val"></div>
+          <span class="mtd-chg" id="mtd-churn-chg"></span>
+        </div>
+      </div>
+      <div class="mtd-stat-card">
+        <span class="mtd-stat-label">Avg Order Value</span>
+        <div style="text-align:right">
+          <div class="mtd-stat-val" id="mtd-aov-val"></div>
+          <span class="mtd-chg" id="mtd-aov-chg"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: AOV trend line -->
+    <div class="mtd-card" style="margin-top:16px;">
+      <div class="mtd-title" style="margin-bottom:2px;">AOV Trend <span style="font-size:11px;font-weight:400;color:#9ca3af;margin-left:6px;">Last 10 Weeks</span></div>
+      <div class="mtd-period" style="margin-bottom:16px;">Average order value per week — SureCart</div>
+      <div style="height:180px;position:relative"><canvas id="mtdAovChart"></canvas></div>
+    </div>
+
   </div>
 
 
@@ -479,7 +670,7 @@
     </div>
     <div class="card section-gap">
       <div class="card-title">Member Growth Trend</div>
-      <div class="card-subtitle">New members, churned members, and net weekly change</div>
+      <div class="card-subtitle">Combined SureCart + MemberPress — new, churned, and net weekly change</div>
       <div class="chart-wrap"><canvas id="trendMemberChart"></canvas></div>
     </div>
   </div>
@@ -496,7 +687,7 @@
       </div>
       <div class="card">
         <div class="card-title">Member Activity by Month</div>
-        <div class="card-subtitle">New vs churned — grouped by month</div>
+        <div class="card-subtitle">Combined SureCart + MemberPress — new vs churned by month</div>
         <div class="chart-wrap"><canvas id="monthlyMemberChart"></canvas></div>
       </div>
     </div>
@@ -581,7 +772,7 @@
       current: {
         mrr                  : 12239,
         weeklyRevenue        : 2895,
-        activeSubscriptions  : 398,
+        activeSubscriptions  : 983,   // SureCart 398 + MemberPress 585
         netGrowth            : 5,
         newMembers           : 22,
         churnedMembers       : 17,
@@ -597,7 +788,8 @@
       prior: {
         mrr                  : 11900,
         weeklyRevenue        : 2640,
-        activeSubscriptions  : 393,
+        activeSubscriptions  : 978,   // SureCart 393 + MemberPress 585
+
         netGrowth            : 3,
         newMembers           : 18,
         churnedMembers       : 15,
@@ -694,6 +886,7 @@
       combinedRev   : [5820,  6140,  6380,  6220,  6580,  6720,  6850,  6440,  6740,  6277 ],
       scRev         : [2280,  2560,  2720,  2340,  2880,  2960,  3050,  2640,  2940,  2895 ],
       mpRev         : [3540,  3580,  3660,  3880,  3700,  3760,  3800,  3800,  3800,  3382 ],
+      // ⚠️ COMBINED — SureCart + MemberPress new/churned each week
       newMembers    : [19, 22, 24, 21, 23, 21, 20, 18, 20, 22],
       churnedMembers: [20, 18, 19, 18, 17, 17, 16, 15, 15, 17],
       netGrowth     : [-1,  4,  5,  3,  6,  4,  4,  3,  5,  5]
@@ -701,6 +894,7 @@
 
     // ── Monthly Rollup ────────────────────────────────────────────
     // ⚠️ PLACEHOLDER — replace Jan/Feb with real monthly totals from SureCart + MemberPress
+    // newMembers / churnedMembers = COMBINED across both platforms each month
     monthly: [
       { label:"January 2026",      mrr:10850, combinedRev:25560, scRev:9900,  mpRev:15660, newMembers:86, churnedMembers:74, netGrowth:12, trialWins:28, cancelAttempts:58, recoveryRate:10.2 },
       { label:"February 2026",     mrr:11900, combinedRev:27210, scRev:11550, mpRev:15660, newMembers:74, churnedMembers:65, netGrowth:9,  trialWins:22, cancelAttempts:47, recoveryRate:11.8 },
@@ -763,6 +957,23 @@
         labels  : ["Mar 12","Mar 13","Mar 14","Mar 15","Mar 16","Mar 17","Mar 18"],
         visitors: [240, 280, 290, 260, 270, 260, 240]
       }
+    },
+
+    // ── MTD Overview ──────────────────────────────────────────────
+    mtd: {
+      // AOV by week (last 10 weeks) — SureCart
+      aovTrend      : [26.50, 27.20, 28.10, 27.80, 28.90, 29.10, 28.40, 28.80, 29.20, 28.66],
+      aovPrior      : 27.40,   // prior month avg AOV (for % change)
+
+      // Monthly subscription churn rate (cancellationsThisMonth / totalActive * 100)
+      churnRatePct  : 2.04,    // = 20 cancellations / 983 total active
+      churnRatePrior: 2.34,    // prior month
+
+      // Non-SureCart non-subscription products (add any external course revenue here)
+      // SureCart products are auto-pulled from DATA.products by type
+      extraProducts : [
+        { name: "Dan's Signature Course", revenue: 0, units: 0 }  // ⚠️ Update when sales occur
+      ]
     }
 
   }; // ← END OF DATA SECTION
@@ -810,7 +1021,7 @@ const BLUE_PALETTE = ["#1d4ed8","#2563eb","#3b82f6","#60a5fa","#93c5fd"];
 const KPI_CONFIG = [
   { key: "mrr",                  label: "MRR",                    fmt: "currency", good: true  },
   { key: "weeklyRevenue",        label: "Weekly Revenue",         fmt: "currency", good: true  },
-  { key: "activeSubscriptions",  label: "Active Subscriptions",   fmt: "number",   good: true  },
+  { key: "activeSubscriptions",  label: "Total Active Members",   fmt: "number",   good: true  },
   { key: "netGrowth",            label: "Net Member Growth",      fmt: "number",   good: true  },
   { key: "newMembers",           label: "New Members",            fmt: "number",   good: true  },
   { key: "churnedMembers",       label: "Churned Members",        fmt: "number",   good: false },
@@ -876,17 +1087,21 @@ document.getElementById("footer").textContent        =
   const d = DATA.subscriptions;
   const totalNew = d.new.reduce((a,b)=>a+b,0);
   const totalChurned = d.churned.reduce((a,b)=>a+b,0);
-  const curActive = d.active[d.active.length-1];
+  const scActive  = d.active[d.active.length-1];   // SureCart active
+  const mpActive  = DATA.mp.activePaid;              // MemberPress active
+  const totalActive = scActive + mpActive;            // combined
   const net = totalNew - totalChurned;
 
   document.getElementById("subs-scores").innerHTML = [
-    { label: "Active Members",     value: curActive.toLocaleString()          },
-    { label: "New This Week",      value: "+" + totalNew                       },
-    { label: "Churned This Week",  value: totalChurned                         },
-    { label: "Net Change",         value: (net >= 0 ? "+" : "") + net          }
+    { label: "Total Active Members", value: totalActive.toLocaleString(),
+      sub: `SC: ${scActive} · MP: ${mpActive}` },
+    { label: "New This Week",        value: "+" + totalNew,   sub: "SureCart" },
+    { label: "Churned This Week",    value: totalChurned,     sub: "SureCart" },
+    { label: "Net Change",           value: (net >= 0 ? "+" : "") + net, sub: "SureCart" }
   ].map(s => `<div class="score-card">
     <div class="score-label">${s.label}</div>
     <div class="score-value">${s.value}</div>
+    <div style="font-size:11px;color:#9ca3af;margin-top:6px;">${s.sub}</div>
   </div>`).join("");
 
   // Grouped bar: New vs Churned per day
@@ -1600,6 +1815,160 @@ document.getElementById("footer").textContent        =
         <td>${fmtTime(pg.avgSec)}</td>
       </tr>`).join("")}
     </tbody>`;
+})();
+
+// ── MTD Overview ──────────────────────────────────────────────────
+(function buildMTD() {
+  const kc     = DATA.kpis.current;
+  const mp     = DATA.mp;
+  const w      = DATA.weekly;
+  const m      = DATA.mtd;
+  const months = DATA.monthly;
+  const mthCurr = months[months.length - 1];
+  const mthPrev = months[months.length - 2];
+
+  // ── MRR ──────────────────────────────────────────────────────────
+  const mrr      = kc.mrr;
+  const mrrPrior = w.mrr[w.mrr.length - 2];
+  const mrrChgPct = (((mrr - mrrPrior) / mrrPrior) * 100).toFixed(2);
+  document.getElementById("mtd-mrr-val").textContent = "$" + mrr.toLocaleString();
+  const mrrEl = document.getElementById("mtd-mrr-chg");
+  mrrEl.textContent = (mrrChgPct >= 0 ? "▲ +" : "▼ ") + mrrChgPct + "% vs prior wk";
+  mrrEl.style.color = mrrChgPct >= 0 ? "#2563eb" : "#dc2626";
+
+  new Chart(document.getElementById("mtdMrrChart").getContext("2d"), {
+    type: "line",
+    data: { labels: w.labels, datasets: [{ data: w.mrr, borderColor: "#111827", backgroundColor: "rgba(17,24,39,0.07)", fill: true, tension: 0.4, pointRadius: 2.5, borderWidth: 1.5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+  });
+
+  // ── Combined Revenue MTD ──────────────────────────────────────────
+  const revMTD   = mthCurr.combinedRev;
+  const revPrior = mthPrev.combinedRev;
+  const revChgPct = (((revMTD - revPrior) / revPrior) * 100).toFixed(1);
+  document.getElementById("mtd-rev-val").textContent = "$" + revMTD.toLocaleString();
+  const revEl = document.getElementById("mtd-rev-chg");
+  revEl.textContent = (revChgPct >= 0 ? "▲ +" : "▼ ") + Math.abs(revChgPct) + "% vs Feb";
+  revEl.style.color = revChgPct >= 0 ? "#2563eb" : "#dc2626";
+
+  new Chart(document.getElementById("mtdRevChart").getContext("2d"), {
+    type: "bar",
+    data: { labels: w.labels, datasets: [{ data: w.combinedRev, backgroundColor: "rgba(99,102,241,0.55)", borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { display: false } } }
+  });
+
+  // ── Revenue Breakdown ─────────────────────────────────────────────
+  const subTypes    = ["Subscription", "Trial", "Upgrade"];
+  const nonSubTypes = ["Course", "One-time"];
+
+  const scSubRev    = DATA.products.filter(p => subTypes.includes(p.type)).reduce((a, p) => a + p.revenue, 0);
+  const scNonSubItems = DATA.products.filter(p => nonSubTypes.includes(p.type));
+  const scNonSubRev = scNonSubItems.reduce((a, p) => a + p.revenue, 0);
+  const mpSubRev    = mp.mtdRevenue;
+  const totalSubRev = scSubRev + mpSubRev;
+
+  const extraNonSub    = m.extraProducts;
+  const extraNonSubRev = extraNonSub.reduce((a, p) => a + p.revenue, 0);
+  const totalNonSub    = scNonSubRev + extraNonSubRev;
+  const grandTotal     = totalSubRev + totalNonSub;
+
+  const allNonSubItems = [...scNonSubItems, ...extraNonSub];
+
+  const nonSubColors = ["#f59e0b", "#f97316", "#eab308", "#10b981", "#6366f1"];
+
+  document.getElementById("mtd-breakdown").innerHTML = `
+    <div class="mtd-bd-section-label">Subscription Revenue</div>
+    <div class="mtd-bd-row">
+      <div class="mtd-bd-label"><div class="mtd-bd-dot" style="background:#2563eb"></div>SureCart Subscriptions</div>
+      <div class="mtd-bd-val">$${scSubRev.toLocaleString()}</div>
+    </div>
+    <div class="mtd-bd-row">
+      <div class="mtd-bd-label"><div class="mtd-bd-dot" style="background:#7c3aed"></div>MemberPress</div>
+      <div class="mtd-bd-val">$${Math.round(mpSubRev).toLocaleString()}</div>
+    </div>
+    <div class="mtd-bd-subtotal"><span>Total Subscription</span><span>$${totalSubRev.toLocaleString()}</span></div>
+
+    <div class="mtd-bd-section-label" style="margin-top:14px;">Non-Subscription Revenue</div>
+    ${allNonSubItems.map((p, i) => `
+    <div class="mtd-bd-row">
+      <div class="mtd-bd-label"><div class="mtd-bd-dot" style="background:${nonSubColors[i % nonSubColors.length]}"></div>${p.name}</div>
+      <div class="mtd-bd-val">${p.revenue > 0 ? "$" + p.revenue.toLocaleString() : '<span style="color:#d1d5db">—</span>'}</div>
+    </div>`).join("")}
+    <div class="mtd-bd-subtotal"><span>Total Non-Subscription</span><span>$${totalNonSub.toLocaleString()}</span></div>
+
+    <div class="mtd-bd-grand"><span>Grand Total MTD</span><span>$${grandTotal.toLocaleString()}</span></div>
+  `;
+
+  // ── Revenue Split Donut ───────────────────────────────────────────
+  new Chart(document.getElementById("mtdSplitChart").getContext("2d"), {
+    type: "doughnut",
+    data: {
+      labels: ["Subscription", "Non-Subscription"],
+      datasets: [{
+        data: [totalSubRev, totalNonSub],
+        backgroundColor: ["#2563eb", "#f59e0b"],
+        borderWidth: 3, borderColor: "white", hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: "58%",
+      plugins: {
+        legend: { position: "bottom", labels: { usePointStyle: true, pointStyleWidth: 8, padding: 18, font: { size: 13 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: $${ctx.parsed.toLocaleString()} (${((ctx.parsed / grandTotal) * 100).toFixed(1)}%)` } }
+      }
+    }
+  });
+
+  // ── ARR ───────────────────────────────────────────────────────────
+  const arr      = mrr * 12;
+  const arrPrior = mrrPrior * 12;
+  const arrChgPct = (((arr - arrPrior) / arrPrior) * 100).toFixed(2);
+  document.getElementById("mtd-arr-val").textContent = "$" + arr.toLocaleString();
+  const arrEl = document.getElementById("mtd-arr-chg");
+  arrEl.textContent = (arrChgPct >= 0 ? "▲ +" : "▼ ") + arrChgPct + "% vs prior wk";
+  arrEl.style.color = arrChgPct >= 0 ? "#2563eb" : "#dc2626";
+
+  // ── Churn Rate ────────────────────────────────────────────────────
+  const churnRate  = m.churnRatePct;
+  const churnPrior = m.churnRatePrior;
+  const churnDiff  = (churnRate - churnPrior).toFixed(2);
+  document.getElementById("mtd-churn-val").textContent = "-" + churnRate.toFixed(2) + "%";
+  const churnEl = document.getElementById("mtd-churn-chg");
+  churnEl.textContent = (churnDiff <= 0 ? "▲ " : "▼ +") + Math.abs(churnDiff) + "% vs prior mo";
+  churnEl.style.color = churnDiff <= 0 ? "#16a34a" : "#dc2626"; // lower churn = green
+
+  // ── AOV ───────────────────────────────────────────────────────────
+  const aov      = kc.avgOrderValue;
+  const aovPrior = m.aovPrior;
+  const aovChgPct = (((aov - aovPrior) / aovPrior) * 100).toFixed(1);
+  document.getElementById("mtd-aov-val").textContent = "$" + aov.toFixed(2);
+  const aovEl = document.getElementById("mtd-aov-chg");
+  aovEl.textContent = (aovChgPct >= 0 ? "▲ +" : "▼ ") + aovChgPct + "% vs prior mo";
+  aovEl.style.color = aovChgPct >= 0 ? "#2563eb" : "#dc2626";
+
+  // ── AOV Trend Chart ───────────────────────────────────────────────
+  new Chart(document.getElementById("mtdAovChart").getContext("2d"), {
+    type: "line",
+    data: {
+      labels: w.labels,
+      datasets: [{
+        label: "AOV",
+        data: m.aovTrend,
+        borderColor: "#f59e0b",
+        backgroundColor: "rgba(245,158,11,0.08)",
+        fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: false, grid: { color: GRID_COLOR }, ticks: { callback: v => "$" + v.toFixed(2) } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
 })();
 
 // ── Tab Switching ─────────────────────────────────────────────────
