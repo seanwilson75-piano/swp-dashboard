@@ -484,6 +484,16 @@
     <!-- Combined revenue banner -->
     <div id="combined-banner" class="three-col-banner"></div>
     <div id="kpi-grid" class="kpi-grid"></div>
+    <!-- Insights panel — hidden until insights are generated -->
+    <div class="card section-gap" id="insights-card" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+        <span style="font-size:16px;">📌</span>
+        <div class="card-title" style="margin-bottom:0;">This Week's Notes</div>
+      </div>
+      <div class="card-subtitle">Opportunities and actions worth your attention — updated each week</div>
+      <div id="insights-panel"></div>
+    </div>
+
     <div class="card section-gap">
       <div class="card-title">Revenue by Product <span style="font-size:11px;font-weight:500;color:#9ca3af;margin-left:6px;">(SureCart, this week)</span></div>
       <div class="card-subtitle" id="rev-subtitle"></div>
@@ -1969,6 +1979,95 @@ document.getElementById("footer").textContent        =
       }
     }
   });
+})();
+
+// ── Weekly Insights ───────────────────────────────────────────────
+(function buildInsights() {
+  const kc   = DATA.kpis.current;
+  const kp   = DATA.kpis.prior;
+  const mp   = DATA.mp;
+  const tips = [];
+
+  const TAG = {
+    Revenue : { color: "#16a34a", bg: "#f0fdf4" },
+    Action  : { color: "#2563eb", bg: "#eff6ff" },
+    Watch   : { color: "#d97706", bg: "#fffbeb" },
+    Growth  : { color: "#7c3aed", bg: "#f5f3ff" }
+  };
+
+  // ── Rule 1: Abandoned checkout recovery opportunity ──────────────
+  // Only fire if abandoned value is meaningful AND recovery rate is low
+  if (kc.abandonedValue > 400 && kc.recoveryRatePct < 20) {
+    const est = Math.round(kc.abandonedValue * 0.17);
+    tips.push({ tag: "Action", icon: "💰",
+      text: `You have <strong>$${kc.abandonedValue.toLocaleString()} in abandoned checkouts</strong> this week with only a ${kc.recoveryRatePct.toFixed(1)}% recovery rate. A 2-email sequence sent within 1–24h typically recovers 15–20% — roughly <strong>$${est} back</strong> with no additional ad spend.`
+    });
+  }
+
+  // ── Rule 2: MemberPress failed renewals — passive churn risk ────
+  // Only fire if count is high enough to be actionable
+  if (mp.failedRenewals > 45) {
+    tips.push({ tag: "Watch", icon: "⚠️",
+      text: `<strong>${mp.failedRenewals} failed MemberPress renewal attempts</strong> this month. These are members whose cards declined — they haven't churned intentionally. A single "payment failed" dunning email can recover several hundred dollars before they even notice.`
+    });
+  }
+
+  // ── Rule 3: Strong non-subscription product — double down ────────
+  const bestNonSub = DATA.products
+    .filter(p => p.type === "Course" || p.type === "One-time")
+    .sort((a, b) => b.convRate - a.convRate)[0];
+  if (bestNonSub && bestNonSub.convRate > 12 && bestNonSub.units > 20) {
+    tips.push({ tag: "Growth", icon: "📈",
+      text: `<strong>"${bestNonSub.name}"</strong> is converting at <strong>${bestNonSub.convRate}%</strong> (${bestNonSub.units} units this month). That's a high-performing offer. If it's not already on every relevant checkout as an order bump, that's the next move.`
+    });
+  }
+
+  // ── Rule 4: Trials with strong win rate — nurture the pipeline ───
+  const totalTrialPool = kc.activeTrials + kc.trialWins;
+  const trialWinRate = totalTrialPool > 0 ? ((kc.trialWins / totalTrialPool) * 100) : 0;
+  if (kc.activeTrials >= 10 && trialWinRate >= 30) {
+    tips.push({ tag: "Growth", icon: "🎯",
+      text: `Trial-to-paid conversion is running at <strong>${trialWinRate.toFixed(0)}%</strong> with ${kc.activeTrials} trials still active. That's a healthy pipeline. Make sure your trial follow-up sequence sends at day 3 and day 6 — most conversions happen before day 7.`
+    });
+  }
+
+  // ── Rule 5: Net membership growth positive — reinforce ───────────
+  if (kc.netGrowth > 0 && kc.newMembers > kc.churnedMembers * 1.2) {
+    tips.push({ tag: "Growth", icon: "✅",
+      text: `New members (${kc.newMembers}) are outpacing churn (${kc.churnedMembers}) by a healthy margin — net +${kc.netGrowth} this week. This is the compounding metric. Anything that brings in even 2–3 more trials per week has an outsized long-term effect on MRR.`
+    });
+  }
+
+  // ── Rule 6: AOV below prior period — actionable if gap is big ────
+  const aovDrop = kc.avgOrderValue - DATA.mtd.aovPrior;
+  if (aovDrop < -2.00) {
+    tips.push({ tag: "Action", icon: "🛒",
+      text: `AOV is down <strong>$${Math.abs(aovDrop).toFixed(2)}</strong> vs last month. Check whether order bumps are showing on active checkout flows — a single bump accepted per 10 orders at $27 adds ~$2.70 to your AOV immediately.`
+    });
+  }
+
+  // ── Cap at 4 tips max — prioritize Action > Watch > Growth ───────
+  const ordered = [
+    ...tips.filter(t => t.tag === "Action"),
+    ...tips.filter(t => t.tag === "Watch"),
+    ...tips.filter(t => t.tag === "Growth"),
+    ...tips.filter(t => t.tag === "Revenue")
+  ].slice(0, 4);
+
+  if (ordered.length === 0) return; // nothing to flag this week
+
+  document.getElementById("insights-card").style.display = "block";
+  document.getElementById("insights-panel").innerHTML = ordered.map((tip, i) => {
+    const t = TAG[tip.tag];
+    const isLast = i === ordered.length - 1;
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:13px 0;${isLast ? "" : "border-bottom:1px solid #f3f4f6;"}">
+      <span style="font-size:18px;line-height:1.2;flex-shrink:0;">${tip.icon}</span>
+      <div>
+        <span style="display:inline-block;background:${t.bg};color:${t.color};font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:10px;margin-bottom:5px;">${tip.tag}</span>
+        <div style="font-size:13px;color:#374151;line-height:1.6;">${tip.text}</div>
+      </div>
+    </div>`;
+  }).join("");
 })();
 
 // ── Tab Switching ─────────────────────────────────────────────────
