@@ -1139,24 +1139,24 @@
   {
     currentWeek : "Mar 15–21, 2026",
     priorWeek   : "Mar 8–14, 2026",
-    lastUpdated : "March 20, 2026",
+    lastUpdated : "March 22, 2026",
 
     kpis: {
       current: {
-        mrr                  : 12327,
-        weeklyRevenue        : 2255,
+        mrr                  : 12269,
+        weeklyRevenue        : 2758,
         activeSubscriptions  : 985,   // SC 401 + MP 584
-        netGrowth            : 5,
-        newMembers           : 16,
-        churnedMembers       : 12,
+        netGrowth            : 9,
+        newMembers           : 20,
+        churnedMembers       : 11,
         trialWins            : 7,
-        activeTrials         : 15,
-        totalOrders          : 79,
-        avgOrderValue        : 28.54,
-        cancellationAttempts : 10,
-        recoveryRatePct      : 12.5,
-        recoverableRevenue   : 948,
-        abandonedValue       : 948
+        activeTrials         : 14,
+        totalOrders          : 93,
+        avgOrderValue        : 29.66,
+        cancellationAttempts : 11,
+        recoveryRatePct      : 15.4,
+        recoverableRevenue   : 736,
+        abandonedValue       : 736
       },
       prior: {
         mrr                  : 12174,
@@ -1177,17 +1177,17 @@
     },
 
     revenue: [
-      { label: "Basic Membership",    value: 1303 },
-      { label: "$1 Trial",            value: 502  },
-      { label: "Premium Membership",  value: 329  },
-      { label: "Other / One-time",    value: 121  }
+      { label: "Basic Membership",    value: 1594 },
+      { label: "$1 Trial",            value: 614  },
+      { label: "Premium Membership",  value: 402  },
+      { label: "Other / One-time",    value: 148  }
     ],
 
     subscriptions: {
       labels  : ["Mar 15","Mar 16","Mar 17","Mar 18","Mar 19","Mar 20","Mar 21"],
-      active  : [397, 396, 396, 398, 400, 402, 401],
-      new     : [2,   3,   5,   3,   3,   0,   0  ],
-      churned : [3,   3,   3,   1,   1,   1,   0  ]
+      active  : [394, 396, 397, 398, 399, 399, 401],
+      new     : [4,   4,   3,   3,   2,   1,   3  ],
+      churned : [2,   2,   2,   2,   1,   1,   1  ]
     },
 
     cancellations: [
@@ -1198,61 +1198,61 @@
 
     abandoned: {
       labels       : ["Mar 15","Mar 16","Mar 17","Mar 18","Mar 19","Mar 20","Mar 21"],
-      abandonments : [7, 5, 4, 3, 4, 1, 0],
-      value        : [35, 133, 4, 742, 33, 1, 0],
-      recovered    : [0, 2, 1, 0, 0, 0, 0]
+      abandonments : [7, 5, 4, 3, 4, 1, 2],
+      value        : [35, 133, 4, 453, 33, 1, 77],
+      recovered    : [0, 2, 1, 1, 0, 0, 0]
     },
 
     trials: {
       labels : ["Mar 15","Mar 16","Mar 17","Mar 18","Mar 19","Mar 20","Mar 21"],
-      active : [21, 20, 20, 18, 17, 16, 15],
+      active : [21, 20, 19, 18, 17, 15, 14],
       won    : [1,  1,  2,  1,  1,  1,  0 ]
     },
 
     mp: {
       activePaid          : 584,
-      activeFree          : 588,
-      mtdRevenue          : 2978,
-      failedRenewals      : 17,
-      avgLifetimeVal      : 262.39,
-      signupsThisMonth    : 6,
-      cancellationsThisMonth : 5,
-      weeklyRevenue: { current: 2978, prior: 3298 },
+      activeFree          : 586,
+      mtdRevenue          : 10514,
+      failedRenewals      : 21,
+      avgLifetimeVal      : 262.47,
+      signupsThisMonth    : 17,
+      cancellationsThisMonth : 26,
+      weeklyRevenue: { current: 3447, prior: 3298 },
       daily: {
         labels       : ["Mar 15","Mar 16","Mar 17","Mar 18","Mar 19","Mar 20","Mar 21"],
-        revenue      : [380, 663, 637, 663.75, 288, 346, 0],
-        transactions : [13, 22, 23, 11, 16, 13, 0],
-        failed       : [2,  5,  3,  2,  3,  2,  0]
+        revenue      : [380, 663, 637, 663.75, 288, 413, 402],
+        transactions : [13, 22, 23, 11, 16, 15, 16],
+        failed       : [2,  5,  3,  2,  3,  2,  4]
       },
       monthly12: {
         labels        : ["Mar'25","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan'26","Feb","Mar'26"],
-        signups       : [136, 38, 21, 12, 21, 15, 15, 18, 21, 27, 19, 10, 14],
-        cancellations : [145,105, 84, 58, 64, 49, 55, 46, 38, 52, 42, 24, 20],
-        growth        : [ -9,-68,-64,-46,-43,-34,-40,-28,-17,-25,-23,-14, -6]
+        signups       : [136, 38, 21, 12, 21, 15, 15, 18, 21, 27, 19, 10, 17],
+        cancellations : [145,105, 84, 58, 64, 49, 55, 46, 38, 52, 42, 24, 26],
+        growth        : [ -9,-68,-64,-46,-43,-34,-40,-28,-17,-25,-23,-14, -9]
       }
     },
 
     weekly: {
       labels        : ["Jan 22","Jan 29","Feb 5","Feb 12","Feb 19","Feb 26","Mar 1","Mar 8","Mar 15","Mar 22"],
-      mrr           : [10680, 10850, 11100, 11350, 11620, 11864, 11879, 12174, 12327, 12327],
-      combinedRev   : [6380,  6220,  6580,  6720,  6850,  6440,  7534,  6435,  5233,  5233 ],
-      scRev         : [2720,  2340,  2880,  2960,  3050,  2640,  3765,  3137,  2255,  2255 ],
-      mpRev         : [3660,  3880,  3700,  3760,  3800,  3800,  3769,  3298,  2978,  2978 ],
-      newMembers    : [24, 21, 23, 21, 20, 18, 17, 20, 16, 16],
-      churnedMembers: [19, 18, 17, 17, 16, 15, 12, 12, 12, 12],
-      netGrowth     : [ 5,  3,  6,  4,  4,  3,  5,  8,  4,  4]
+      mrr           : [10680, 10850, 11100, 11350, 11620, 11864, 11879, 12174, 12269, 12269],
+      combinedRev   : [6380,  6220,  6580,  6720,  6850,  6440,  7534,  6435,  6205,  6205 ],
+      scRev         : [2720,  2340,  2880,  2960,  3050,  2640,  3765,  3137,  2758,  2758 ],
+      mpRev         : [3660,  3880,  3700,  3760,  3800,  3800,  3769,  3298,  3447,  3447 ],
+      newMembers    : [24, 21, 23, 21, 20, 18, 17, 20, 20, 20],
+      churnedMembers: [19, 18, 17, 17, 16, 15, 12, 12, 11, 11],
+      netGrowth     : [ 5,  3,  6,  4,  4,  3,  5,  8,  9,  9]
     },
 
     monthly: [
       { label:"January 2026",      mrr:10850, combinedRev:25560, scRev:9900,  mpRev:15660, newMembers:86, churnedMembers:74, netGrowth:12, trialWins:28, cancelAttempts:58, recoveryRate:10.2 },
       { label:"February 2026",     mrr:11900, combinedRev:27210, scRev:11550, mpRev:15660, newMembers:74, churnedMembers:65, netGrowth:9,  trialWins:22, cancelAttempts:47, recoveryRate:11.8 },
-      { label:"March 2026 (WTD)",  mrr:12327, combinedRev:19168, scRev:9157,  mpRev:10011, newMembers:53, churnedMembers:36, netGrowth:17, trialWins:19, cancelAttempts:36, recoveryRate:16.0 }
+      { label:"March 2026 (WTD)",  mrr:12269, combinedRev:20174, scRev:9660,  mpRev:10514, newMembers:57, churnedMembers:35, netGrowth:22, trialWins:19, cancelAttempts:37, recoveryRate:15.4 }
     ],
 
     products: [
-      { name:"Basic Membership",        type:"Subscription", price:29, units:45, revenue:1303, convRate:17.6, pos:"core",   rec:"Core offer — 45 signups, best of the 3 weeks. Hold pricing."                 },
-      { name:"$1 Trial",                type:"Trial",        price:1,  units:24, revenue:24,   convRate:18.8, pos:"entry",  rec:"Entry hook — trial volume dropped vs prior week. Check ad spend."            },
-      { name:"Premium Membership",      type:"Subscription", price:47, units:7,  revenue:329,  convRate:5.5,  pos:"upsell", rec:"Post-purchase Upsell — solid. Keep offering after Basic checkout."           },
+      { name:"Basic Membership",        type:"Subscription", price:29, units:61, revenue:1594, convRate:18.5, pos:"core",   rec:"Core offer — solid week. Renewals strong; hold pricing."                     },
+      { name:"$1 Trial",                type:"Trial",        price:1,  units:12, revenue:12,   convRate:12.9, pos:"entry",  rec:"Entry hook — 12 new trials this week. Monitor 7-day conversion closely."    },
+      { name:"Premium Membership",      type:"Subscription", price:47, units:10, revenue:402,  convRate:5.8,  pos:"upsell", rec:"Post-purchase Upsell — steady. Keep offering after Basic checkout."          },
       { name:"Dan's Signature Sounds",  type:"Course",       price:47, units:1,  revenue:47,   convRate:0.8,  pos:"upsell", rec:"Course Upsell — low volume. Test as email offer to existing members."        },
       { name:"Master Beginner 4 Days",  type:"Course",       price:27, units:1,  revenue:27,   convRate:0.8,  pos:"bump",   rec:"Order Bump — test on $1 trial checkout as low-friction add-on."              },
       { name:"Coaching Session",        type:"One-time",     price:47, units:1,  revenue:47,   convRate:0.8,  pos:"upsell", rec:"Coaching Upsell — book via email. Target members who stalled in roadmap."   }
@@ -1282,10 +1282,10 @@
     },
 
     mtd: {
-      aovTrend      : [26.50, 27.20, 28.10, 27.80, 28.90, 29.10, 28.40, 28.80, 30.76, 28.54],
-      aovPrior      : 30.76,
-      churnRatePct  : 2.04,
-      churnRatePrior: 1.96,
+      aovTrend      : [27.20, 28.10, 27.80, 28.90, 29.10, 28.40, 28.80, 30.76, 28.54, 29.66],
+      aovPrior      : 28.54,
+      churnRatePct  : 1.12,
+      churnRatePrior: 2.04,
       extraProducts : [{ name: "Dan's Signature Course", revenue: 47, units: 1 }]
     }
   }
