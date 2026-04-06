@@ -509,7 +509,8 @@
     <button class="period-btn" data-period="0" onclick="setPeriod(0)">Mar 1–7</button>
     <button class="period-btn" data-period="1" onclick="setPeriod(1)">Mar 8–14</button>
     <button class="period-btn" data-period="2" onclick="setPeriod(2)">Mar 15–21</button>
-    <button class="period-btn current-tag active" data-period="3" onclick="setPeriod(3)">Mar 22–28</button>
+    <button class="period-btn" data-period="3" onclick="setPeriod(3)">Mar 22–28</button>
+    <button class="period-btn current-tag active" data-period="4" onclick="setPeriod(4)">Mar 29–Apr 4</button>
   </div>
 
   <!-- Tabs -->
@@ -1445,9 +1446,164 @@
     }
   }
 
+
+  // ─────────────────────── PERIOD 4: Mar 29–Apr 4 (current) ─────────────
+  {
+    currentWeek : "Mar 29\u2013Apr 4, 2026",
+    priorWeek   : "Mar 22\u201328, 2026",
+    lastUpdated : "April 5, 2026",
+
+    kpis: {
+      current: {
+        mrr                  : 12488,
+        weeklyRevenue        : 2085,
+        activeSubscriptions  : 958,   // SC 386 + MP paid 572
+        netGrowth            : -8,
+        newMembers           : 18,
+        churnedMembers       : 26,
+        trialWins            : 7,
+        activeTrials         : 19,
+        totalOrders          : 89,
+        avgOrderValue        : 23.43,
+        cancellationAttempts : 11,
+        recoveryRatePct      : 0,
+        recoverableRevenue   : 212,
+        abandonedValue       : 212
+      },
+      prior: {
+        mrr                  : 12576,
+        weeklyRevenue        : 3709,
+        activeSubscriptions  : 966,
+        netGrowth            : 11,
+        newMembers           : 21,
+        churnedMembers       : 10,
+        trialWins            : 7,
+        activeTrials         : 18,
+        totalOrders          : 130,
+        avgOrderValue        : 28.53,
+        cancellationAttempts : 22,
+        recoveryRatePct      : 27.3,
+        recoverableRevenue   : 192,
+        abandonedValue       : 192
+      }
+    },
+
+    revenue: [
+      { label: "Basic Membership",    value: 1738 },
+      { label: "$1 Trial",            value: 17   },
+      { label: "Premium Membership",  value: 235  },
+      { label: "Other / One-time",    value: 95   }
+    ],
+
+    subscriptions: {
+      labels  : ["Mar 29","Mar 30","Mar 31","Apr 1","Apr 2","Apr 3","Apr 4"],
+      active  : [385, 383, 386, 386, 385, 385, 386],
+      new     : [0,   0,   6,   3,   3,   4,   2  ],
+      churned : [1,   2,   3,   3,   4,   4,   1  ]
+    },
+
+    cancellations: [
+      { reason: "Too busy",         count: 5, revenueLost: 145, action: "Add pause option"    },
+      { reason: "Too expensive",    count: 3, revenueLost: 87,  action: "Offer 20% discount"  },
+      { reason: "Not using it",     count: 2, revenueLost: 58,  action: "Re-engagement email" }
+    ],
+
+    abandoned: {
+      labels       : ["Mar 29","Mar 30","Mar 31","Apr 1","Apr 2","Apr 3","Apr 4"],
+      abandonments : [0, 1, 2, 0, 2, 4, 2],
+      value        : [0, 1, 2, 0, 30, 105, 74],
+      recovered    : [0, 0, 0, 0,  0,   0,  0]
+    },
+
+    trials: {
+      labels : ["Mar 29","Mar 30","Mar 31","Apr 1","Apr 2","Apr 3","Apr 4"],
+      active : [18, 20, 21, 19, 18, 18, 19],
+      won    : [0,  1,  1,  2,  2,  1,  1 ]
+    },
+
+    mp: {
+      activePaid          : 572,
+      activeFree          : 597,
+      mtdRevenue          : 1243,
+      failedRenewals      : 20,
+      avgLifetimeVal      : 262.95,
+      signupsThisMonth    : 0,
+      cancellationsThisMonth : 4,
+      weeklyRevenue: { current: 2694, prior: 3938 },
+      daily: {
+        labels       : ["Mar 29","Mar 30","Mar 31","Apr 1","Apr 2","Apr 3","Apr 4"],
+        revenue      : [537, 324, 590, 760, 454, 29, 0],
+        transactions : [21,  13,  23,  29,  18,  1,  0],
+        failed       : [12,   3,   2,   2,   2,  1,  0]
+      },
+      monthly12: {
+        labels        : ["Apr'25","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan'26","Feb","Mar","Apr'26"],
+        signups       : [38, 21, 12, 21, 15, 15, 18, 21, 27, 19, 10, 20, 0],
+        cancellations : [105, 84, 58, 64, 49, 55, 46, 38, 52, 42, 24, 34, 4],
+        growth        : [-68,-64,-46,-43,-34,-40,-28,-17,-25,-23,-14,-14,-4]
+      }
+    },
+
+    weekly: {
+      labels        : ["Feb 5","Feb 12","Feb 19","Feb 26","Mar 1","Mar 8","Mar 15","Mar 22","Mar 29","Apr 5"],
+      mrr           : [11100, 11350, 11620, 11864, 11879, 12174, 12269, 12576, 12488, 12488],
+      combinedRev   : [6580,  6720,  6850,  6440,  7534,  6435,  6205,  7647,  4779,  4779 ],
+      scRev         : [2880,  2960,  3050,  2640,  3765,  3137,  2758,  3709,  2085,  2085 ],
+      mpRev         : [3700,  3760,  3800,  3800,  3769,  3298,  3447,  3938,  2694,  2694 ],
+      newMembers    : [23, 21, 20, 18, 17, 20, 20, 21, 18, 18],
+      churnedMembers: [17, 17, 16, 15, 12, 12, 11, 10, 26, 26],
+      netGrowth     : [ 6,  4,  4,  3,  5,  8,  9, 11, -8, -8]
+    },
+
+    monthly: [
+      { label:"January 2026",     mrr:10850, combinedRev:25560, scRev:9900,  mpRev:15660, newMembers:86, churnedMembers:74, netGrowth:12, trialWins:28, cancelAttempts:58, recoveryRate:10.2 },
+      { label:"February 2026",    mrr:11900, combinedRev:27210, scRev:11550, mpRev:15660, newMembers:74, churnedMembers:65, netGrowth:9,  trialWins:22, cancelAttempts:47, recoveryRate:11.8 },
+      { label:"March 2026",       mrr:12576, combinedRev:29550, scRev:13647, mpRev:15903, newMembers:84, churnedMembers:51, netGrowth:33, trialWins:28, cancelAttempts:66, recoveryRate:15.2 },
+      { label:"April 2026 (WTD)", mrr:12488, combinedRev:3050,  scRev:1807,  mpRev:1243,  newMembers:12, churnedMembers:13, netGrowth:-1, trialWins:5,  cancelAttempts:8,  recoveryRate:0    }
+    ],
+
+    products: [
+      { name:"Basic Membership",   type:"Subscription", price:29, units:72, revenue:1738, convRate:20.1, pos:"core",   rec:"Core offer \u2014 72 renewal orders this week. SC volume lighter than prior week; monitor billing cycle overlap."  },
+      { name:"$1 Trial",           type:"Trial",        price:1,  units:17, revenue:17,   convRate:15.4, pos:"entry",  rec:"Entry hook \u2014 17 new trials this week. 7 converted. Keep nurture sequence active."                            },
+      { name:"Premium Membership", type:"Subscription", price:47, units:5,  revenue:235,  convRate:9.8,  pos:"upsell", rec:"Post-checkout Upsell \u2014 lighter Premium week. Test prominent CTA placement post-trial conversion."              },
+      { name:"Other / One-time",   type:"One-time",     price:18, units:5,  revenue:95,   convRate:2.8,  pos:"bump",   rec:"Bumps and add-ons. Review checkout page for highest-converting positions."                                         }
+    ],
+
+    fathom: {
+      uniqueVisitors   : 2400,
+      pageviews        : 16500,
+      avgSessionSec    : 542,
+      bounceRatePct    : 1,
+      prior: { uniqueVisitors: 2700, pageviews: 20800, avgSessionSec: 600, bounceRatePct: 3 },
+      sources: [
+        { label:"Paid/Campaign",  visitors:1060, pct:44.2, convRate:2.8 },
+        { label:"Direct",         visitors:991,  pct:41.3, convRate:5.2 },
+        { label:"Organic",        visitors:209,  pct:8.7,  convRate:1.9 },
+        { label:"Social/Other",   visitors:140,  pct:5.8,  convRate:1.0 }
+      ],
+      topPages: [
+        { page:"/join-for-1-today/",            views:1900, avgSec:190 },
+        { page:"/join-membership-today-trial/", views:1800, avgSec:188 },
+        { page:"/membership-homepage/",         views:863,  avgSec:135 }
+      ],
+      daily: {
+        labels  : ["Mar 29","Mar 30","Mar 31","Apr 1","Apr 2","Apr 3","Apr 4"],
+        visitors: [280, 380, 360, 350, 380, 380, 270]
+      }
+    },
+
+    mtd: {
+      aovTrend      : [27.80, 28.90, 29.10, 28.40, 28.80, 30.76, 28.54, 29.66, 28.53, 23.43],
+      aovPrior      : 28.53,
+      churnRatePct  : 2.71,
+      churnRatePrior: 1.15,
+      extraProducts : [{ name: "Dan's Signature Course", revenue: 47, units: 1 }]
+    }
+  }
+
   ]; // \u2190 END OF PERIODS
 
-  var _activePeriod = 3;
+  var _activePeriod = 4;
   var DATA = PERIODS[_activePeriod];
   // ← END OF DATA SECTION
 // ════════════════════════════════════════════════════════════════
