@@ -510,7 +510,8 @@
     <button class="period-btn" data-period="1" onclick="setPeriod(1)">Mar 8–14</button>
     <button class="period-btn" data-period="2" onclick="setPeriod(2)">Mar 15–21</button>
     <button class="period-btn" data-period="3" onclick="setPeriod(3)">Mar 22–28</button>
-    <button class="period-btn current-tag active" data-period="4" onclick="setPeriod(4)">Mar 29–Apr 4</button>
+    <button class="period-btn" data-period="4" onclick="setPeriod(4)">Mar 29–Apr 4</button>
+    <button class="period-btn current-tag active" data-period="5" onclick="setPeriod(5)">Apr 5–11</button>
   </div>
 
   <!-- Tabs -->
@@ -1600,10 +1601,168 @@
       extraProducts : [{ name: "Dan's Signature Course", revenue: 47, units: 1 }]
     }
   }
+  ,
+
+  // ─────────────────────── PERIOD 5: Apr 5–11 (current) ─────────────
+  {
+    currentWeek : "Apr 5\u201311, 2026",
+    priorWeek   : "Mar 29\u2013Apr 4, 2026",
+    lastUpdated : "April 12, 2026",
+
+    kpis: {
+      current: {
+        mrr                  : 12118,   // SC MRR from SC dashboard
+        weeklyRevenue        : 2442,    // SC revenue Apr 5-11
+        activeSubscriptions  : 956,     // SC 391 + MP paid 565
+        netGrowth            : -2,
+        newMembers           : 23,      // SC 22 + MP 1
+        churnedMembers       : 25,      // SC ~17 + MP 8
+        trialWins            : 10,
+        activeTrials         : 13,      // current SC trialing count
+        totalOrders          : 105,
+        avgOrderValue        : 23.26,
+        cancellationAttempts : 19,      // from SC dashboard
+        recoveryRatePct      : 3.3,     // 1 recovered / 30 abandoned
+        recoverableRevenue   : 1194,
+        abandonedValue       : 1194
+      },
+      prior: {
+        mrr                  : 12488,
+        weeklyRevenue        : 2085,
+        activeSubscriptions  : 958,
+        netGrowth            : -8,
+        newMembers           : 18,
+        churnedMembers       : 26,
+        trialWins            : 7,
+        activeTrials         : 19,
+        totalOrders          : 89,
+        avgOrderValue        : 23.43,
+        cancellationAttempts : 11,
+        recoveryRatePct      : 0,
+        recoverableRevenue   : 212,
+        abandonedValue       : 212
+      }
+    },
+
+    revenue: [
+      { label: "Basic Membership",    value: 1740 },
+      { label: "$1 Trial",            value: 24   },
+      { label: "Premium Membership",  value: 235  },
+      { label: "Other / One-time",    value: 443  }
+    ],
+
+    subscriptions: {
+      labels  : ["Apr 5","Apr 6","Apr 7","Apr 8","Apr 9","Apr 10","Apr 11"],
+      active  : [385, 386, 386, 388, 390, 389, 391],
+      new     : [2,   3,   2,   5,   4,   2,   4  ],
+      churned : [3,   2,   2,   3,   2,   3,   2  ]
+    },
+
+    cancellations: [
+      { reason: "Too busy",         count: 7, revenueLost: 203, action: "Add pause option"    },
+      { reason: "Too expensive",    count: 5, revenueLost: 145, action: "Offer 20% discount"  },
+      { reason: "Not using it",     count: 4, revenueLost: 116, action: "Re-engagement email" },
+      { reason: "Technical issues", count: 2, revenueLost: 58,  action: "1:1 tech support"    }
+    ],
+
+    abandoned: {
+      labels       : ["Apr 5","Apr 6","Apr 7","Apr 8","Apr 9","Apr 10","Apr 11"],
+      abandonments : [2,  2,   7,   2,   0,   8,   9  ],
+      value        : [31, 31, 388,  13,   0, 486, 245  ],
+      recovered    : [0,  0,   1,   0,   0,   0,   0  ]
+    },
+
+    trials: {
+      labels : ["Apr 5","Apr 6","Apr 7","Apr 8","Apr 9","Apr 10","Apr 11"],
+      active : [20, 22, 23, 25, 24, 19, 13],
+      won    : [1,  1,  2,  2,  1,  2,  1 ]
+    },
+
+    mp: {
+      activePaid          : 565,
+      activeFree          : 598,
+      mtdRevenue          : 6089,
+      failedRenewals      : 17,
+      avgLifetimeVal      : 263.59,
+      signupsThisMonth    : 1,
+      cancellationsThisMonth : 12,
+      weeklyRevenue: { current: 3877, prior: 2694 },
+      daily: {
+        labels       : ["Apr 5","Apr 6","Apr 7","Apr 8","Apr 9","Apr 10","Apr 11"],
+        revenue      : [454, 313, 517, 429, 796, 722, 646],
+        transactions : [18,  13,  19,  17,  27,  21,  27 ],
+        failed       : [3,   4,   1,   2,   2,   4,   1  ]
+      },
+      monthly12: {
+        labels        : ["Apr'25","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan'26","Feb","Mar","Apr'26"],
+        signups       : [38, 21, 12, 21, 15, 15, 18, 21, 27, 19, 10, 20, 1],
+        cancellations : [105, 84, 58, 64, 49, 55, 46, 38, 52, 42, 24, 34, 12],
+        growth        : [-68,-64,-46,-43,-34,-40,-28,-17,-25,-23,-14,-14,-11]
+      }
+    },
+
+    weekly: {
+      labels        : ["Feb 12","Feb 19","Feb 26","Mar 1","Mar 8","Mar 15","Mar 22","Mar 29","Apr 5","Apr 12"],
+      mrr           : [11350, 11620, 11864, 11879, 12174, 12269, 12576, 12488, 12118, 12118],
+      combinedRev   : [6720,  6850,  6440,  7534,  6435,  6205,  7647,  4779,  6319,  6319 ],
+      scRev         : [2960,  3050,  2640,  3765,  3137,  2758,  3709,  2085,  2442,  2442 ],
+      mpRev         : [3760,  3800,  3800,  3769,  3298,  3447,  3938,  2694,  3877,  3877 ],
+      newMembers    : [21, 20, 18, 17, 20, 20, 21, 18, 23, 23],
+      churnedMembers: [17, 16, 15, 12, 12, 11, 10, 26, 25, 25],
+      netGrowth     : [ 4,  4,  3,  5,  8,  9, 11, -8, -2, -2]
+    },
+
+    monthly: [
+      { label:"January 2026",     mrr:10850, combinedRev:25560, scRev:9900,  mpRev:15660, newMembers:86, churnedMembers:74, netGrowth:12, trialWins:28, cancelAttempts:58, recoveryRate:10.2 },
+      { label:"February 2026",    mrr:11900, combinedRev:27210, scRev:11550, mpRev:15660, newMembers:74, churnedMembers:65, netGrowth:9,  trialWins:22, cancelAttempts:47, recoveryRate:11.8 },
+      { label:"March 2026",       mrr:12576, combinedRev:29550, scRev:13647, mpRev:15903, newMembers:84, churnedMembers:51, netGrowth:33, trialWins:28, cancelAttempts:66, recoveryRate:15.2 },
+      { label:"April 2026 (WTD)", mrr:12118, combinedRev:10338, scRev:4249,  mpRev:6089,  newMembers:35, churnedMembers:38, netGrowth:-3, trialWins:15, cancelAttempts:27, recoveryRate:3.3  }
+    ],
+
+    products: [
+      { name:"Basic Membership",   type:"Subscription", price:29, units:60, revenue:1740, convRate:17.5, pos:"core",   rec:"Core offer \u2014 60 orders this week (renewals + new). SC volume up vs prior week." },
+      { name:"$1 Trial",           type:"Trial",        price:1,  units:24, revenue:24,   convRate:32.0, pos:"entry",  rec:"Entry hook \u2014 24 new trials this week. 10 converted. Keep nurture sequence active." },
+      { name:"Premium Membership", type:"Subscription", price:47, units:5,  revenue:235,  convRate:8.5,  pos:"upsell", rec:"Post-checkout Upsell \u2014 5 orders. Test more prominent CTA post-trial conversion." },
+      { name:"Other / One-time",   type:"One-time",     price:28, units:16, revenue:443,  convRate:3.1,  pos:"bump",   rec:"Bumps and add-ons including April Focus Bundle. Monitor bundle page conversion this week." }
+    ],
+
+    fathom: {
+      uniqueVisitors   : 2600,
+      pageviews        : 19900,
+      avgSessionSec    : 552,
+      bounceRatePct    : 1,
+      prior: { uniqueVisitors: 2400, pageviews: 16500, avgSessionSec: 542, bounceRatePct: 1 },
+      sources: [
+        { label:"Direct",         visitors:1400, pct:53.8, convRate:4.8 },
+        { label:"Paid/Social",    visitors:772,  pct:29.7, convRate:3.5 },
+        { label:"Organic/Search", visitors:271,  pct:10.4, convRate:2.4 },
+        { label:"YouTube/Other",  visitors:157,  pct:6.0,  convRate:1.2 }
+      ],
+      topPages: [
+        { page:"/join-for-1-today/",            views:1300, avgSec:190 },
+        { page:"/join-membership-today-trial/", views:1400, avgSec:185 },
+        { page:"/april-focus-bundle-2026/",     views:922,  avgSec:220 },
+        { page:"/membership-homepage/",         views:1100, avgSec:130 },
+        { page:"/login/",                       views:847,  avgSec:80  }
+      ],
+      daily: {
+        labels  : ["Apr 5","Apr 6","Apr 7","Apr 8","Apr 9","Apr 10","Apr 11"],
+        visitors: [320, 350, 430, 380, 420, 380, 320]
+      }
+    },
+
+    mtd: {
+      aovTrend      : [28.90, 29.10, 28.40, 28.80, 30.76, 28.54, 29.66, 28.53, 23.43, 23.26],
+      aovPrior      : 23.43,
+      churnRatePct  : 2.61,
+      churnRatePrior: 2.71,
+      extraProducts : [{ name: "Dan's Signature Course", revenue: 0, units: 0 }]
+    }
+  }
 
   ]; // \u2190 END OF PERIODS
 
-  var _activePeriod = 4;
+  var _activePeriod = 5;
   var DATA = PERIODS[_activePeriod];
   // ← END OF DATA SECTION
 // ════════════════════════════════════════════════════════════════
