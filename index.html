@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWP Performance Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #030712; --surface: #0f172a; --surface2: #0a1628;
+    --border: #1e293b; --border2: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --dim: #475569; --faint: #1e293b;
+    --accent: #E8472A; --accent2: #9b1c0a;
+    --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6;
+    --yellow: #f59e0b; --red: #ef4444; --teal: #06b6d4; --pink: #ec4899;
+    --header: linear-gradient(135deg,#0a1628 0%,#0f172a 60%,#0a1628 100%);
+    --pill: #0f172a; --row-alt: #0a1628; --hover: rgba(30,41,59,0.4);
+    --input-bg: #0f172a; --input-border: #334155;
+    --shadow: 0 1px 8px rgba(0,0,0,0.4);
+    --radius: 10px;
+  }
+  [data-theme="light"] {
+    --bg: #f1f5f9; --surface: #ffffff; --surface2: #f8fafc;
+    --border: #e2e8f0; --border2: #cbd5e1;
+    --text: #0f172a; --muted: #475569; --dim: #64748b; --faint: #e2e8f0;
+    --header: linear-gradient(135deg,#ffffff 0%,#f8fafc 60%,#ffffff 100%);
+    --pill: #f1f5f9; --row-alt: #f8fafc; --hover: rgba(226,232,240,0.6);
+    --input-bg: #ffffff; --input-border: #cbd5e1;
+    --shadow: 0 1px 6px rgba(0,0,0,0.08);
+  }
+
+  body { font-family: 'DM Sans','Segoe UI',system-ui,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .2s, color .2s; }
+
+  /* HEADER */
+  .header { background: var(--header); border-bottom: 1px solid var(--border); padding: 16px 24px 0; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .brand { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 7px var(--green); }
+  .brand-label { font-size: 10px; color: var(--dim); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+  .subtitle { font-size: 11px; color: var(--dim); margin-top: 2px; }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  /* PERIOD SWITCHER */
+  .period-switcher { display: flex; gap: 3px; background: var(--pill); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+  .period-btn { padding: 5px 13px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; transition: all .15s; background: transparent; color: var(--dim); }
+  .period-btn.active { background: var(--accent); color: #fff; }
+
+  /* THEME TOGGLE */
+  .theme-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--pill); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; }
+  .tab-btn { padding: 9px 16px; border: none; cursor: pointer; font-size: 13px; font-weight: 700; background: transparent; color: var(--dim); border-bottom: 2px solid transparent; transition: all .15s; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--card-color, var(--blue)); border-radius: var(--radius); padding: 13px 15px; }
+  .kpi-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 5px; }
+  .kpi-value { font-size: 26px; font-weight: 800; color: var(--card-color, var(--blue)); letter-spacing: -.03em; line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+  .kpi-delta { font-size: 11px; font-weight: 700; margin-top: 3px; }
+  .kpi-delta.up { color: var(--green); }
+  .kpi-delta.down { color: var(--red); }
+
+  /* MAIN CONTENT */
+  .main { padding: 18px 24px; max-width: 1100px; margin: 0 auto; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 11px; color: var(--dim); font-weight: 700; margin-right: 2px; }
+  .filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--dim); font-size: 12px; cursor: pointer; font-weight: 700; transition: all .15s; }
+  .filter-btn.active { border-color: var(--accent); background: rgba(232,71,42,.1); color: var(--accent); }
+
+  /* TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .table-head { display: grid; grid-template-columns: 2fr 90px 90px 80px 80px 54px; padding: 9px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .table-row { display: grid; grid-template-columns: 2fr 90px 90px 80px 80px 54px; padding: 10px 16px; border-bottom: 1px solid var(--border); align-items: center; transition: background .1s; cursor: default; }
+  .table-row:last-child { border-bottom: none; }
+  .table-row:nth-child(even) { background: var(--row-alt); }
+  .table-row:hover { background: var(--hover); }
+  .tr-right { text-align: right; }
+  .tr-center { text-align: center; }
+
+  /* BADGE */
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+
+  /* MINI BAR */
+  .mini-bar-wrap { width: 100%; height: 3px; background: var(--faint); border-radius: 2px; overflow: hidden; margin-top: 5px; }
+  .mini-bar-fill { height: 100%; border-radius: 2px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+
+  /* SIGNAL DOT */
+  .signal-dot { width: 9px; height: 9px; border-radius: 50%; margin: 0 auto; transition: all .3s; }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* FUNNEL GRID */
+  .funnel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  .funnel-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--faint); padding: 16px; }
+  .funnel-title { font-size: 13px; font-weight: 800; margin-bottom: 14px; }
+  .funnel-row { margin-bottom: 11px; }
+  .funnel-row-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+  .funnel-name { font-size: 12px; color: var(--muted); flex: 1; }
+  .funnel-name.action { color: var(--yellow); font-weight: 700; }
+  .funnel-val { font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .funnel-note { font-size: 10px; color: var(--dim); margin-bottom: 4px; }
+
+  /* MONTHLY CHART */
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 18px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 10px; height: 150px; }
+  .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .chart-val { font-size: 10px; color: var(--dim); font-weight: 700; }
+  .chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height .8s ease; position: relative; }
+  .chart-bar.solid { background: linear-gradient(180deg, var(--accent), var(--accent2)); }
+  .chart-bar.partial { background: transparent; border: 2px dashed rgba(232,71,42,.5); }
+  .partial-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--accent); white-space: nowrap; }
+  .chart-month { font-size: 11px; font-weight: 700; color: var(--dim); }
+  .chart-uniq { font-size: 10px; color: var(--faint); }
+
+  /* MONTHLY TABLE */
+  .monthly-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .monthly-head { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 9px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .monthly-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 11px 16px; border-bottom: 1px solid var(--border); align-items: center; }
+  .monthly-row:nth-child(even) { background: var(--row-alt); }
+  .monthly-total { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 11px 16px; border-top: 2px solid var(--border); background: var(--surface2); }
+
+  /* SURECART PANEL */
+  .sc-connect { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; text-align: center; }
+  .sc-icon { font-size: 36px; margin-bottom: 10px; }
+  .sc-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .sc-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .sc-note { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .sc-offline { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); border-radius: var(--radius); padding: 16px; color: var(--red); font-size: 13px; }
+
+  /* SC KPI GRID */
+  .sc-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media(max-width:600px) { .sc-kpi-grid { grid-template-columns: 1fr; } }
+
+  /* PRODUCT TABLE */
+  .product-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .product-head { padding: 11px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .product-row { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  .product-row:last-child { border-bottom: none; }
+  .product-row:nth-child(even) { background: var(--row-alt); }
+  .product-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .product-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .product-count { font-size: 12px; color: var(--muted); margin-right: 10px; }
+  .product-rev { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; }
+
+  /* RECENT ORDERS */
+  .orders-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .orders-head { padding: 11px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .orders-head-label { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .order-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .order-row:last-child { border-bottom: none; }
+  .order-row:nth-child(even) { background: var(--row-alt); }
+  .order-id { font-size: 12px; font-weight: 600; }
+  .order-date { font-size: 11px; color: var(--dim); }
+  .order-right { display: flex; align-items: center; gap: 10px; }
+  .status-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .status-paid { background: rgba(16,185,129,.13); color: var(--green); }
+  .status-other { background: rgba(245,158,11,.13); color: var(--yellow); }
+  .order-amount { font-size: 14px; font-weight: 800; color: var(--green); }
+
+  /* FOOTER */
+  .footer { margin-top: 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .footer-left .f-label { font-size: 11px; font-weight: 700; color: var(--dim); }
+  .footer-left .f-sub { font-size: 11px; color: var(--faint); margin-top: 1px; }
+  .footer-right { font-size: 10px; color: var(--dim); text-align: right; }
+
+  /* PANEL HIDDEN */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SPINNER */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 18px; height: 18px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; }
+
+  /* UTIL */
+  .flex-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .gap-col { display: flex; flex-direction: column; gap: 14px; }
+  .text-green { color: var(--green); }
+  .text-red { color: var(--red); }
+  .text-blue { color: var(--blue); }
+  .text-accent { color: var(--accent); }
+  .fw-800 { font-weight: 800; }
+  .fs-14 { font-size: 14px; }
+  .fs-13 { font-size: 13px; }
+  .fs-12 { font-size: 12px; }
+  .mt-4 { margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="brand">
+        <div class="live-dot"></div>
+        <span class="brand-label">Sean Wilson Piano LLC</span>
+      </div>
+      <h1>Performance Dashboard</h1>
+      <div class="subtitle" id="subtitle-ts">Loading…</div>
+    </div>
+    <div class="header-controls">
+      <div class="period-switcher">
+        <button class="period-btn" data-period="daily"  onclick="setPeriod('daily')">Today</button>
+        <button class="period-btn active" data-period="weekly" onclick="setPeriod('weekly')">7 Days</button>
+        <button class="period-btn" data-period="ytd"    onclick="setPeriod('ytd')">YTD 2026</button>
+      </div>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="pages"   onclick="setTab('pages')">📊 Pages</button>
+    <button class="tab-btn"        data-tab="sales"   onclick="setTab('sales')">🛒 Sales</button>
+    <button class="tab-btn"        data-tab="funnel"  onclick="setTab('funnel')">🔀 Funnel</button>
+    <button class="tab-btn"        data-tab="monthly" onclick="setTab('monthly')">📅 Monthly</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ MAIN -->
+<div class="main">
+
+  <!-- KPI strip -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- Pages panel -->
+  <div class="panel active" id="panel-pages">
+    <div class="filter-bar">
+      <span class="filter-label">FILTER:</span>
+      <button class="filter-btn active" onclick="setFilter('all')">All</button>
+      <button class="filter-btn" onclick="setFilter('paid')">Paid</button>
+      <button class="filter-btn" onclick="setFilter('lead')">Lead Magnets</button>
+      <button class="filter-btn" onclick="setFilter('checkout')">Checkouts</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <div>Page / Product</div>
+        <div class="tr-right">Views</div>
+        <div class="tr-right">Uniques</div>
+        <div class="tr-right">Avg Time</div>
+        <div class="tr-right">Bounce</div>
+        <div class="tr-center">Signal</div>
+      </div>
+      <div id="pages-table-body"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Strong</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Moderate</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Low</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#334155"></div>No data</div>
+    </div>
+  </div>
+
+  <!-- Sales panel -->
+  <div class="panel" id="panel-sales">
+    <div class="gap-col" id="sales-content"></div>
+  </div>
+
+  <!-- Funnel panel -->
+  <div class="panel" id="panel-funnel">
+    <div class="funnel-grid" id="funnel-grid"></div>
+  </div>
+
+  <!-- Monthly panel -->
+  <div class="panel" id="panel-monthly">
+    <div class="gap-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Monthly Pageviews — 2026</div>
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+      <div class="monthly-table">
+        <div class="monthly-head">
+          <div>Month</div>
+          <div class="tr-right">Pageviews</div>
+          <div class="tr-right">Uniques</div>
+          <div class="tr-right">vs Prior</div>
+        </div>
+        <div id="monthly-table-body"></div>
+        <div class="monthly-total" id="monthly-total"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="f-label">🤖 Cowork Automation</div>
+      <div class="f-sub">Daily refresh: 8:00 AM ET · Fathom MCP (BCWEGICN) + SureCart MCP</div>
+    </div>
+    <div class="footer-right">
+      <div>seanwilsonpiano.com</div>
+      <div id="footer-ts">v3</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─── DATA (Cowork injects between these markers) ─────────────────────────────
+// [DASHBOARD-DATA-START]
+const FATHOM_DAILY = {
+  "/join-for-1-today/":              { pageviews:50,  uniques:23,  avg_duration:116.6, bounce_rate:0    },
+  "/join-membership-today/":         { pageviews:2,   uniques:1,   avg_duration:6.0,   bounce_rate:0    },
+  "/4-week-beginner-sales-page/":    { pageviews:30,  uniques:10,  avg_duration:185.9, bounce_rate:0    },
+  "/standard-checkout-page/":        null,
+  "/hear-any-chord/":                { pageviews:4,   uniques:2,   avg_duration:28.5,  bounce_rate:0    },
+  "/scales-charts/":                 { pageviews:6,   uniques:1,   avg_duration:7.0,   bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:4,   uniques:1,   avg_duration:12.7,  bounce_rate:0    },
+  "/major-vs-minor-quiz/":           { pageviews:4,   uniques:2,   avg_duration:16.0,  bounce_rate:0    },
+  "/dans-signature-sounds/":         { pageviews:6,   uniques:2,   avg_duration:908.0, bounce_rate:0    },
+  "/drop-2-exercise-download-page/": { pageviews:2,   uniques:1,   avg_duration:12.0,  bounce_rate:0    },
+  "/available-to-you/":              null,
+  "/new-1trial-registration-page/":  null,
+  "/27musicians/":                   null,
+  "/april-focus-bundle-2026/":       null,
+  "/27-bundle-waitlist/":            null,
+  "/9sus4-to-dominant-release/":     null,
+};
+const FATHOM_WEEKLY = {
+  "/join-for-1-today/":              { pageviews:910,  uniques:435, avg_duration:49.4,  bounce_rate:4.6  },
+  "/join-membership-today/":         { pageviews:113,  uniques:56,  avg_duration:228.5, bounce_rate:3.6  },
+  "/4-week-beginner-sales-page/":    { pageviews:1032, uniques:335, avg_duration:66.7,  bounce_rate:5.7  },
+  "/standard-checkout-page/":        { pageviews:59,   uniques:27,  avg_duration:152.3, bounce_rate:0    },
+  "/hear-any-chord/":                { pageviews:89,   uniques:38,  avg_duration:40.7,  bounce_rate:0    },
+  "/scales-charts/":                 { pageviews:78,   uniques:21,  avg_duration:123.4, bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:78,   uniques:19,  avg_duration:15.2,  bounce_rate:0    },
+  "/major-vs-minor-quiz/":           { pageviews:96,   uniques:27,  avg_duration:79.2,  bounce_rate:0    },
+  "/dans-signature-sounds/":         { pageviews:63,   uniques:19,  avg_duration:979.3, bounce_rate:0    },
+  "/drop-2-exercise-download-page/": null,
+  "/available-to-you/":              null,
+  "/new-1trial-registration-page/":  null,
+  "/27musicians/":                   null,
+  "/april-focus-bundle-2026/":       null,
+  "/27-bundle-waitlist/":            null,
+  "/9sus4-to-dominant-release/":     null,
+};
+const FATHOM_YTD = {
+  "/join-for-1-today/":              { pageviews:22898, uniques:10029, avg_duration:65.5,  bounce_rate:0.70 },
+  "/join-membership-today/":         { pageviews:7770,  uniques:3248,  avg_duration:123.9, bounce_rate:0.31 },
+  "/standard-checkout-page/":        { pageviews:1581,  uniques:662,   avg_duration:114.7, bounce_rate:0    },
+  "/4-week-beginner-sales-page/":    { pageviews:7400,  uniques:2296,  avg_duration:77.2,  bounce_rate:3.14 },
+  "/27musicians/":                   { pageviews:3470,  uniques:1423,  avg_duration:156.0, bounce_rate:0.14 },
+  "/april-focus-bundle-2026/":       { pageviews:1479,  uniques:607,   avg_duration:93.7,  bounce_rate:0.49 },
+  "/dans-signature-sounds/":         { pageviews:3130,  uniques:949,   avg_duration:166.3, bounce_rate:1.58 },
+  "/drop-2-exercise-download-page/": { pageviews:1352,  uniques:588,   avg_duration:285.3, bounce_rate:0.51 },
+  "/hear-any-chord/":                { pageviews:1564,  uniques:672,   avg_duration:75.1,  bounce_rate:0.15 },
+  "/scales-charts/":                 { pageviews:1364,  uniques:366,   avg_duration:48.8,  bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:2404,  uniques:705,   avg_duration:49.7,  bounce_rate:0.43 },
+  "/major-vs-minor-quiz/":           { pageviews:2041,  uniques:652,   avg_duration:60.8,  bounce_rate:0.31 },
+  "/available-to-you/":              { pageviews:1418,  uniques:561,   avg_duration:380.5, bounce_rate:0    },
+  "/new-1trial-registration-page/":  { pageviews:758,   uniques:305,   avg_duration:130.7, bounce_rate:0.98 },
+  "/27-bundle-waitlist/":            { pageviews:1064,  uniques:482,   avg_duration:117.7, bounce_rate:0.41 },
+  "/9sus4-to-dominant-release/":     { pageviews:966,   uniques:427,   avg_duration:163.3, bounce_rate:0    },
+};
+const SITE_TOTALS = {
+  daily:  { pageviews:676,    uniques:87,    visits:87,    bounce_rate:1.15  },
+  weekly: { pageviews:18727,  uniques:2004,  visits:2004,  bounce_rate:2.69  },
+  ytd:    { pageviews:470736, uniques:57506, visits:57506, bounce_rate:1.20  },
+};
+const MONTHLY = [
+  { month:"Jan", pageviews:107821, uniques:11505 },
+  { month:"Feb", pageviews:89585,  uniques:12208 },
+  { month:"Mar", pageviews:96961,  uniques:13126 },
+  { month:"Apr", pageviews:76415,  uniques:9450  },
+  { month:"May", pageviews:85525,  uniques:9742  },
+  { month:"Jun", pageviews:14429,  uniques:1475,  partial:true },
+];
+const SC_DATA = {
+  stats: {
+    today:  { count: 3,    revenue: 3000   },
+    week:   { count: 101,  revenue: 230810 },
+    month:  { count: 772,  revenue: 1402700, approx: true },
+    ytd:    { count: 2770, revenue: 7051440 },
+  },
+  byProduct: [
+    ["Basic Monthly Checkout ($29 sub)", { count: 4, revenue: 11600 }],
+    ["$1 Trial Membership",              { count: 2, revenue: 1900  }],
+    ["Dan's Logic Sessions",             { count: 1, revenue: 810   }],
+    ["Beginner Course Bump (+$17)",      { count: 1, revenue: 1700  }],
+    ["Ear Chart Lead Magnet (free)",     { count: 1, revenue: 0     }],
+  ],
+  recentOrders: [
+    { number:"1C1DAD11", name:"Jax Singhvi",         status:"paid", amount:0,    when:"Jun 7, 2:17 AM"  },
+    { number:"222D4032", name:"Benjamin Morris",     status:"paid", amount:100,  when:"Jun 7, 1:35 AM"  },
+    { number:"E23237A1", name:"Lionel Massiah",      status:"paid", amount:2900, when:"Jun 7, 12:43 AM" },
+    { number:"8256860F", name:"Cornelius",           status:"paid", amount:1800, when:"Jun 6, 10:25 PM" },
+    { number:"AEC09051", name:"Scott Krouse",        status:"paid", amount:810,  when:"Jun 6, 9:45 PM"  },
+    { number:"6CFC893E", name:"Malaki Moody",        status:"paid", amount:2900, when:"Jun 6, 9:23 PM"  },
+    { number:"3235BB00", name:"Jarrett Roseborough", status:"paid", amount:2900, when:"Jun 6, 8:43 PM"  },
+    { number:"B0B99964", name:"Joshua Newbury",      status:"paid", amount:2900, when:"Jun 6, 8:24 PM"  },
+  ],
+  lastFetched: "2026-06-07T08:30:00-04:00",
+};
+const LAST_UPDATED = "Jun 7, 8:30 AM";
+// [DASHBOARD-DATA-END]
+
+// ─── TRACKED PAGES ───────────────────────────────────────────────────────────
+const TRACKED = [
+  { name:"$1 Trial Membership",       slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout" },
+  { name:"Main Trial Sales Page",     slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel"   },
+  { name:"Basic Monthly Checkout",    slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout" },
+  { name:"4-Day Beginner Course",     slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales"    },
+  { name:"27 MIDI File Bundle",       slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales"    },
+  { name:"April Focus Guide",         slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales"    },
+  { name:"Dan's Signature Sounds",    slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales"    },
+  { name:"Piano Blueprint Session",   slug:"/break",                          type:"Coaching",     price:297, cat:"sales"    },
+  { name:"Mediant Drop 2 ($1)",       slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout" },
+  { name:"Ear Chart Lead Magnet",     slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"     },
+  { name:"Scales Charts",             slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"     },
+  { name:"Roadmap Lead",              slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"     },
+  { name:"Major vs Minor Quiz",       slug:"/major-vs-minor-quiz/",           type:"Lead Magnet",  price:0,   cat:"lead"     },
+  { name:"Available Bridge Page",     slug:"/available-to-you/",              type:"Bridge",       price:0,   cat:"lead"     },
+  { name:"Trial Registration Page",   slug:"/new-1trial-registration-page/",  type:"Checkout",     price:0,   cat:"funnel"   },
+  { name:"27 Bundle Waitlist",        slug:"/27-bundle-waitlist/",            type:"Bridge",       price:0,   cat:"lead"     },
+  { name:"9sus4 Practice Page",       slug:"/9sus4-to-dominant-release/",     type:"Content",      price:0,   cat:"lead"     },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let currentPeriod = "weekly";
+let currentFilter = "all";
+let currentTab    = "pages";
+let isDark        = true;
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const fmt    = n => (!n && n!==0) ? "—" : n>=1000 ? (n/1000).toFixed(1)+"k" : n.toLocaleString();
+const fmtPct = n => (!n && n!==0) ? "—" : n.toFixed(1)+"%";
+const fmtSec = n => !n ? "—" : n>=60 ? Math.floor(n/60)+"m "+Math.round(n%60)+"s" : Math.round(n)+"s";
+const fmtUSD = n => !n && n!==0 ? "—" : "$"+(n/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+const TYPE_COLORS = {
+  "Subscription":"#8b5cf6","Product":"#3b82f6","Lead Magnet":"#10b981",
+  "Bridge":"#06b6d4","Sales Page":"#E8472A","Checkout":"#f59e0b",
+  "Coaching":"#ec4899","Content":"#64748b",
+};
+
+function getPageData(slug, period) {
+  const map = period==="daily" ? FATHOM_DAILY : period==="weekly" ? FATHOM_WEEKLY : FATHOM_YTD;
+  const key = Object.keys(map).find(k =>
+    slug.startsWith(k.replace(/\/$/,"")) || k.startsWith(slug.substring(0,10))
+  );
+  return key ? map[key] : null;
+}
+
+function signalColor(views, cat) {
+  if (!views) return "#334155";
+  const t = cat==="lead" ? [200,1000] : cat==="checkout" ? [500,5000] : [100,500];
+  return views>=t[1] ? "#10b981" : views>=t[0] ? "#f59e0b" : "#ef4444";
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderAll() {
+  renderSubtitle();
+  renderKPI();
+  renderPages();
+  renderSales();
+  renderFunnel();
+  renderMonthly();
+}
+
+function renderSubtitle() {
+  document.getElementById("subtitle-ts").textContent =
+    `Updated ${LAST_UPDATED} · Fathom BCWEGICN + SureCart${SC_DATA ? "" : " (offline)"}`;
+  document.getElementById("footer-ts").textContent = `v3 · ${LAST_UPDATED}`;
+}
+
+function renderKPI() {
+  const tot = SITE_TOTALS[currentPeriod] || {};
+  const trialD = getPageData("/join-for-1-today/", currentPeriod);
+  const begD   = getPageData("/4-week-beginner-sales-page/", currentPeriod);
+  const earD   = getPageData("/hear-any-chord/", currentPeriod);
+  const cards = [
+    { label:"Site Pageviews",    value:fmt(tot.pageviews), sub: currentPeriod==="daily"?"Today":currentPeriod==="weekly"?"7 Days":"YTD 2026", color:"#3b82f6" },
+    { label:"Unique Visitors",   value:fmt(tot.uniques),   sub: currentPeriod==="daily"?"Today":currentPeriod==="weekly"?"7 Days":"YTD 2026", color:"#8b5cf6" },
+    { label:"$1 Trial Page",     value:fmt(trialD?.pageviews), sub:"/join-for-1-today/", color:"#E8472A" },
+    { label:"Beginner Course",   value:fmt(begD?.pageviews),   sub:"Sales page views",   color:"#f59e0b" },
+    { label:"Ear Chart Leads",   value:fmt(earD?.pageviews),   sub:"Since May 14",        color:"#10b981" },
+    { label:"Revenue Today",
+      value: SC_DATA ? fmtUSD(SC_DATA.stats.today.revenue) : "—",
+      sub: SC_DATA ? `${SC_DATA.stats.today.count} orders` : "Connect SureCart", color:"#10b981" },
+  ];
+  document.getElementById("kpi-grid").innerHTML = cards.map(c => `
+    <div class="kpi-card" style="--card-color:${c.color}">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join("");
+}
+
+function renderPages() {
+  const pages = TRACKED.filter(p =>
+    currentFilter==="all"      ? true :
+    currentFilter==="paid"     ? p.price>0 :
+    currentFilter==="lead"     ? p.price===0 :
+    currentFilter==="checkout" ? p.cat==="checkout" : true
+  );
+  const maxPvs = Math.max(1, ...pages.map(p => getPageData(p.slug, currentPeriod)?.pageviews||0));
+  document.getElementById("pages-table-body").innerHTML = pages.map((p,i) => {
+    const d    = getPageData(p.slug, currentPeriod);
+    const pvs  = d?.pageviews||0;
+    const sc   = signalColor(pvs, p.cat);
+    const tc   = TYPE_COLORS[p.type]||"#64748b";
+    const pct  = maxPvs>0 ? Math.min(100,(pvs/maxPvs)*100) : 0;
+    const bHigh = (d?.bounce_rate||0)>5;
+    return `
+      <div class="table-row">
+        <div>
+          <div class="flex-row">
+            <span class="badge" style="background:${tc}22;color:${tc}">${p.type}</span>
+            <span class="fs-13 fw-800">${p.name}</span>
+            ${p.price>0 ? `<span style="font-size:10px;color:#10b981;font-weight:800">$${p.price}</span>` : ""}
+          </div>
+          <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${sc}"></div></div>
+        </div>
+        <div class="tr-right fs-14 fw-800" style="color:${pvs>0?"var(--text)":"var(--faint)"}">${fmt(pvs)}</div>
+        <div class="tr-right fs-13" style="color:var(--muted)">${fmt(d?.uniques)}</div>
+        <div class="tr-right fs-12" style="color:var(--dim)">${fmtSec(d?.avg_duration)}</div>
+        <div class="tr-right fs-12" style="color:${bHigh?"var(--red)":"var(--dim)"}">${d?fmtPct(d.bounce_rate):"—"}</div>
+        <div class="tr-center"><div class="signal-dot" style="background:${sc};box-shadow:${pvs>1000?"0 0 7px "+sc:"none"}"></div></div>
+      </div>`;
+  }).join("");
+}
+
+function renderSales() {
+  const el = document.getElementById("sales-content");
+  if (!SC_DATA) {
+    el.innerHTML = `
+      <div class="sc-connect">
+        <div class="sc-icon">🛒</div>
+        <div class="sc-title">SureCart — Pending Data</div>
+        <div class="sc-sub">Cowork will inject live revenue data on the next scheduled run (8:00 AM ET).</div>
+        <div class="sc-note">
+          <strong>For Cowork:</strong> Call <code>surecart/list-orders</code> with limit=100, expand checkout + line items.
+          Compute today/week/month/ytd revenue and inject into the <code>SC_DATA</code> constant above the marker comment.
+        </div>
+      </div>`;
+    return;
+  }
+  const { stats, byProduct, recentOrders } = SC_DATA;
+  const scKPIs = [
+    { label:"Today's Revenue",  value:fmtUSD(stats.today.revenue),  sub:`${stats.today.count} orders`,  color:"#10b981" },
+    { label:"7-Day Revenue",    value:fmtUSD(stats.week.revenue),   sub:`${stats.week.count} orders`,   color:"#3b82f6" },
+    { label:"30-Day Revenue",   value:fmtUSD(stats.month.revenue),  sub:`${stats.month.count} orders`,  color:"#E8472A" },
+  ];
+  const maxRev = byProduct.length ? byProduct[0][1].revenue : 1;
+  el.innerHTML = `
+    <div class="sc-kpi-grid">
+      ${scKPIs.map(c=>`
+        <div class="kpi-card" style="--card-color:${c.color}">
+          <div class="kpi-label">${c.label}</div>
+          <div class="kpi-value">${c.value}</div>
+          <div class="kpi-sub">${c.sub}</div>
+        </div>`).join("")}
+    </div>
+    ${byProduct.length ? `
+    <div class="product-table">
+      <div class="product-head">Revenue by Product — Last 30 Days</div>
+      ${byProduct.map(([name,data],i)=>{
+        const pct = maxRev>0 ? Math.min(100,(data.revenue/maxRev)*100) : 0;
+        return `
+          <div class="product-row">
+            <div class="product-meta">
+              <span class="product-name">${name}</span>
+              <span class="product-count">${data.count}×</span>
+              <span class="product-rev">${fmtUSD(data.revenue)}</span>
+            </div>
+            <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:#10b981"></div></div>
+          </div>`;
+      }).join("")}
+    </div>` : ""}
+    ${recentOrders && recentOrders.length ? `
+    <div class="orders-table">
+      <div class="orders-head">
+        <span class="orders-head-label">Recent Orders</span>
+        <span style="font-size:11px;color:var(--dim)">Last fetched: ${SC_DATA.lastFetched||"—"}</span>
+      </div>
+      ${recentOrders.slice(0,8).map((o,i)=>{
+        const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+        const paid = o.status==="paid";
+        return `
+          <div class="order-row">
+            <div>
+              <div class="order-id">${o.number?"#"+o.number:o.id?.slice(0,10)}</div>
+              <div class="order-date">${date}</div>
+            </div>
+            <div class="order-right">
+              <span class="status-badge ${paid?"status-paid":"status-other"}">${o.status}</span>
+              <span class="order-amount" style="color:${paid?"var(--green)":"var(--muted)"}">${fmtUSD(o.amount||o.checkout?.amount_due)}</span>
+            </div>
+          </div>`;
+      }).join("")}
+    </div>` : ""}`;
+}
+
+function renderFunnel() {
+  const stages = [
+    { title:"🔍 Lead Magnets", color:"#10b981", items:[
+      { name:"Ear Chart Landing",    views:FATHOM_YTD["/hear-any-chord/"]?.pageviews||0 },
+      { name:"Roadmap Offer",        views:FATHOM_YTD["/our-roadmap-offer/"]?.pageviews||0 },
+      { name:"Major vs Minor Quiz",  views:FATHOM_YTD["/major-vs-minor-quiz/"]?.pageviews||0 },
+      { name:"Scales Charts",        views:FATHOM_YTD["/scales-charts/"]?.pageviews||0 },
+      { name:"Available Bridge",     views:FATHOM_YTD["/available-to-you/"]?.pageviews||0 },
+      { name:"27 Bundle Waitlist",   views:FATHOM_YTD["/27-bundle-waitlist/"]?.pageviews||0 },
+    ]},
+    { title:"💡 Sales Pages", color:"#3b82f6", items:[
+      { name:"Main Trial Sales",       views:FATHOM_YTD["/join-membership-today/"]?.pageviews||0 },
+      { name:"$1 Trial Checkout",      views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
+      { name:"4-Day Beginner Sales",   views:FATHOM_YTD["/4-week-beginner-sales-page/"]?.pageviews||0 },
+      { name:"Dan's Signature Sounds", views:FATHOM_YTD["/dans-signature-sounds/"]?.pageviews||0 },
+      { name:"27 MIDI Bundle",         views:FATHOM_YTD["/27musicians/"]?.pageviews||0 },
+      { name:"April Focus Guide",      views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
+    ]},
+    { title:"💳 Checkouts", color:"#E8472A", items:[
+      { name:"$1 Trial",          views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
+      { name:"Basic Monthly",     views:FATHOM_YTD["/standard-checkout-page/"]?.pageviews||0 },
+      { name:"Drop 2 ($1)",       views:FATHOM_YTD["/drop-2-exercise-download-page/"]?.pageviews||0 },
+      { name:"April Focus ($27)", views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
+      { name:"Blueprint ($297)",  views:0 },
+    ]},
+    { title:"⚠️ Action Needed", color:"#f59e0b", items:[
+      { name:"76 — embed on site + add bumps",   views:0, note:"1,000+ comments · IG 68.5% / FB 51.5% CTR", action:true },
+      { name:"Evil Laugh — needs site embed",    views:0, note:"89.6% CTR · 48 runs", action:true },
+      { name:"Adore Him — raw Loom URL",         views:0, note:"No landing page yet", action:true },
+      { name:"Inverted Dominant — confirm URL",  views:0, note:"Two URLs still open", action:true },
+    ]},
+  ];
+  document.getElementById("funnel-grid").innerHTML = stages.map(s => {
+    const maxV = Math.max(1,...s.items.map(x=>x.views||0));
+    return `
+      <div class="funnel-card" style="border-top:2px solid ${s.color}30;border-color:${s.color}30">
+        <div class="funnel-title" style="color:${s.color}">${s.title}</div>
+        ${s.items.map(item => {
+          const pct = maxV>0 ? Math.min(100,(item.views/maxV)*100) : 0;
+          return `
+            <div class="funnel-row">
+              <div class="funnel-row-top">
+                <span class="funnel-name ${item.action?"action":""}">${item.action?"⚠️ ":""}${item.name}</span>
+                <span class="funnel-val" style="color:${item.views>0?"var(--text)":"var(--faint)"}">${item.views>0?fmt(item.views):"—"}</span>
+              </div>
+              ${item.note ? `<div class="funnel-note">${item.note}</div>` : ""}
+              ${!item.action ? `<div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${s.color}"></div></div>` : ""}
+            </div>`;
+        }).join("")}
+      </div>`;
+  }).join("");
+}
+
+function renderMonthly() {
+  const maxPv = Math.max(1,...MONTHLY.map(m=>m.pageviews));
+  document.getElementById("chart-bars").innerHTML = MONTHLY.map(m => {
+    const h = Math.max(8,(m.pageviews/maxPv)*130);
+    return `
+      <div class="chart-col">
+        <div class="chart-val">${fmt(m.pageviews)}</div>
+        <div class="chart-bar ${m.partial?"partial":"solid"}" style="height:${h}px">
+          ${m.partial?'<span class="partial-label">partial</span>':""}
+        </div>
+        <div class="chart-month">${m.month}</div>
+        <div class="chart-uniq" style="color:var(--dim)">${fmt(m.uniques)}</div>
+      </div>`;
+  }).join("");
+
+  const ytdTot = MONTHLY.reduce((s,m)=>({pageviews:s.pageviews+m.pageviews,uniques:s.uniques+m.uniques}),{pageviews:0,uniques:0});
+  document.getElementById("monthly-table-body").innerHTML = MONTHLY.map((m,i,arr)=>{
+    const prev = arr[i-1];
+    const delta = prev ? (m.pageviews-prev.pageviews)/prev.pageviews*100 : null;
+    return `
+      <div class="monthly-row">
+        <div class="fs-14 fw-800">${m.month} 2026${m.partial?' <span style="font-size:10px;color:var(--accent)">●</span>':""}</div>
+        <div class="tr-right fs-14 fw-800 text-blue">${fmt(m.pageviews)}</div>
+        <div class="tr-right fs-13" style="color:var(--muted)">${fmt(m.uniques)}</div>
+        <div class="tr-right fs-13 fw-800" style="color:${delta===null?"var(--dim)":delta>=0?"var(--green)":"var(--red)"}">
+          ${delta===null?"—":(delta>=0?"▲":"▼")+" "+Math.abs(delta).toFixed(1)+"%"}
+        </div>
+      </div>`;
+  }).join("");
+  document.getElementById("monthly-total").innerHTML = `
+    <div class="fs-13 fw-800">YTD TOTAL</div>
+    <div class="tr-right fw-800 text-accent">${fmt(ytdTot.pageviews)}</div>
+    <div class="tr-right fw-800" style="color:var(--purple)">${fmt(ytdTot.uniques)}</div>
+    <div class="tr-right fs-12" style="color:var(--dim)">Jan – Jun 6</div>`;
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+function setPeriod(p) {
+  currentPeriod = p;
+  document.querySelectorAll(".period-btn").forEach(b => b.classList.toggle("active", b.dataset.period===p));
+  renderKPI(); renderPages();
+}
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.textContent.toLowerCase()===f || (f==="all"&&b.textContent==="All") || (f==="paid"&&b.textContent==="Paid") || (f==="lead"&&b.textContent==="Lead Magnets") || (f==="checkout"&&b.textContent==="Checkouts")));
+  renderPages();
+}
+function setTab(t) {
+  currentTab = t;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab===t));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id==="panel-"+t));
+}
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute("data-theme", isDark?"":"light");
+  document.getElementById("theme-btn").textContent = isDark ? "🌙" : "☀️";
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
