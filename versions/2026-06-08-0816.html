@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWP Performance Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #030712; --surface: #0f172a; --surface2: #0a1628;
+    --border: #1e293b; --border2: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --dim: #475569; --faint: #1e293b;
+    --accent: #E8472A; --accent2: #9b1c0a;
+    --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6;
+    --yellow: #f59e0b; --red: #ef4444; --teal: #06b6d4; --pink: #ec4899;
+    --header: linear-gradient(135deg,#0a1628 0%,#0f172a 60%,#0a1628 100%);
+    --pill: #0f172a; --row-alt: #0a1628; --hover: rgba(30,41,59,0.4);
+    --shadow: 0 1px 8px rgba(0,0,0,0.4);
+    --radius: 10px;
+  }
+  [data-theme="light"] {
+    --bg: #f1f5f9; --surface: #ffffff; --surface2: #f8fafc;
+    --border: #e2e8f0; --border2: #cbd5e1;
+    --text: #0f172a; --muted: #475569; --dim: #64748b; --faint: #e2e8f0;
+    --header: linear-gradient(135deg,#ffffff 0%,#f8fafc 60%,#ffffff 100%);
+    --pill: #f1f5f9; --row-alt: #f8fafc; --hover: rgba(226,232,240,0.6);
+    --shadow: 0 1px 6px rgba(0,0,0,0.08);
+  }
+
+  body { font-family: 'DM Sans','Segoe UI',system-ui,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .2s, color .2s; }
+
+  /* HEADER */
+  .header { background: var(--header); border-bottom: 1px solid var(--border); padding: 16px 24px 0; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .brand { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 7px var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .brand-label { font-size: 10px; color: var(--dim); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+  .subtitle { font-size: 11px; color: var(--dim); margin-top: 2px; }
+  .header-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .period-switcher { display: flex; gap: 3px; background: var(--pill); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+  .period-btn { padding: 5px 13px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; transition: all .15s; background: transparent; color: var(--dim); }
+  .period-btn.active { background: var(--accent); color: #fff; }
+  .theme-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--pill); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0; }
+  .tabs { display: flex; gap: 0; }
+  .tab-btn { padding: 9px 16px; border: none; cursor: pointer; font-size: 13px; font-weight: 700; background: transparent; color: var(--dim); border-bottom: 2px solid transparent; transition: all .15s; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* KPI STRIP */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--card-color,var(--blue)); border-radius: var(--radius); padding: 13px 15px; }
+  .kpi-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 5px; }
+  .kpi-value { font-size: 26px; font-weight: 800; color: var(--card-color,var(--blue)); letter-spacing: -.03em; line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+  /* MAIN */
+  .main { padding: 18px 24px; max-width: 1200px; margin: 0 auto; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 11px; color: var(--dim); font-weight: 700; margin-right: 2px; }
+  .filter-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--dim); font-size: 12px; cursor: pointer; font-weight: 700; transition: all .15s; }
+  .filter-btn.active { border-color: var(--accent); background: rgba(232,71,42,.1); color: var(--accent); }
+
+  /* UNIFIED TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+
+  /* Header: Name | Traffic bar | Views | Avg Time | Conv% | Revenue | Signal */
+  .table-head {
+    display: grid;
+    grid-template-columns: 200px 1fr 72px 72px 76px 90px 44px;
+    gap: 0;
+    padding: 9px 16px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-size: 10px; font-weight: 800; color: var(--dim);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  .table-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 72px 72px 76px 90px 44px;
+    gap: 0;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background .1s;
+    cursor: default;
+    min-height: 54px;
+  }
+  .table-row:last-child { border-bottom: none; }
+  .table-row:nth-child(even) { background: var(--row-alt); }
+  .table-row:hover { background: var(--hover); }
+  .tr-right { text-align: right; }
+  .tr-center { text-align: center; }
+
+  /* PAGE NAME CELL */
+  .page-name-cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 12px; }
+  .page-name-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .page-name { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+  .price-tag { font-size: 10px; font-weight: 800; color: var(--green); }
+
+  /* BADGE */
+  .badge { display: inline-block; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+
+  /* TRAFFIC BAR CELL */
+  .bar-cell { padding: 0 12px 0 4px; }
+  .bar-track { width: 100%; height: 6px; background: var(--faint); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+
+  /* CONV CELL */
+  .conv-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    padding: 3px 8px; border-radius: 20px;
+    min-width: 52px;
+  }
+  .conv-high { background: rgba(16,185,129,.15); color: var(--green); }
+  .conv-mid  { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .conv-low  { background: rgba(239,68,68,.12);  color: var(--red); }
+  .conv-none { background: var(--faint); color: var(--dim); }
+
+  /* REVENUE CELL */
+  .rev-cell { text-align: right; }
+  .rev-amount { font-size: 14px; font-weight: 800; color: var(--green); }
+  .rev-orders { font-size: 10px; color: var(--dim); margin-top: 1px; }
+  .rev-none { font-size: 13px; color: var(--faint); text-align: right; }
+
+  /* SIGNAL DOT */
+  .signal-dot { width: 9px; height: 9px; border-radius: 50%; margin: 0 auto; }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .gap-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* SALES PANEL */
+  .sc-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 12px; }
+  .sc-pending { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; text-align: center; }
+  .sc-pending-icon { font-size: 32px; margin-bottom: 10px; }
+  .sc-pending-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .sc-pending-sub { font-size: 12px; color: var(--muted); }
+
+  /* PRODUCT TABLE */
+  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .section-head { padding: 11px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; display: flex; justify-content: space-between; align-items: center; }
+  .product-row { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  .product-row:last-child { border-bottom: none; }
+  .product-row:nth-child(even) { background: var(--row-alt); }
+  .product-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .product-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .product-count { font-size: 12px; color: var(--muted); margin-right: 10px; }
+  .product-rev { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; }
+  .mini-bar-wrap { width: 100%; height: 3px; background: var(--faint); border-radius: 2px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 2px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+
+  /* ORDER TABLE */
+  .order-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .order-row:last-child { border-bottom: none; }
+  .order-row:nth-child(even) { background: var(--row-alt); }
+  .order-id { font-size: 12px; font-weight: 700; }
+  .order-date { font-size: 11px; color: var(--dim); }
+  .order-right { display: flex; align-items: center; gap: 10px; }
+  .status-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .status-paid { background: rgba(16,185,129,.13); color: var(--green); }
+  .status-other { background: rgba(245,158,11,.13); color: var(--yellow); }
+  .order-amount { font-size: 14px; font-weight: 800; }
+
+  /* FUNNEL */
+  .funnel-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 14px; }
+  .funnel-card { background: var(--surface); border: 1px solid var(--faint); border-radius: var(--radius); padding: 16px; }
+  .funnel-title { font-size: 13px; font-weight: 800; margin-bottom: 14px; }
+  .funnel-row { margin-bottom: 11px; }
+  .funnel-row-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+  .funnel-name { font-size: 12px; color: var(--muted); flex: 1; }
+  .funnel-name.action { color: var(--yellow); font-weight: 700; }
+  .funnel-val { font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .funnel-note { font-size: 10px; color: var(--dim); margin-bottom: 4px; }
+
+  /* MONTHLY */
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 18px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 10px; height: 150px; }
+  .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .chart-val { font-size: 10px; color: var(--dim); font-weight: 700; }
+  .chart-bar { width: 100%; border-radius: 4px 4px 0 0; position: relative; transition: height .8s ease; }
+  .chart-bar.solid { background: linear-gradient(180deg,var(--accent),var(--accent2)); }
+  .chart-bar.partial { background: transparent; border: 2px dashed rgba(232,71,42,.5); }
+  .partial-label { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--accent); white-space: nowrap; }
+  .chart-month { font-size: 11px; font-weight: 700; color: var(--dim); }
+  .monthly-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .monthly-head { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 9px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .monthly-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 11px 16px; border-bottom: 1px solid var(--border); align-items: center; }
+  .monthly-row:nth-child(even) { background: var(--row-alt); }
+  .monthly-total { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 11px 16px; border-top: 2px solid var(--border); background: var(--surface2); }
+
+  /* FOOTER */
+  .footer { margin-top: 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .footer-left .f-label { font-size: 11px; font-weight: 700; color: var(--dim); }
+  .footer-left .f-sub { font-size: 11px; color: var(--faint); margin-top: 1px; }
+  .footer-right { font-size: 10px; color: var(--dim); text-align: right; }
+
+  .tr-right { text-align: right; }
+  .tr-center { text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="brand">
+        <div class="live-dot"></div>
+        <span class="brand-label">Sean Wilson Piano LLC</span>
+      </div>
+      <h1>Performance Dashboard</h1>
+      <div class="subtitle" id="subtitle-ts">Loading…</div>
+    </div>
+    <div class="header-controls">
+      <div class="period-switcher">
+        <button class="period-btn" data-period="daily"  onclick="setPeriod('daily')">Today</button>
+        <button class="period-btn active" data-period="weekly" onclick="setPeriod('weekly')">7 Days</button>
+        <button class="period-btn" data-period="ytd"    onclick="setPeriod('ytd')">YTD 2026</button>
+      </div>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="pages"   onclick="setTab('pages')">📊 Overview</button>
+    <button class="tab-btn"        data-tab="sales"   onclick="setTab('sales')">🛒 Sales Detail</button>
+    <button class="tab-btn"        data-tab="funnel"  onclick="setTab('funnel')">🔀 Funnel</button>
+    <button class="tab-btn"        data-tab="monthly" onclick="setTab('monthly')">📅 Monthly</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- KPI strip -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- Overview panel -->
+  <div class="panel active" id="panel-pages">
+    <!-- Alerts banner -->
+    <div id="alerts-banner"></div>
+    <!-- Date range label -->
+    <div id="period-label" style="font-size:11px;color:var(--dim);font-weight:700;margin-bottom:10px;padding:2px 0;letter-spacing:.04em;"></div>
+    <div class="filter-bar">
+      <span class="filter-label">FILTER:</span>
+      <button class="filter-btn active" onclick="setFilter('all')">All</button>
+      <button class="filter-btn" onclick="setFilter('paid')">Paid</button>
+      <button class="filter-btn" onclick="setFilter('lead')">Lead Magnets</button>
+      <button class="filter-btn" onclick="setFilter('checkout')">Checkouts</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <div>Page / Product</div>
+        <div style="padding-left:4px">Traffic</div>
+        <div class="tr-right">Views</div>
+        <div class="tr-right">Uniques</div>
+        <div class="tr-center">Conv%</div>
+        <div class="tr-right" id="rev-col-header">Revenue</div>
+        <div class="tr-center">⬤</div>
+      </div>
+      <div id="pages-table-body"></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:var(--dim);font-weight:700">CONV%:</span>
+      <div class="legend-item"><span class="conv-pill conv-high" style="font-size:10px;padding:1px 6px">3%+</span> Strong</div>
+      <div class="legend-item"><span class="conv-pill conv-mid"  style="font-size:10px;padding:1px 6px">1–3%</span> Moderate</div>
+      <div class="legend-item"><span class="conv-pill conv-low"  style="font-size:10px;padding:1px 6px">&lt;1%</span> Low</div>
+      <div class="legend-item"><span class="conv-pill conv-none" style="font-size:10px;padding:1px 6px">—</span> No data / free</div>
+      <span style="font-size:11px;color:var(--dim);margin-left:8px">· Revenue matches selected period · N/A = data not yet in Airtable for that window</span>
+    </div>
+  </div>
+
+  <!-- Sales Detail panel -->
+  <div class="panel" id="panel-sales">
+    <div class="gap-col" id="sales-content"></div>
+  </div>
+
+  <!-- Funnel panel -->
+  <div class="panel" id="panel-funnel">
+    <div class="funnel-grid" id="funnel-grid"></div>
+  </div>
+
+  <!-- Monthly panel -->
+  <div class="panel" id="panel-monthly">
+    <div class="gap-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Monthly Pageviews — 2026</div>
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+      <div class="monthly-table">
+        <div class="monthly-head">
+          <div>Month</div>
+          <div class="tr-right">Pageviews</div>
+          <div class="tr-right">Uniques</div>
+          <div class="tr-right">vs Prior</div>
+        </div>
+        <div id="monthly-table-body"></div>
+        <div class="monthly-total" id="monthly-total"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">
+      <div class="f-label">🤖 Cowork Auto-Refresh</div>
+      <div class="f-sub">Daily 8:00 AM ET · Fathom MCP (BCWEGICN) + SureCart MCP → GitHub → Vercel</div>
+    </div>
+    <div class="footer-right">
+      <div>seanwilsonpiano.com</div>
+      <div id="footer-ts">v4</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA — Cowork injects between these markers every morning ────────────────
+// [DASHBOARD-DATA-START]
+const FATHOM_DAILY = {
+  "/join-for-1-today/":              { pageviews:122,  uniques:54,  avg_duration:72.84,  bounce_rate:0    },
+  "/join-membership-today/":         { pageviews:35,   uniques:12,  avg_duration:19.15,  bounce_rate:0    },
+  "/4-week-beginner-sales-page/":    { pageviews:148,  uniques:45,  avg_duration:137.96, bounce_rate:2.22 },
+  "/standard-checkout-page/":        { pageviews:4,    uniques:2,   avg_duration:63,     bounce_rate:0    },
+  "/hear-any-chord/":                { pageviews:4,    uniques:2,   avg_duration:28.5,   bounce_rate:0    },
+  "/27musicians/":                   { pageviews:2,    uniques:1,   avg_duration:0,      bounce_rate:0    },
+  "/april-focus-bundle-2026/":       { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/dans-signature-sounds/":         { pageviews:12,   uniques:3,   avg_duration:478.4,  bounce_rate:0    },
+  "/break":                          { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/drop-2-exercise-download-page/": { pageviews:2,    uniques:1,   avg_duration:12,     bounce_rate:0    },
+  "/scales-charts/":                 { pageviews:21,   uniques:6,   avg_duration:59.57,  bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:10,   uniques:3,   avg_duration:22,     bounce_rate:0    },
+  "/major-vs-minor-quiz/":           { pageviews:16,   uniques:7,   avg_duration:22,     bounce_rate:0    },
+  "/available-to-you/":              { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/new-1trial-registration-page/":  { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/27-bundle-waitlist/":            { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/9sus4-to-dominant-release/":     { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/gospel-embell":                  { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+};
+const FATHOM_WEEKLY = {
+  "/join-for-1-today/":              { pageviews:843,  uniques:400, avg_duration:50.48,  bounce_rate:4.75 },
+  "/join-membership-today/":         { pageviews:134,  uniques:61,  avg_duration:195.54, bounce_rate:3.28 },
+  "/4-week-beginner-sales-page/":    { pageviews:949,  uniques:311, avg_duration:70.23,  bounce_rate:6.43 },
+  "/standard-checkout-page/":        { pageviews:61,   uniques:28,  avg_duration:155.44, bounce_rate:0    },
+  "/hear-any-chord/":                { pageviews:75,   uniques:31,  avg_duration:37.62,  bounce_rate:0    },
+  "/scales-charts/":                 { pageviews:87,   uniques:24,  avg_duration:122.87, bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:66,   uniques:16,  avg_duration:16.54,  bounce_rate:0    },
+  "/major-vs-minor-quiz/":           { pageviews:92,   uniques:29,  avg_duration:85.65,  bounce_rate:0    },
+  "/dans-signature-sounds/":         { pageviews:63,   uniques:18,  avg_duration:873.14, bounce_rate:0    },
+};
+const FATHOM_YTD = {
+  "/join-for-1-today/":              { pageviews:22970, uniques:10060, avg_duration:65.38,  bounce_rate:0.70 },
+  "/join-membership-today/":         { pageviews:7807,  uniques:3260,  avg_duration:123.48, bounce_rate:0.31 },
+  "/standard-checkout-page/":        { pageviews:1585,  uniques:664,   avg_duration:114.59, bounce_rate:0    },
+  "/4-week-beginner-sales-page/":    { pageviews:7521,  uniques:2332,  avg_duration:77.84,  bounce_rate:3.13 },
+  "/27musicians/":                   { pageviews:3472,  uniques:1424,  avg_duration:156.03, bounce_rate:0.14 },
+  "/april-focus-bundle-2026/":       { pageviews:1479,  uniques:607,   avg_duration:93.71,  bounce_rate:0.49 },
+  "/dans-signature-sounds/":         { pageviews:3136,  uniques:950,   avg_duration:166.43, bounce_rate:1.58 },
+  "/drop-2-exercise-download-page/": { pageviews:1352,  uniques:588,   avg_duration:285.35, bounce_rate:0.51 },
+  "/hear-any-chord/":                { pageviews:1564,  uniques:672,   avg_duration:75.11,  bounce_rate:0.15 },
+  "/scales-charts/":                 { pageviews:1379,  uniques:371,   avg_duration:49.12,  bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:2410,  uniques:707,   avg_duration:49.69,  bounce_rate:0.42 },
+  "/major-vs-minor-quiz/":           { pageviews:2053,  uniques:657,   avg_duration:60.58,  bounce_rate:0.30 },
+  "/available-to-you/":              { pageviews:1418,  uniques:561,   avg_duration:380.48, bounce_rate:0    },
+  "/new-1trial-registration-page/":  { pageviews:758,   uniques:305,   avg_duration:130.67, bounce_rate:0.98 },
+  "/27-bundle-waitlist/":            { pageviews:1064,  uniques:482,   avg_duration:117.70, bounce_rate:0.41 },
+  "/9sus4-to-dominant-release/":     { pageviews:966,   uniques:427,   avg_duration:163.33, bounce_rate:0    },
+};
+const SITE_TOTALS = {
+  daily:  { pageviews:2064,   uniques:261   },
+  weekly: { pageviews:18305,  uniques:1905  },
+  ytd:    { pageviews:472124, uniques:58027 },
+};
+const MONTHLY = [
+  { month:"Jan", pageviews:107821, uniques:11505 },
+  { month:"Feb", pageviews:89585,  uniques:12208 },
+  { month:"Mar", pageviews:96961,  uniques:13126 },
+  { month:"Apr", pageviews:76415,  uniques:9450  },
+  { month:"May", pageviews:85525,  uniques:9742  },
+  { month:"Jun", pageviews:15817,  uniques:1646,  partial:true },
+];
+const SC_DATA = {
+  // NOTE (Cowork, Jun 8): today/week/month figures below are computed from SureCart's
+  // get-store-dashboard 30-day daily aggregate (confirmed ET-anchored and cross-checked
+  // against individually-verified order amounts). YTD is a labeled ESTIMATE — SureCart's
+  // dashboard endpoint only exposes a fixed ~31-day window, so YTD is extrapolated from
+  // the 30-day daily average × 159 days elapsed (Jan 1–Jun 8). Treat YTD as directional.
+  stats: {
+    today: { count:1,   revenue:2900     },
+    week:  { count:110, revenue:258910   },
+    month: { count:715, revenue:1269910  },
+    ytd:   { count:3790, revenue:6730523, estimated:true },
+  },
+  // byProduct / SC_PREV_30 carried forward from prior refresh — SureCart's order API does
+  // not expand line_item price→product names (only returns price IDs), so a fresh top-10
+  // breakdown by product cannot be computed without per-order product lookups. Flagging
+  // for Sean: a price-ID → product-name lookup table would unblock this permanently.
+  byProduct: [
+    ["Basic Monthly Membership", { count:312, revenue:904800 }],
+    ["$1 Trial Membership",      { count:890, revenue:89000  }],
+    ["4-Day Beginner Course",    { count:98,  revenue:264600 }],
+    ["27 MIDI File Bundle",      { count:64,  revenue:172800 }],
+    ["Dan's Signature Sounds",   { count:18,  revenue:84600  }],
+    ["April Focus Guide",        { count:44,  revenue:118800 }],
+    ["Piano Blueprint Session",  { count:4,   revenue:118800 }],
+    ["Mediant Drop 2",           { count:112, revenue:11200  }],
+  ],
+  recentOrders: [
+    { id:"F41756B5", number:"F41756B5", created_at:1780911540, status:"paid", amount:2900 },
+    { id:"4434E19B", number:"4434E19B", created_at:1780887420, status:"paid", amount:2900 },
+    { id:"10915B0D", number:"10915B0D", created_at:1780878660, status:"paid", amount:2900 },
+    { id:"10D16511", number:"10D16511", created_at:1780864620, status:"paid", amount:2900 },
+    { id:"853BCE82", number:"853BCE82", created_at:1780862340, status:"paid", amount:2900 },
+    { id:"99F4D805", number:"99F4D805", created_at:1780862160, status:"paid", amount:3900 },
+    { id:"8CD5B4E7", number:"8CD5B4E7", created_at:1780861860, status:"paid", amount:3900 },
+    { id:"3F150E75", number:"3F150E75", created_at:1780858020, status:"paid", amount:2900 },
+  ],
+  lastFetched: "Jun 8, 8:00 AM",
+  // byProductPeriod: Cowork injects daily from Airtable — period-matched revenue per product
+  // Keys must match sc_product field in TRACKED array exactly
+  // null = data not yet available for that period (shows N/A in table)
+  byProductPeriod: {
+    daily: [
+      ["Basic Monthly Membership", { count:6, revenue:17400 }],
+      ["$1 Trial Membership",      { count:0, revenue:0     }],
+      ["4-Day Beginner Course",    { count:2, revenue:4800  }],
+    ],
+    weekly: null,
+    ytd:    null,
+  },
+  // New signups = active subscriptions with created_at in window (pulled directly from
+  // SureCart subscription records — 300/373 active subs sampled, fully covers all windows below)
+  // NOTE (Cowork, Jun 8 — Monday): growth block carried forward unchanged from last
+  // Sunday's refresh per schedule (signups/renewals breakdown only recomputed on Sundays).
+  growth: {
+    week:  { newSignups:4,   newRevenue:11600,  renewals:104, renewalRevenue:241510, totalRevenue:253110  },
+    month: { newSignups:50,  newRevenue:145000, renewals:662, renewalRevenue:1116210,totalRevenue:1261210 },
+    ytd:   { newSignups:213, newRevenue:617700, renewals:2564,renewalRevenue:6456040,totalRevenue:7073740 },
+    monthlyNewSignups: [
+      { month:"Jan", count:39 },
+      { month:"Feb", count:38 },
+      { month:"Mar", count:38 },
+      { month:"Apr", count:37 },
+      { month:"May", count:57 },
+      { month:"Jun", count:4, partial:true },
+    ],
+  },
+};
+// PREV_PERIOD: prior 7-day window for spike detection (Cowork injects daily)
+// Each entry: { pageviews, uniques } keyed by pathname
+// SC_PREV: prior 30-day product counts for sales spike detection
+const PREV_PERIOD = {
+  "/join-for-1-today/":           { pageviews:1028, uniques:472 },
+  "/join-membership-today/":      { pageviews:147,  uniques:62  },
+  "/4-week-beginner-sales-page/": { pageviews:1093, uniques:342 },
+  "/standard-checkout-page/":     { pageviews:61,   uniques:25  },
+  "/hear-any-chord/":             { pageviews:272,  uniques:118 },
+  "/our-roadmap-offer/":          { pageviews:108,  uniques:29  },
+  "/major-vs-minor-quiz/":        { pageviews:102,  uniques:28  },
+  "/scales-charts/":              { pageviews:101,  uniques:22  },
+  "/dans-signature-sounds/":      { pageviews:81,   uniques:27  },
+};
+const SC_PREV_30 = {
+  "Basic Monthly Membership": { count:298, revenue:864200 },
+  "$1 Trial Membership":      { count:856, revenue:85600  },
+  "4-Day Beginner Course":    { count:91,  revenue:245700 },
+  "27 MIDI File Bundle":      { count:59,  revenue:159300 },
+  "Dan's Signature Sounds":   { count:16,  revenue:75200  },
+  "April Focus Guide":        { count:40,  revenue:108000 },
+  "Piano Blueprint Session":  { count:3,   revenue:89100  },
+  "Mediant Drop 2":           { count:104, revenue:10400  },
+};
+const LAST_UPDATED = "Jun 8, 8:00 AM";
+// [DASHBOARD-DATA-END]
+
+// ─── TRACKED PAGES with conversion targets ────────────────────────────────────
+// conv_target: expected checkout/signup page for this page (to compute Conv%)
+// sc_product:  matching key in SC_DATA.byProduct for revenue lookup
+const TRACKED = [
+  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"$1 Trial Membership"      },
+  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"         },
+  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Monthly Membership"  },
+  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"4-Day Beginner Course"     },
+  { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"       },
+  { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"         },
+  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"    },
+  { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"   },
+  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"            },
+  { name:"Ear Chart Lead Magnet",    slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"                                             },
+  { name:"Scales Charts",            slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"                                             },
+  { name:"Roadmap Lead",             slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"                                             },
+  { name:"Major vs Minor Quiz",      slug:"/major-vs-minor-quiz/",           type:"Lead Magnet",  price:0,   cat:"lead"                                             },
+  { name:"Available Bridge Page",    slug:"/available-to-you/",              type:"Bridge",       price:0,   cat:"lead"                                             },
+  { name:"Trial Registration Page",  slug:"/new-1trial-registration-page/",  type:"Checkout",     price:0,   cat:"funnel"                                           },
+  { name:"27 Bundle Waitlist",       slug:"/27-bundle-waitlist/",            type:"Bridge",       price:0,   cat:"lead"                                             },
+  { name:"9sus4 Practice Page",      slug:"/9sus4-to-dominant-release/",     type:"Content",      price:0,   cat:"lead"                                             },
+];
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const fmt    = n => (!n&&n!==0)?"—":n>=1000?(n/1000).toFixed(1)+"k":n.toLocaleString();
+const fmtPct = n => (!n&&n!==0)?"—":n.toFixed(1)+"%";
+const fmtSec = n => !n?"—":n>=60?Math.floor(n/60)+"m "+Math.round(n%60)+"s":Math.round(n)+"s";
+const fmtUSD = n => (!n&&n!==0)?"—":"$"+(n/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtUSDshort = n => {
+  if(!n&&n!==0) return "—";
+  const d = n/100;
+  return d>=1000?"$"+(d/1000).toFixed(1)+"k":"$"+d.toFixed(0);
+};
+
+const TYPE_COLORS = {
+  "Subscription":"#8b5cf6","Product":"#3b82f6","Lead Magnet":"#10b981",
+  "Bridge":"#06b6d4","Sales Page":"#E8472A","Checkout":"#f59e0b",
+  "Coaching":"#ec4899","Content":"#64748b",
+};
+
+function getPageData(slug, period) {
+  const map = period==="daily"?FATHOM_DAILY:period==="weekly"?FATHOM_WEEKLY:FATHOM_YTD;
+  // Exact match first
+  if (map[slug]) return map[slug];
+  // Trailing slash tolerance only
+  const withSlash    = slug.endsWith("/") ? slug : slug+"/";
+  const withoutSlash = slug.endsWith("/") ? slug.slice(0,-1) : slug;
+  return map[withSlash] || map[withoutSlash] || null;
+}
+
+function getScProduct(name) {
+  if (!SC_DATA || !name) return null;
+  const entry = SC_DATA.byProduct.find(([n]) => n===name);
+  return entry ? entry[1] : null;
+}
+
+// Conv% = if page has a conv_slug, use that page's uniques / this page's uniques
+// For checkout pages themselves, use SC orders / page uniques
+function getConvRate(page, period) {
+  const d = getPageData(page.slug, period);
+  if (!d || !d.uniques) return null;
+
+  if (page.conv_slug) {
+    // Sales page → downstream checkout
+    const downstream = getPageData(page.conv_slug, period);
+    if (!downstream || !downstream.uniques) return null;
+    return (downstream.uniques / d.uniques) * 100;
+  }
+  if (page.sc_product && SC_DATA) {
+    // Checkout/product page: orders / page uniques
+    const sc = getScProduct(page.sc_product);
+    if (!sc) return null;
+    // Scale sc.count to period (sc is ~30-day, scale by period ratio)
+    const periodDays = period==="daily"?1:period==="weekly"?7:157;
+    const scaledCount = sc.count * (periodDays / 30);
+    return (scaledCount / d.uniques) * 100;
+  }
+  return null;
+}
+
+function convClass(rate) {
+  if (rate===null) return "conv-none";
+  if (rate>=3) return "conv-high";
+  if (rate>=1) return "conv-mid";
+  return "conv-low";
+}
+
+function signalColor(views, cat) {
+  if (!views) return "#334155";
+  const t = cat==="lead"?[200,1000]:cat==="checkout"?[500,5000]:[100,500];
+  return views>=t[1]?"#10b981":views>=t[0]?"#f59e0b":"#ef4444";
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let currentPeriod = "weekly";
+let currentFilter = "all";
+let currentTab    = "pages";
+let isDark        = true;
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderAlerts() {
+  const banner = document.getElementById("alerts-banner");
+  if (!banner) return;
+  const alerts = [];
+
+  // ── POSITIVE ALERTS ──────────────────────────────────────────────────────
+
+  // Traffic spikes vs prior 7-day window (current period = weekly)
+  if (PREV_PERIOD) {
+    TRACKED.forEach(page => {
+      const curr = getPageData(page.slug, "weekly");
+      const prev = Object.keys(PREV_PERIOD).find(k =>
+        page.slug.startsWith(k.replace(/\/$/,"")) || k.startsWith(page.slug.substring(0,10))
+      );
+      if (!curr || !prev) return;
+      const prevD = PREV_PERIOD[prev];
+      if (!prevD?.pageviews || prevD.pageviews < 20) return; // too small to be meaningful
+      const ratio = curr.pageviews / prevD.pageviews;
+      if (ratio >= 2) {
+        const pct = Math.round((ratio - 1) * 100);
+        alerts.push({ type:"positive", msg:`📈 ${page.name}: ${fmt(curr.pageviews)} views this week — ${pct}% above prior week (${fmt(prevD.pageviews)}). Check what you posted 1–2 days before the spike.` });
+      }
+    });
+  }
+
+  // Sales spikes vs prior 30 days
+  if (SC_DATA?.byProduct && SC_PREV_30) {
+    SC_DATA.byProduct.forEach(([name, data]) => {
+      const prev = SC_PREV_30[name];
+      if (!prev || prev.count < 5) return;
+      const ratio = data.count / prev.count;
+      if (ratio >= 1.5) {
+        const pct = Math.round((ratio - 1) * 100);
+        alerts.push({ type:"positive", msg:`💰 ${name}: ${data.count} sales this month — ${pct}% above prior month (${prev.count}). Something is converting better. Find it and repeat it.` });
+      }
+    });
+  }
+
+  // ── NEGATIVE ALERTS ──────────────────────────────────────────────────────
+
+  // Failed / past_due payments
+  if (SC_DATA?.recentOrders) {
+    const failed = SC_DATA.recentOrders.filter(o => o.status==="failed" || o.status==="past_due");
+    failed.forEach(o => {
+      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      alerts.push({ type:"warning", msg:`⚠️ Failed payment: Order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Check dunning sequence.` });
+    });
+  }
+
+  // High-value paid orders that need manual action (≥$297)
+  if (SC_DATA?.recentOrders) {
+    const highValue = SC_DATA.recentOrders.filter(o => o.status==="paid" && o.amount >= 29700);
+    highValue.forEach(o => {
+      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      alerts.push({ type:"action", msg:`🔔 High-value order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Confirm session is scheduled with customer.` });
+    });
+  }
+
+  // Traffic drops vs prior week (>40% drop on a page that had meaningful traffic)
+  if (PREV_PERIOD) {
+    TRACKED.filter(p => p.price > 0).forEach(page => {
+      const curr = getPageData(page.slug, "weekly");
+      const prev = Object.keys(PREV_PERIOD).find(k =>
+        page.slug.startsWith(k.replace(/\/$/,"")) || k.startsWith(page.slug.substring(0,10))
+      );
+      if (!curr || !prev) return;
+      const prevD = PREV_PERIOD[prev];
+      if (!prevD?.pageviews || prevD.pageviews < 50) return;
+      const ratio = curr.pageviews / prevD.pageviews;
+      if (ratio < 0.6) {
+        const pct = Math.round((1 - ratio) * 100);
+        alerts.push({ type:"warning", msg:`📉 ${page.name}: ${fmt(curr.pageviews)} views this week — ${pct}% below prior week (${fmt(prevD.pageviews)}). Traffic dropped, check funnel.` });
+      }
+    });
+  }
+
+  if (!alerts.length) {
+    banner.innerHTML = `<div style="margin-bottom:12px;padding:10px 14px;border-radius:8px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);font-size:12px;color:var(--green);font-weight:600">✅ No unusual activity — traffic and sales are within normal range.</div>`;
+    return;
+  }
+
+  // Sort: positive first, then action, then warnings
+  const order = { positive:0, action:1, warning:2 };
+  alerts.sort((a,b) => order[a.type] - order[b.type]);
+
+  const colors = {
+    positive: { border:"var(--green)",  bg:"rgba(16,185,129,.07)", icon:"📈" },
+    action:   { border:"var(--yellow)", bg:"rgba(245,158,11,.07)", icon:"🔔" },
+    warning:  { border:"var(--red)",    bg:"rgba(239,68,68,.07)",  icon:"⚠️" },
+  };
+
+  banner.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">
+        ${alerts.length} Alert${alerts.length>1?"s":""} — ${new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${alerts.map(a=>{
+          const c = colors[a.type];
+          return `<div style="padding:10px 14px;border-radius:8px;border-left:3px solid ${c.border};background:${c.bg};font-size:12px;font-weight:600;color:var(--text);line-height:1.5">${a.msg}</div>`;
+        }).join("")}
+      </div>
+    </div>`;
+}
+
+function renderAll() {
+  document.getElementById("subtitle-ts").textContent =
+    `Updated ${LAST_UPDATED} · Fathom BCWEGICN + SureCart`;
+  document.getElementById("footer-ts").textContent = `v6 · ${LAST_UPDATED}`;
+  renderAlerts();
+  renderKPI();
+  renderPages();
+  renderSales();
+  renderFunnel();
+  renderMonthly();
+}
+
+function getDateRange(period) {
+  const today = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.toLocaleString('en-US',{month:'short'})} ${d.getDate()}, ${d.getFullYear()}`;
+  if (period === "daily") {
+    return `Today — ${fmt(today)}`;
+  } else if (period === "weekly") {
+    const start = new Date(today); start.setDate(today.getDate()-6);
+    return `${fmt(start)} – ${fmt(today)}`;
+  } else {
+    return `Jan 1, 2026 – ${fmt(today)}`;
+  }
+}
+
+function renderKPI() {
+  const tot = SITE_TOTALS[currentPeriod]||{};
+  const trialD = getPageData("/join-for-1-today/", currentPeriod);
+  const begD   = getPageData("/4-week-beginner-sales-page/", currentPeriod);
+  const scStats = SC_DATA?.stats;
+  const dateRange = getDateRange(currentPeriod);
+
+  // Update period label on Overview tab
+  const pl = document.getElementById("period-label");
+  if (pl) pl.textContent = `Showing: ${dateRange} · Traffic from Fathom · Revenue from Airtable`;
+  // Update revenue column header to match period
+  const rh = document.getElementById("rev-col-header");
+  if (rh) rh.textContent = currentPeriod==="daily"?"Today Rev":currentPeriod==="weekly"?"7-Day Rev":"YTD Rev";
+
+  const cards = [
+    { label:"Site Pageviews",   value:fmt(tot.pageviews),     sub:dateRange,              color:"#3b82f6" },
+    { label:"Unique Visitors",  value:fmt(tot.uniques),       sub:dateRange,              color:"#8b5cf6" },
+    { label:"$1 Trial Page",    value:fmt(trialD?.pageviews), sub:dateRange,              color:"#E8472A" },
+    { label:"Beginner Course",  value:fmt(begD?.pageviews),   sub:dateRange,              color:"#f59e0b" },
+    { label:"Revenue Today",    value:scStats ? fmtUSD(scStats.today.revenue) : "—",
+      sub:`${scStats?.today.count??'—'} orders · ${getDateRange('daily')}`,              color:"#10b981" },
+    { label:"Revenue 7-Day",    value:scStats ? fmtUSD(scStats.week.revenue) : "—",
+      sub:`${scStats?.week.count??'—'} orders · ${getDateRange('weekly')}`,              color:"#10b981" },
+  ];
+  document.getElementById("kpi-grid").innerHTML = cards.map(c=>`
+    <div class="kpi-card" style="--card-color:${c.color}">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>`).join("");
+}
+
+function renderPages() {
+  const pages = TRACKED.filter(p =>
+    currentFilter==="all"      ? true :
+    currentFilter==="paid"     ? p.price>0 :
+    currentFilter==="lead"     ? p.price===0 :
+    currentFilter==="checkout" ? p.cat==="checkout" : true
+  );
+  const maxPvs = Math.max(1,...pages.map(p=>getPageData(p.slug,currentPeriod)?.pageviews||0));
+  const dateRange = getDateRange(currentPeriod);
+
+  document.getElementById("pages-table-body").innerHTML = pages.map((page,i) => {
+    const d    = getPageData(page.slug, currentPeriod);
+    const pvs  = d?.pageviews||0;
+    const uniq = d?.uniques||0;
+    const pct  = maxPvs>0 ? Math.min(100,(pvs/maxPvs)*100) : 0;
+    const sc   = signalColor(pvs, page.cat);
+    const tc   = TYPE_COLORS[page.type]||"#64748b";
+    const conv = getConvRate(page, currentPeriod);
+    const convRate = conv!==null ? conv.toFixed(1)+"%" : "—";
+    const cClass   = convClass(conv);
+
+    // Period-matched revenue from Airtable via SC_DATA.byProductPeriod
+    // Shows N/A when data not yet available for that period
+    let revDisplay = "";
+    if (page.price === 0) {
+      revDisplay = `<div class="tr-right" style="font-size:11px;color:var(--dim)">free</div>`;
+    } else if (page.sc_product && SC_DATA?.byProductPeriod) {
+      const periodData = SC_DATA.byProductPeriod[currentPeriod];
+      const entry = periodData?.find(([n]) => n === page.sc_product);
+      if (entry) {
+        revDisplay = `
+          <div class="tr-right">
+            <div style="font-size:13px;font-weight:800;color:var(--green)">${fmtUSD(entry[1].revenue)}</div>
+            <div style="font-size:10px;color:var(--dim);margin-top:1px">${entry[1].count} orders</div>
+          </div>`;
+      } else {
+        revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">N/A</div>`;
+      }
+    } else {
+      revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">N/A</div>`;
+    }
+
+    return `
+      <div class="table-row">
+        <div class="page-name-cell">
+          <div class="page-name-top">
+            <span class="badge" style="background:${tc}22;color:${tc}">${page.type}</span>
+            ${page.price>0?`<span class="price-tag">$${page.price}</span>`:""}
+          </div>
+          <div class="page-name" title="${page.name}">${page.name}</div>
+        </div>
+        <div class="bar-cell">
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>
+        </div>
+        <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${fmt(pvs)}</div>
+        <div class="tr-right" style="font-size:12px;color:var(--muted)">${uniq>0?fmt(uniq):"—"}</div>
+        <div class="tr-center"><span class="conv-pill ${cClass}">${convRate}</span></div>
+        ${revDisplay}
+        <div class="tr-center"><div class="signal-dot" style="background:${sc};box-shadow:${pvs>1000?"0 0 7px "+sc:"none"}"></div></div>
+      </div>`;
+  }).join("");
+}
+
+function renderSales() {
+  const el = document.getElementById("sales-content");
+  if (!SC_DATA) {
+    el.innerHTML = `<div class="sc-pending"><div class="sc-pending-icon">🛒</div><div class="sc-pending-title">SureCart data pending</div><div class="sc-pending-sub">Cowork will inject live data on next 8 AM refresh.</div></div>`;
+    return;
+  }
+  const { stats, byProduct, recentOrders, growth } = SC_DATA;
+
+  // ── Revenue KPIs ──
+  const scKPIs = [
+    { label:"Today",    value:fmtUSD(stats.today.revenue), sub:`${stats.today.count} orders`,      color:"#10b981" },
+    { label:"7-Day",    value:fmtUSD(stats.week.revenue),  sub:`${stats.week.count} orders`,       color:"#3b82f6" },
+    { label:"30-Day",   value:fmtUSD(stats.month.revenue), sub:`${stats.month.count} orders`,      color:"#E8472A" },
+    { label:"YTD 2026", value:fmtUSD(stats.ytd?.revenue||0), sub:`${stats.ytd?.count||0} orders`, color:"#8b5cf6" },
+  ];
+
+  // ── Growth split rows ──
+  function growthRow(g) {
+    if (!g) return "";
+    const newPct  = g.totalRevenue>0 ? (g.newRevenue/g.totalRevenue*100).toFixed(0) : 0;
+    const renPct  = g.totalRevenue>0 ? (g.renewalRevenue/g.totalRevenue*100).toFixed(0) : 0;
+    const newBar  = g.totalRevenue>0 ? (g.newRevenue/g.totalRevenue*100) : 0;
+    const renBar  = 100 - newBar;
+    return `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
+        <!-- New Signups -->
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px">
+          <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🟢 New Signups</div>
+          <div style="font-size:24px;font-weight:800;color:var(--green);letter-spacing:-.02em">${g.newSignups}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--green);margin-top:2px">${fmtUSD(g.newRevenue)}</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:3px">${newPct}% of revenue</div>
+        </div>
+        <!-- Renewals -->
+        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:12px 14px">
+          <div style="font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🔄 Renewals</div>
+          <div style="font-size:24px;font-weight:800;color:var(--blue);letter-spacing:-.02em">${g.renewals}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-top:2px">${fmtUSD(g.renewalRevenue)}</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:3px">${renPct}% of revenue</div>
+        </div>
+      </div>
+      <!-- Split bar -->
+      <div style="height:6px;border-radius:3px;overflow:hidden;display:flex;margin-bottom:6px">
+        <div style="width:${newBar}%;background:#10b981;transition:width .7s ease"></div>
+        <div style="width:${renBar}%;background:#3b82f6;transition:width .7s ease"></div>
+      </div>
+      <div style="display:flex;gap:16px;font-size:11px;color:var(--dim)">
+        <span><span style="color:var(--green);font-weight:700">■</span> New signup revenue</span>
+        <span><span style="color:var(--blue);font-weight:700">■</span> Renewal revenue</span>
+      </div>`;
+  }
+
+  // ── Monthly new signup trend ──
+  const monthlyTrend = growth?.monthlyNewSignups || [];
+  const maxSignups = Math.max(1,...monthlyTrend.map(m=>m.count));
+  const trendChart = monthlyTrend.length ? `
+    <div class="section-card">
+      <div class="section-head"><span>New Signups by Month — 2026</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
+      <div style="padding:16px 16px 8px;display:flex;align-items:flex-end;gap:10px;height:110px">
+        ${monthlyTrend.map(m=>{
+          const h = Math.max(6,(m.count/maxSignups)*80);
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <div style="font-size:10px;color:var(--dim);font-weight:700">${m.count}</div>
+            <div style="width:100%;height:${h}px;background:${m.partial?"transparent":"linear-gradient(180deg,#10b981,#059669)"};border-radius:3px 3px 0 0;${m.partial?"border:2px dashed rgba(16,185,129,.4)":""};position:relative">
+              ${m.partial?'<span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--green);white-space:nowrap">now</span>':""}
+            </div>
+            <div style="font-size:10px;color:var(--dim);font-weight:700">${m.month}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>` : "";
+
+  // ── Growth windows tabs ──
+  const windows = [
+    { key:"week",  label:"7 Days",   g:growth?.week  },
+    { key:"month", label:"30 Days",  g:growth?.month },
+    { key:"ytd",   label:"YTD 2026", g:growth?.ytd   },
+  ];
+
+  const maxRev = byProduct.length ? byProduct[0][1].revenue : 1;
+
+  el.innerHTML = `
+    <!-- Revenue KPIs -->
+    <div class="sc-kpi-grid">
+      ${scKPIs.map(c=>`
+        <div class="kpi-card" style="--card-color:${c.color}">
+          <div class="kpi-label">${c.label}</div>
+          <div class="kpi-value">${c.value}</div>
+          <div class="kpi-sub">${c.sub}</div>
+        </div>`).join("")}
+    </div>
+
+    <!-- New Signups vs Renewals -->
+    <div class="section-card">
+      <div class="section-head">
+        <span>New Signups vs Renewals</span>
+        <span style="font-weight:400;font-size:10px">your growth signal</span>
+      </div>
+      <div style="padding:14px 16px">
+        <!-- Window tabs -->
+        <div style="display:flex;gap:4px;margin-bottom:14px">
+          ${windows.map((w,i)=>`
+            <button onclick="document.querySelectorAll('.growth-pane').forEach(p=>p.style.display='none');document.getElementById('growth-${w.key}').style.display='block';this.closest('.growth-tabs').querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.color='var(--dim)'});this.style.background='var(--accent)';this.style.color='#fff'"
+              class="growth-tabs" style="padding:5px 14px;border-radius:6px;border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:${i===0?"var(--accent)":"transparent"};color:${i===0?"#fff":"var(--dim)"}">
+              ${w.label}
+            </button>`).join("")}
+        </div>
+        ${windows.map((w,i)=>`
+          <div id="growth-${w.key}" class="growth-pane" style="display:${i===0?"block":"none"}">
+            ${growthRow(w.g)}
+          </div>`).join("")}
+      </div>
+    </div>
+
+    <!-- Monthly trend chart -->
+    ${trendChart}
+
+    <!-- Revenue by product -->
+    <div class="section-card">
+      <div class="section-head"><span>Revenue by Product — Last 30 Days</span><span style="font-weight:400;font-size:10px">from SureCart</span></div>
+      ${byProduct.map(([name,data])=>{
+        const pct=maxRev>0?Math.min(100,(data.revenue/maxRev)*100):0;
+        return `<div class="product-row">
+          <div class="product-meta">
+            <span class="product-name">${name}</span>
+            <span class="product-count">${data.count}×</span>
+            <span class="product-rev">${fmtUSD(data.revenue)}</span>
+          </div>
+          <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <!-- Recent orders -->
+    ${recentOrders?.length?`
+    <div class="section-card">
+      <div class="section-head"><span>Recent Orders</span><span style="font-weight:400;font-size:10px">fetched ${SC_DATA.lastFetched}</span></div>
+      ${recentOrders.slice(0,8).map(o=>{
+        const date=new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+        const paid=o.status==="paid";
+        return `<div class="order-row">
+          <div><div class="order-id">#${o.number||o.id?.slice(0,8)}</div><div class="order-date">${date}</div></div>
+          <div class="order-right">
+            <span class="status-badge ${paid?"status-paid":"status-other"}">${o.status}</span>
+            <span class="order-amount" style="color:${paid?"var(--green)":"var(--muted)"}">${fmtUSD(o.amount)}</span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`:""}`;
+}
+
+function renderFunnel() {
+  const stages = [
+    { title:"🔍 Lead Magnets", color:"#10b981", items:[
+      { name:"Ear Chart Landing",   views:FATHOM_YTD["/hear-any-chord/"]?.pageviews||0 },
+      { name:"Roadmap Offer",       views:FATHOM_YTD["/our-roadmap-offer/"]?.pageviews||0 },
+      { name:"Major vs Minor Quiz", views:FATHOM_YTD["/major-vs-minor-quiz/"]?.pageviews||0 },
+      { name:"Scales Charts",       views:FATHOM_YTD["/scales-charts/"]?.pageviews||0 },
+      { name:"Available Bridge",    views:FATHOM_YTD["/available-to-you/"]?.pageviews||0 },
+      { name:"27 Bundle Waitlist",  views:FATHOM_YTD["/27-bundle-waitlist/"]?.pageviews||0 },
+    ]},
+    { title:"💡 Sales Pages", color:"#3b82f6", items:[
+      { name:"Main Trial Sales",       views:FATHOM_YTD["/join-membership-today/"]?.pageviews||0 },
+      { name:"$1 Trial Checkout",      views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
+      { name:"4-Day Beginner Sales",   views:FATHOM_YTD["/4-week-beginner-sales-page/"]?.pageviews||0 },
+      { name:"Dan's Signature Sounds", views:FATHOM_YTD["/dans-signature-sounds/"]?.pageviews||0 },
+      { name:"27 MIDI Bundle",         views:FATHOM_YTD["/27musicians/"]?.pageviews||0 },
+      { name:"April Focus Guide",      views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
+    ]},
+    { title:"💳 Checkouts", color:"#E8472A", items:[
+      { name:"$1 Trial",          views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
+      { name:"Basic Monthly",     views:FATHOM_YTD["/standard-checkout-page/"]?.pageviews||0 },
+      { name:"Drop 2 ($1)",       views:FATHOM_YTD["/drop-2-exercise-download-page/"]?.pageviews||0 },
+      { name:"April Focus ($27)", views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
+    ]},
+    { title:"⚠️ Action Needed", color:"#f59e0b", items:[
+      { name:"76 — embed on site + add bumps",  views:0, note:"1,000+ comments · IG 68.5% CTR", action:true },
+      { name:"Evil Laugh — needs site embed",   views:0, note:"89.6% CTR · 48 runs",            action:true },
+      { name:"Adore Him — raw Loom URL",        views:0, note:"No landing page yet",             action:true },
+      { name:"Inverted Dominant — confirm URL", views:0, note:"Two URLs still open",             action:true },
+    ]},
+  ];
+  document.getElementById("funnel-grid").innerHTML = stages.map(s=>{
+    const maxV=Math.max(1,...s.items.map(x=>x.views||0));
+    return `<div class="funnel-card" style="border-top:2px solid ${s.color}40">
+      <div class="funnel-title" style="color:${s.color}">${s.title}</div>
+      ${s.items.map(item=>{
+        const pct=maxV>0?Math.min(100,(item.views/maxV)*100):0;
+        return `<div class="funnel-row">
+          <div class="funnel-row-top">
+            <span class="funnel-name ${item.action?"action":""}">${item.action?"⚠️ ":""}${item.name}</span>
+            <span class="funnel-val" style="color:${item.views>0?"var(--text)":"var(--faint)"}">${item.views>0?fmt(item.views):"—"}</span>
+          </div>
+          ${item.note?`<div class="funnel-note">${item.note}</div>`:""}
+          ${!item.action?`<div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${s.color}"></div></div>`:""}
+        </div>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+
+function renderMonthly() {
+  const maxPv=Math.max(1,...MONTHLY.map(m=>m.pageviews));
+  document.getElementById("chart-bars").innerHTML = MONTHLY.map(m=>{
+    const h=Math.max(8,(m.pageviews/maxPv)*130);
+    return `<div class="chart-col">
+      <div class="chart-val">${fmt(m.pageviews)}</div>
+      <div class="chart-bar ${m.partial?"partial":"solid"}" style="height:${h}px">
+        ${m.partial?'<span class="partial-label">partial</span>':""}
+      </div>
+      <div class="chart-month">${m.month}</div>
+    </div>`;
+  }).join("");
+  const ytdTot=MONTHLY.reduce((s,m)=>({pageviews:s.pageviews+m.pageviews,uniques:s.uniques+m.uniques}),{pageviews:0,uniques:0});
+  document.getElementById("monthly-table-body").innerHTML = MONTHLY.map((m,i,arr)=>{
+    const prev=arr[i-1];
+    const delta=prev?(m.pageviews-prev.pageviews)/prev.pageviews*100:null;
+    return `<div class="monthly-row">
+      <div style="font-size:14px;font-weight:700">${m.month} 2026${m.partial?' <span style="font-size:10px;color:var(--accent)">●</span>':""}</div>
+      <div class="tr-right" style="font-size:14px;font-weight:800;color:var(--blue)">${fmt(m.pageviews)}</div>
+      <div class="tr-right" style="font-size:13px;color:var(--muted)">${fmt(m.uniques)}</div>
+      <div class="tr-right" style="font-size:13px;font-weight:700;color:${delta===null?"var(--dim)":delta>=0?"var(--green)":"var(--red)"}">
+        ${delta===null?"—":(delta>=0?"▲":"▼")+" "+Math.abs(delta).toFixed(1)+"%"}
+      </div>
+    </div>`;
+  }).join("");
+  document.getElementById("monthly-total").innerHTML = `
+    <div style="font-size:13px;font-weight:800">YTD TOTAL</div>
+    <div class="tr-right" style="font-weight:800;color:var(--accent)">${fmt(ytdTot.pageviews)}</div>
+    <div class="tr-right" style="font-weight:700;color:var(--purple)">${fmt(ytdTot.uniques)}</div>
+    <div class="tr-right" style="font-size:11px;color:var(--dim)">Jan–Jun 6</div>`;
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+function setPeriod(p) {
+  currentPeriod=p;
+  document.querySelectorAll(".period-btn").forEach(b=>b.classList.toggle("active",b.dataset.period===p));
+  renderAlerts();
+  renderKPI();
+  renderPages();
+}
+function setFilter(f) {
+  currentFilter=f;
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b.textContent.trim().toLowerCase().replace(" ","")===f||(f==="all"&&b.textContent.trim()==="All")||(f==="paid"&&b.textContent.trim()==="Paid")||(f==="lead"&&b.textContent.trim()==="Lead Magnets")||(f==="checkout"&&b.textContent.trim()==="Checkouts")));
+  renderPages();
+}
+function setTab(t) {
+  currentTab=t;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+t));
+}
+function toggleTheme() {
+  isDark=!isDark;
+  document.documentElement.setAttribute("data-theme",isDark?"":"light");
+  document.getElementById("theme-btn").textContent=isDark?"🌙":"☀️";
+}
+
+renderAll();
+</script>
+</body>
+</html>
