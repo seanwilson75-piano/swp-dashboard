@@ -624,6 +624,7 @@ function renderAlerts() {
   // Traffic spikes vs prior 7-day window (current period = weekly)
   if (PREV_PERIOD) {
     TRACKED.forEach(page => {
+      if (!page.slug) return;
       const curr = getPageData(page.slug, "weekly");
       const prev = Object.keys(PREV_PERIOD).find(k =>
         page.slug.startsWith(k.replace(/\/$/,"")) || k.startsWith(page.slug.substring(0,10))
@@ -674,7 +675,7 @@ function renderAlerts() {
 
   // Traffic drops vs prior week (>40% drop on a page that had meaningful traffic)
   if (PREV_PERIOD) {
-    TRACKED.filter(p => p.price > 0).forEach(page => {
+    TRACKED.filter(p => p.price > 0 && p.slug).forEach(page => {
       const curr = getPageData(page.slug, "weekly");
       const prev = Object.keys(PREV_PERIOD).find(k =>
         page.slug.startsWith(k.replace(/\/$/,"")) || k.startsWith(page.slug.substring(0,10))
