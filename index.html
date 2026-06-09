@@ -514,15 +514,18 @@ const LAST_UPDATED = "Jun 9, 8:13 AM";
 // conv_target: expected checkout/signup page for this page (to compute Conv%)
 // sc_product:  matching key in SC_DATA.byProduct for revenue lookup
 const TRACKED = [
-  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial" },
-  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"                      },
-  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership"                       },
-  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days" },
-  { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                    },
-  { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                      },
-  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"                 },
-  { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"                },
-  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"                         },
+  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial",  recurring:true  },
+  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"                                   },
+  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership",                   recurring:true  },
+  { name:"Premium Membership",       slug:null,                              type:"Subscription", price:47,  cat:"checkout", sc_product:"Premium Membership",                 recurring:true  },
+  { name:"Annual Membership",        slug:null,                              type:"Subscription", price:290, cat:"checkout", sc_product:"Annual Standard Membership",          recurring:true  },
+  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days"              },
+  { name:"Beginner Practice Plan",   slug:null,                              type:"Product",      price:12,  cat:"checkout", sc_product:"Beginner Practice Plan - for 4 Songs"               },
+  { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                                 },
+  { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                                   },
+  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"                              },
+  { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"                             },
+  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"                                      },
   { name:"Ear Chart Lead Magnet",    slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Scales Charts",            slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Roadmap Lead",             slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"                                             },
@@ -748,9 +751,9 @@ function renderKPI() {
   const scStats = SC_DATA?.stats;
   const dateRange = getDateRange(currentPeriod);
 
-  // Update period label on Overview tab
+  // Update period label on Overview tab — bold date always visible
   const pl = document.getElementById("period-label");
-  if (pl) pl.textContent = `Showing: ${dateRange} · Traffic from Fathom · Revenue from Airtable`;
+  if (pl) pl.innerHTML = `<span style="font-size:15px;font-weight:900;color:${currentPeriod==="daily"?"var(--green)":"var(--accent)"};letter-spacing:-.01em">${dateRange}</span><span style="font-size:11px;color:var(--dim);margin-left:8px">· Traffic: Fathom · Revenue: Airtable</span>`;
   // Update revenue column header to match period
   const rh = document.getElementById("rev-col-header");
   if (rh) rh.textContent = currentPeriod==="daily"?"Today Rev":currentPeriod==="weekly"?"7-Day Rev":"YTD Rev";
@@ -791,18 +794,18 @@ function renderPages() {
   const dateRange = getDateRange(currentPeriod);
 
   document.getElementById("pages-table-body").innerHTML = pages.map((page,i) => {
-    const d    = getPageData(page.slug, currentPeriod);
+    const noSlug = !page.slug;
+    const d    = noSlug ? null : getPageData(page.slug, currentPeriod);
     const pvs  = d?.pageviews||0;
     const uniq = d?.uniques||0;
     const pct  = maxPvs>0 ? Math.min(100,(pvs/maxPvs)*100) : 0;
-    const sc   = signalColor(pvs, page.cat);
+    const sc   = noSlug ? "var(--border)" : signalColor(pvs, page.cat);
     const tc   = TYPE_COLORS[page.type]||"#64748b";
-    const conv = getConvRate(page, currentPeriod);
+    const conv = noSlug ? null : getConvRate(page, currentPeriod);
     const convRate = conv!==null ? conv.toFixed(1)+"%" : "—";
     const cClass   = convClass(conv);
 
     // Period-matched revenue from Airtable via SC_DATA.byProductPeriod
-    // Shows N/A when data not yet available for that period
     let revDisplay = "";
     if (page.price === 0) {
       revDisplay = `<div class="tr-right" style="font-size:11px;color:var(--dim)">free</div>`;
@@ -810,16 +813,22 @@ function renderPages() {
       const periodData = SC_DATA.byProductPeriod[currentPeriod];
       const entry = periodData?.find(([n]) => n === page.sc_product);
       if (entry) {
+        // For subscription products, show new vs recurring split if available
+        const newCount     = entry[1].newCount     ?? null;
+        const recurCount   = entry[1].recurCount   ?? null;
+        const splitLine    = (page.recurring && newCount!==null && recurCount!==null)
+          ? `<div style="font-size:10px;color:var(--dim);margin-top:1px">🟢 ${newCount} new · 🔄 ${recurCount} renew</div>`
+          : `<div style="font-size:10px;color:var(--dim);margin-top:1px">${entry[1].count} orders</div>`;
         revDisplay = `
           <div class="tr-right">
-            <div style="font-size:13px;font-weight:800;color:var(--green)">${fmtUSD(entry[1].revenue)}</div>
-            <div style="font-size:10px;color:var(--dim);margin-top:1px">${entry[1].count} orders</div>
+            <div style="font-size:13px;font-weight:800;color:var(--green)">${entry[1].revenue>0?fmtUSD(entry[1].revenue):"$0"}</div>
+            ${splitLine}
           </div>`;
       } else {
-        revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">N/A</div>`;
+        revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
       }
     } else {
-      revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">N/A</div>`;
+      revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
     }
 
     return `
@@ -828,14 +837,17 @@ function renderPages() {
           <div class="page-name-top">
             <span class="badge" style="background:${tc}22;color:${tc}">${page.type}</span>
             ${page.price>0?`<span class="price-tag">$${page.price}</span>`:""}
+            ${page.recurring?`<span style="font-size:9px;font-weight:700;color:var(--blue);background:rgba(59,130,246,.12);border-radius:4px;padding:1px 5px;margin-left:2px">↻ sub</span>`:""}
           </div>
           <div class="page-name" title="${page.name}">${page.name}</div>
         </div>
         <div class="bar-cell">
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>
+          ${noSlug
+            ? `<div style="font-size:11px;color:var(--dim);padding-left:4px">no landing page</div>`
+            : `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>`}
         </div>
-        <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${fmt(pvs)}</div>
-        <div class="tr-right" style="font-size:12px;color:var(--muted)">${uniq>0?fmt(uniq):"—"}</div>
+        <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${noSlug?"—":fmt(pvs)}</div>
+        <div class="tr-right" style="font-size:12px;color:var(--muted)">${noSlug?"—":uniq>0?fmt(uniq):"—"}</div>
         <div class="tr-center"><span class="conv-pill ${cClass}">${convRate}</span></div>
         ${revDisplay}
         <div class="tr-center"><div class="signal-dot" style="background:${sc};box-shadow:${pvs>1000?"0 0 7px "+sc:"none"}"></div></div>
@@ -962,28 +974,71 @@ function renderSales() {
     <!-- Revenue by product — period-matched -->
     ${(()=>{
       const periodRows = SC_DATA?.byProductPeriod?.[currentPeriod];
+      const periodLabel = currentPeriod==="daily"?"Yesterday (Prior Full Day)":currentPeriod==="weekly"?"Last 7 Days":"YTD 2026";
+      const dateStamp   = currentPeriod==="daily"
+        ? `<div style="font-size:18px;font-weight:900;color:var(--green);letter-spacing:-.02em;margin-bottom:2px">${getDateRange('daily')}</div>`
+        : `<div style="font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-.02em;margin-bottom:2px">${getDateRange(currentPeriod)}</div>`;
+
       if (periodRows && periodRows.length) {
-        const periodLabel = currentPeriod==="daily"?"Yesterday (Prior Full Day)":currentPeriod==="weekly"?"Last 7 Days":"YTD 2026";
-        const maxPR = Math.max(1, ...periodRows.map(([,d])=>d.revenue));
-        return `<div class="section-card">
-          <div class="section-head"><span>Revenue by Product — ${periodLabel}</span><span style="font-weight:400;font-size:10px">from Airtable · SureCart-verified</span></div>
-          ${periodRows.map(([name,data])=>{
-            const pct=maxPR>0?Math.min(100,(data.revenue/maxPR)*100):0;
-            return `<div class="product-row">
-              <div class="product-meta">
-                <span class="product-name">${name}</span>
-                <span class="product-count">${data.count}×</span>
-                <span class="product-rev">${data.revenue>0?fmtUSD(data.revenue):"<span style=\'color:var(--dim);font-size:11px\'>free</span>"}</span>
-              </div>
-              <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
+        // Separate subscriptions, one-time products, and bumps
+        const SUBSCRIPTION_PRODUCTS = ["Basic Membership — 7 Day $1 Trial","Basic Membership","Premium Membership","Annual Standard Membership"];
+        const BUMP_PRODUCTS         = ["Beginner Practice Plan - for 4 Songs","Mediant Drop 2"];
+        const subs    = periodRows.filter(([n])=> SUBSCRIPTION_PRODUCTS.includes(n));
+        const bumps   = periodRows.filter(([n])=> BUMP_PRODUCTS.includes(n));
+        const oneTime = periodRows.filter(([n])=> !SUBSCRIPTION_PRODUCTS.includes(n) && !BUMP_PRODUCTS.includes(n));
+        const maxPR   = Math.max(1, ...periodRows.map(([,d])=>d.revenue));
+
+        function productBlock(rows, sectionLabel, accentColor) {
+          if (!rows.length) return "";
+          return `
+            <div style="margin-bottom:6px">
+              <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:${accentColor};margin:14px 0 8px">${sectionLabel}</div>
+              ${rows.map(([name,data])=>{
+                const pct = maxPR>0 ? Math.min(100,(data.revenue/maxPR)*100) : 0;
+                const isRecurring = SUBSCRIPTION_PRODUCTS.includes(name);
+                const newCount   = data.newCount   ?? null;
+                const recurCount = data.recurCount ?? null;
+                const splitBadge = (isRecurring && newCount!==null && recurCount!==null)
+                  ? `<span style="font-size:10px;color:var(--dim);margin-left:6px">🟢 ${newCount} new · 🔄 ${recurCount} renew</span>`
+                  : `<span style="font-size:10px;color:var(--dim);margin-left:6px">${data.count}×</span>`;
+                return `<div class="product-row">
+                  <div class="product-meta">
+                    <span class="product-name">${name}</span>
+                    ${splitBadge}
+                    <span class="product-rev" style="margin-left:auto">${data.revenue>0?fmtUSD(data.revenue):'<span style="color:var(--dim);font-size:11px">$0</span>'}</span>
+                  </div>
+                  <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${accentColor}"></div></div>
+                </div>`;
+              }).join("")}
             </div>`;
-          }).join("")}
+        }
+
+        const subTotal  = subs.reduce((s,[,d])=>s+d.revenue,0);
+        const oneTotal  = oneTime.reduce((s,[,d])=>s+d.revenue,0);
+        const bumpTotal = bumps.reduce((s,[,d])=>s+d.revenue,0);
+        const grandTotal = subTotal + oneTotal + bumpTotal;
+
+        return `<div class="section-card">
+          <div class="section-head">
+            <span>Revenue by Product — ${periodLabel}</span>
+            <span style="font-weight:400;font-size:10px">Airtable · SureCart-verified</span>
+          </div>
+          <div style="padding:14px 16px 4px">
+            ${dateStamp}
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">${fmtUSD(grandTotal)} total · ${periodRows.reduce((s,[,d])=>s+d.count,0)} orders</div>
+            ${productBlock(subs,    "↻ Subscriptions",  "#3b82f6")}
+            ${productBlock(oneTime, "📦 One-Time Products", "#10b981")}
+            ${productBlock(bumps,   "⚡ Bumps",          "#f59e0b")}
+          </div>
         </div>`;
       } else {
         // Fallback: show the carried-forward 30-day byProduct block
         const maxRev2 = byProduct.length ? byProduct[0][1].revenue : 1;
         return `<div class="section-card">
           <div class="section-head"><span>Revenue by Product — Last 30 Days</span><span style="font-weight:400;font-size:10px">from SureCart · carried forward</span></div>
+          <div style="padding:14px 16px 4px">
+            ${dateStamp}
+          </div>
           ${byProduct.map(([name,data])=>{
             const pct=maxRev2>0?Math.min(100,(data.revenue/maxRev2)*100):0;
             return `<div class="product-row">
