@@ -435,19 +435,34 @@ const SC_DATA = {
   // byProductPeriod: Cowork injects daily from Airtable — period-matched revenue per product
   // Keys must match sc_product field in TRACKED array exactly
   // null = data not yet available for that period (shows N/A in table)
+  // byProductPeriod: sourced from Airtable Daily Product Stats, verified against SureCart
+  // screenshots Jun 7 & Jun 8. Product names match SureCart exactly.
+  // "daily" = Jun 8 (prior full day). "weekly" = Jun 2-8. "ytd" = Jan 1-Jun 8 (limited history).
   byProductPeriod: {
-    daily: [],
+    daily: [
+      ["Basic Membership — 7 Day $1 Trial",        { count:5, revenue:6100  }],
+      ["Premium Membership",                        { count:3, revenue:14100 }],
+      ["Annual Standard Membership",                { count:1, revenue:29000 }],
+      ["Basic Membership",                          { count:1, revenue:2900  }],
+      ["Hear Any Chord — Free Ear Training Chart",  { count:2, revenue:0     }],
+    ],
     weekly: [
-      ["$1 Trial Membership",                 { count:4, revenue:8800  }],
-      ["Basic Monthly Membership",             { count:3, revenue:8700  }],
-      ["4-Day Beginner Course",               { count:2, revenue:5400  }],
-      ["Beginner Practice Plan - for 4 Songs", { count:2, revenue:2400  }],
+      ["Annual Standard Membership",                { count:1, revenue:29000 }],
+      ["Basic Membership",                          { count:6, revenue:17400 }],
+      ["Basic Membership — 7 Day $1 Trial",         { count:9, revenue:14900 }],
+      ["Premium Membership",                        { count:3, revenue:14100 }],
+      ["Master Beginner Fundamentals in 4 Days",    { count:2, revenue:5400  }],
+      ["Beginner Practice Plan - for 4 Songs",      { count:2, revenue:2400  }],
+      ["Hear Any Chord — Free Ear Training Chart",  { count:3, revenue:0     }],
     ],
     ytd: [
-      ["$1 Trial Membership",                 { count:4, revenue:8800  }],
-      ["Basic Monthly Membership",             { count:3, revenue:8700  }],
-      ["4-Day Beginner Course",               { count:2, revenue:5400  }],
-      ["Beginner Practice Plan - for 4 Songs", { count:2, revenue:2400  }],
+      ["Annual Standard Membership",                { count:1, revenue:29000 }],
+      ["Basic Membership",                          { count:6, revenue:17400 }],
+      ["Basic Membership — 7 Day $1 Trial",         { count:9, revenue:14900 }],
+      ["Premium Membership",                        { count:3, revenue:14100 }],
+      ["Master Beginner Fundamentals in 4 Days",    { count:2, revenue:5400  }],
+      ["Beginner Practice Plan - for 4 Songs",      { count:2, revenue:2400  }],
+      ["Hear Any Chord — Free Ear Training Chart",  { count:3, revenue:0     }],
     ],
   },
   // New signups = active subscriptions with created_at in window (pulled directly from
