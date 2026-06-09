@@ -324,78 +324,88 @@
 // ─── DATA — Cowork injects between these markers every morning ────────────────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
-  "/join-for-1-today/":              { pageviews:122,  uniques:54,  avg_duration:72.84,  bounce_rate:0    },
-  "/join-membership-today/":         { pageviews:35,   uniques:12,  avg_duration:19.15,  bounce_rate:0    },
-  "/4-week-beginner-sales-page/":    { pageviews:148,  uniques:45,  avg_duration:137.96, bounce_rate:2.22 },
-  "/standard-checkout-page/":        { pageviews:4,    uniques:2,   avg_duration:63,     bounce_rate:0    },
-  "/hear-any-chord/":                { pageviews:4,    uniques:2,   avg_duration:28.5,   bounce_rate:0    },
-  "/27musicians/":                   { pageviews:2,    uniques:1,   avg_duration:0,      bounce_rate:0    },
+  "/join-for-1-today/":              { pageviews:26,  uniques:11, avg_duration:15.38,  bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:15,  uniques:5,  avg_duration:18,     bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:2,   uniques:1,  avg_duration:54,     bounce_rate:0 },
+  "/27musicians/":                   { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:6,   uniques:2,  avg_duration:8,      bounce_rate:0 },
+  "/break":                          { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:3,   uniques:1,  avg_duration:405,    bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:8,   uniques:1,  avg_duration:8,      bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0,   uniques:0,  avg_duration:0,      bounce_rate:0 },
+};
+const FATHOM_WEEKLY = {
+  "/join-for-1-today/":              { pageviews:885,  uniques:414, avg_duration:41.89,  bounce_rate:4.59 },
+  "/join-membership-today/":         { pageviews:146,  uniques:65,  avg_duration:196.52, bounce_rate:6.15 },
+  "/4-week-beginner-sales-page/":    { pageviews:991,  uniques:322, avg_duration:64.09,  bounce_rate:6.52 },
+  "/standard-checkout-page/":        { pageviews:57,   uniques:26,  avg_duration:129.30, bounce_rate:0    },
+  "/hear-any-chord/":                { pageviews:75,   uniques:32,  avg_duration:35.18,  bounce_rate:0    },
+  "/27musicians/":                   { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/april-focus-bundle-2026/":       { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
-  "/dans-signature-sounds/":         { pageviews:12,   uniques:3,   avg_duration:478.4,  bounce_rate:0    },
+  "/dans-signature-sounds/":         { pageviews:90,   uniques:21,  avg_duration:620.6,  bounce_rate:0    },
   "/break":                          { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
-  "/drop-2-exercise-download-page/": { pageviews:2,    uniques:1,   avg_duration:12,     bounce_rate:0    },
-  "/scales-charts/":                 { pageviews:21,   uniques:6,   avg_duration:59.57,  bounce_rate:0    },
-  "/our-roadmap-offer/":             { pageviews:10,   uniques:3,   avg_duration:22,     bounce_rate:0    },
-  "/major-vs-minor-quiz/":           { pageviews:16,   uniques:7,   avg_duration:22,     bounce_rate:0    },
+  "/drop-2-exercise-download-page/": { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
+  "/scales-charts/":                 { pageviews:84,   uniques:24,  avg_duration:139,    bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:84,   uniques:21,  avg_duration:17.36,  bounce_rate:0    },
+  "/major-vs-minor-quiz/":           { pageviews:114,  uniques:30,  avg_duration:110.91, bounce_rate:0    },
   "/available-to-you/":              { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/new-1trial-registration-page/":  { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/27-bundle-waitlist/":            { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/9sus4-to-dominant-release/":     { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/gospel-embell":                  { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
 };
-const FATHOM_WEEKLY = {
-  "/join-for-1-today/":              { pageviews:843,  uniques:400, avg_duration:50.48,  bounce_rate:4.75 },
-  "/join-membership-today/":         { pageviews:134,  uniques:61,  avg_duration:195.54, bounce_rate:3.28 },
-  "/4-week-beginner-sales-page/":    { pageviews:949,  uniques:311, avg_duration:70.23,  bounce_rate:6.43 },
-  "/standard-checkout-page/":        { pageviews:61,   uniques:28,  avg_duration:155.44, bounce_rate:0    },
-  "/hear-any-chord/":                { pageviews:75,   uniques:31,  avg_duration:37.62,  bounce_rate:0    },
-  "/scales-charts/":                 { pageviews:87,   uniques:24,  avg_duration:122.87, bounce_rate:0    },
-  "/our-roadmap-offer/":             { pageviews:66,   uniques:16,  avg_duration:16.54,  bounce_rate:0    },
-  "/major-vs-minor-quiz/":           { pageviews:92,   uniques:29,  avg_duration:85.65,  bounce_rate:0    },
-  "/dans-signature-sounds/":         { pageviews:63,   uniques:18,  avg_duration:873.14, bounce_rate:0    },
-};
 const FATHOM_YTD = {
-  "/join-for-1-today/":              { pageviews:22970, uniques:10060, avg_duration:65.38,  bounce_rate:0.70 },
-  "/join-membership-today/":         { pageviews:7807,  uniques:3260,  avg_duration:123.48, bounce_rate:0.31 },
-  "/standard-checkout-page/":        { pageviews:1585,  uniques:664,   avg_duration:114.59, bounce_rate:0    },
-  "/4-week-beginner-sales-page/":    { pageviews:7521,  uniques:2332,  avg_duration:77.84,  bounce_rate:3.13 },
+  "/join-for-1-today/":              { pageviews:23148, uniques:10140, avg_duration:65.09,  bounce_rate:0.71 },
+  "/join-membership-today/":         { pageviews:7845,  uniques:3276,  avg_duration:124.43, bounce_rate:0.37 },
+  "/standard-checkout-page/":        { pageviews:1591,  uniques:666,   avg_duration:114.56, bounce_rate:0    },
+  "/4-week-beginner-sales-page/":    { pageviews:7704,  uniques:2391,  avg_duration:76.99,  bounce_rate:3.18 },
   "/27musicians/":                   { pageviews:3472,  uniques:1424,  avg_duration:156.03, bounce_rate:0.14 },
   "/april-focus-bundle-2026/":       { pageviews:1479,  uniques:607,   avg_duration:93.71,  bounce_rate:0.49 },
-  "/dans-signature-sounds/":         { pageviews:3136,  uniques:950,   avg_duration:166.43, bounce_rate:1.58 },
+  "/dans-signature-sounds/":         { pageviews:3169,  uniques:955,   avg_duration:168.08, bounce_rate:1.57 },
   "/drop-2-exercise-download-page/": { pageviews:1352,  uniques:588,   avg_duration:285.35, bounce_rate:0.51 },
-  "/hear-any-chord/":                { pageviews:1564,  uniques:672,   avg_duration:75.11,  bounce_rate:0.15 },
-  "/scales-charts/":                 { pageviews:1379,  uniques:371,   avg_duration:49.12,  bounce_rate:0    },
-  "/our-roadmap-offer/":             { pageviews:2410,  uniques:707,   avg_duration:49.69,  bounce_rate:0.42 },
-  "/major-vs-minor-quiz/":           { pageviews:2053,  uniques:657,   avg_duration:60.58,  bounce_rate:0.30 },
-  "/available-to-you/":              { pageviews:1418,  uniques:561,   avg_duration:380.48, bounce_rate:0    },
+  "/hear-any-chord/":                { pageviews:1574,  uniques:677,   avg_duration:74.84,  bounce_rate:0.15 },
+  "/scales-charts/":                 { pageviews:1388,  uniques:374,   avg_duration:49.76,  bounce_rate:0    },
+  "/our-roadmap-offer/":             { pageviews:2438,  uniques:713,   avg_duration:49.34,  bounce_rate:0.42 },
+  "/major-vs-minor-quiz/":           { pageviews:2081,  uniques:661,   avg_duration:62.35,  bounce_rate:0.30 },
+  "/available-to-you/":              { pageviews:1426,  uniques:564,   avg_duration:378.79, bounce_rate:0    },
   "/new-1trial-registration-page/":  { pageviews:758,   uniques:305,   avg_duration:130.67, bounce_rate:0.98 },
   "/27-bundle-waitlist/":            { pageviews:1064,  uniques:482,   avg_duration:117.70, bounce_rate:0.41 },
   "/9sus4-to-dominant-release/":     { pageviews:966,   uniques:427,   avg_duration:163.33, bounce_rate:0    },
+  "/gospel-embell":                  { pageviews:0,     uniques:0,     avg_duration:0,      bounce_rate:0    },
+  "/break":                          { pageviews:0,     uniques:0,     avg_duration:0,      bounce_rate:0    },
 };
 const SITE_TOTALS = {
-  daily:  { pageviews:2064,   uniques:261   },
-  weekly: { pageviews:18305,  uniques:1905  },
-  ytd:    { pageviews:472124, uniques:58027 },
+  daily:  { pageviews:745,    uniques:47    },
+  weekly: { pageviews:19049,  uniques:1969  },
+  ytd:    { pageviews:476306, uniques:58075 },
 };
 const MONTHLY = [
-  { month:"Jan", pageviews:107821, uniques:11505 },
-  { month:"Feb", pageviews:89585,  uniques:12208 },
-  { month:"Mar", pageviews:96961,  uniques:13126 },
-  { month:"Apr", pageviews:76415,  uniques:9450  },
-  { month:"May", pageviews:85525,  uniques:9742  },
-  { month:"Jun", pageviews:15817,  uniques:1646,  partial:true },
+  { month:"Jan", pageviews:106364, uniques:11275 },
+  { month:"Feb", pageviews:89436,  uniques:12190 },
+  { month:"Mar", pageviews:96964,  uniques:13098 },
+  { month:"Apr", pageviews:75833,  uniques:9495  },
+  { month:"May", pageviews:85417,  uniques:9722  },
+  { month:"Jun", pageviews:22292,  uniques:2295,  partial:true },
 ];
 const SC_DATA = {
-  // NOTE (Cowork, Jun 8): today/week/month figures below are computed from SureCart's
-  // get-store-dashboard 30-day daily aggregate (confirmed ET-anchored and cross-checked
-  // against individually-verified order amounts). YTD is a labeled ESTIMATE — SureCart's
-  // dashboard endpoint only exposes a fixed ~31-day window, so YTD is extrapolated from
-  // the 30-day daily average × 159 days elapsed (Jan 1–Jun 8). Treat YTD as directional.
+  // NOTE (Cowork, Jun 9): today/week/month figures computed from SureCart's
+  // get-store-dashboard 30-day daily aggregate (ET-anchored). YTD is a labeled ESTIMATE —
+  // extrapolated from 30-day daily average × 160 days elapsed (Jan 1–Jun 9). Treat YTD as directional.
+  // Today count=0 (early morning pull, no orders yet for Jun 9).
   stats: {
-    today: { count:1,   revenue:2900     },
-    week:  { count:110, revenue:258910   },
-    month: { count:715, revenue:1269910  },
-    ytd:   { count:3790, revenue:6730523, estimated:true },
+    today: { count:0,   revenue:0        },
+    week:  { count:95,  revenue:246110   },
+    month: { count:710, revenue:1241010  },
+    ytd:   { count:3664, revenue:6405212, estimated:true },
   },
   // byProduct / SC_PREV_30 carried forward from prior refresh — SureCart's order API does
   // not expand line_item price→product names (only returns price IDs), so a fresh top-10
@@ -412,31 +422,37 @@ const SC_DATA = {
     ["Mediant Drop 2",           { count:112, revenue:11200  }],
   ],
   recentOrders: [
-    { id:"F41756B5", number:"F41756B5", created_at:1780911540, status:"paid", amount:2900 },
-    { id:"4434E19B", number:"4434E19B", created_at:1780887420, status:"paid", amount:2900 },
-    { id:"10915B0D", number:"10915B0D", created_at:1780878660, status:"paid", amount:2900 },
-    { id:"10D16511", number:"10D16511", created_at:1780864620, status:"paid", amount:2900 },
-    { id:"853BCE82", number:"853BCE82", created_at:1780862340, status:"paid", amount:2900 },
-    { id:"99F4D805", number:"99F4D805", created_at:1780862160, status:"paid", amount:3900 },
-    { id:"8CD5B4E7", number:"8CD5B4E7", created_at:1780861860, status:"paid", amount:3900 },
-    { id:"3F150E75", number:"3F150E75", created_at:1780858020, status:"paid", amount:2900 },
+    { id:"F93A9204", number:"F93A9204", created_at:1780969279, status:"paid", amount:2900 },
+    { id:"30787C2D", number:"30787C2D", created_at:1780958488, status:"paid", amount:2900 },
+    { id:"B50AA4B7", number:"B50AA4B7", created_at:1780952489, status:"paid", amount:2900 },
+    { id:"539EC3D2", number:"539EC3D2", created_at:1780948791, status:"paid", amount:2900 },
+    { id:"EFE0401A", number:"EFE0401A", created_at:1780948370, status:"paid", amount:2900 },
+    { id:"A7660D65", number:"A7660D65", created_at:1780943572, status:"paid", amount:2900 },
+    { id:"2CE3B60E", number:"2CE3B60E", created_at:1780940001, status:"paid", amount:2900 },
+    { id:"97A99CF2", number:"97A99CF2", created_at:1780940001, status:"paid", amount:2900 },
   ],
-  lastFetched: "Jun 8, 8:00 AM",
+  lastFetched: "Jun 9, 8:13 AM",
   // byProductPeriod: Cowork injects daily from Airtable — period-matched revenue per product
   // Keys must match sc_product field in TRACKED array exactly
   // null = data not yet available for that period (shows N/A in table)
   byProductPeriod: {
-    daily: [
-      ["Basic Monthly Membership", { count:6, revenue:17400 }],
-      ["$1 Trial Membership",      { count:0, revenue:0     }],
-      ["4-Day Beginner Course",    { count:2, revenue:4800  }],
+    daily: [],
+    weekly: [
+      ["$1 Trial Membership",                 { count:4, revenue:8800  }],
+      ["Basic Monthly Membership",             { count:3, revenue:8700  }],
+      ["4-Day Beginner Course",               { count:2, revenue:5400  }],
+      ["Beginner Practice Plan - for 4 Songs", { count:2, revenue:2400  }],
     ],
-    weekly: null,
-    ytd:    null,
+    ytd: [
+      ["$1 Trial Membership",                 { count:4, revenue:8800  }],
+      ["Basic Monthly Membership",             { count:3, revenue:8700  }],
+      ["4-Day Beginner Course",               { count:2, revenue:5400  }],
+      ["Beginner Practice Plan - for 4 Songs", { count:2, revenue:2400  }],
+    ],
   },
   // New signups = active subscriptions with created_at in window (pulled directly from
   // SureCart subscription records — 300/373 active subs sampled, fully covers all windows below)
-  // NOTE (Cowork, Jun 8 — Monday): growth block carried forward unchanged from last
+  // NOTE (Cowork, Jun 9 — Tuesday): growth block carried forward unchanged from last
   // Sunday's refresh per schedule (signups/renewals breakdown only recomputed on Sundays).
   growth: {
     week:  { newSignups:4,   newRevenue:11600,  renewals:104, renewalRevenue:241510, totalRevenue:253110  },
@@ -456,15 +472,15 @@ const SC_DATA = {
 // Each entry: { pageviews, uniques } keyed by pathname
 // SC_PREV: prior 30-day product counts for sales spike detection
 const PREV_PERIOD = {
-  "/join-for-1-today/":           { pageviews:1028, uniques:472 },
-  "/join-membership-today/":      { pageviews:147,  uniques:62  },
-  "/4-week-beginner-sales-page/": { pageviews:1093, uniques:342 },
-  "/standard-checkout-page/":     { pageviews:61,   uniques:25  },
-  "/hear-any-chord/":             { pageviews:272,  uniques:118 },
-  "/our-roadmap-offer/":          { pageviews:108,  uniques:29  },
-  "/major-vs-minor-quiz/":        { pageviews:102,  uniques:28  },
-  "/scales-charts/":              { pageviews:101,  uniques:22  },
-  "/dans-signature-sounds/":      { pageviews:81,   uniques:27  },
+  "/join-for-1-today/":           { pageviews:970,  uniques:450 },
+  "/join-membership-today/":      { pageviews:159,  uniques:67  },
+  "/4-week-beginner-sales-page/": { pageviews:1061, uniques:336 },
+  "/standard-checkout-page/":     { pageviews:65,   uniques:26  },
+  "/hear-any-chord/":             { pageviews:212,  uniques:91  },
+  "/our-roadmap-offer/":          { pageviews:116,  uniques:29  },
+  "/major-vs-minor-quiz/":        { pageviews:108,  uniques:31  },
+  "/scales-charts/":              { pageviews:96,   uniques:20  },
+  "/dans-signature-sounds/":      { pageviews:75,   uniques:25  },
 };
 const SC_PREV_30 = {
   "Basic Monthly Membership": { count:298, revenue:864200 },
@@ -476,7 +492,7 @@ const SC_PREV_30 = {
   "Piano Blueprint Session":  { count:3,   revenue:89100  },
   "Mediant Drop 2":           { count:104, revenue:10400  },
 };
-const LAST_UPDATED = "Jun 8, 8:00 AM";
+const LAST_UPDATED = "Jun 9, 8:13 AM";
 // [DASHBOARD-DATA-END]
 
 // ─── TRACKED PAGES with conversion targets ────────────────────────────────────
