@@ -412,14 +412,14 @@ const SC_DATA = {
   // breakdown by product cannot be computed without per-order product lookups. Flagging
   // for Sean: a price-ID → product-name lookup table would unblock this permanently.
   byProduct: [
-    ["Basic Monthly Membership", { count:312, revenue:904800 }],
-    ["$1 Trial Membership",      { count:890, revenue:89000  }],
-    ["4-Day Beginner Course",    { count:98,  revenue:264600 }],
-    ["27 MIDI File Bundle",      { count:64,  revenue:172800 }],
-    ["Dan's Signature Sounds",   { count:18,  revenue:84600  }],
-    ["April Focus Guide",        { count:44,  revenue:118800 }],
-    ["Piano Blueprint Session",  { count:4,   revenue:118800 }],
-    ["Mediant Drop 2",           { count:112, revenue:11200  }],
+    ["Basic Membership",                          { count:312, revenue:904800 }],
+    ["Basic Membership — 7 Day $1 Trial",         { count:890, revenue:89000  }],
+    ["Master Beginner Fundamentals in 4 Days",    { count:98,  revenue:264600 }],
+    ["27 MIDI File Bundle",                       { count:64,  revenue:172800 }],
+    ["Dan's Signature Sounds",                    { count:18,  revenue:84600  }],
+    ["April Focus Guide",                         { count:44,  revenue:118800 }],
+    ["Piano Blueprint Session",                   { count:4,   revenue:118800 }],
+    ["Mediant Drop 2",                            { count:112, revenue:11200  }],
   ],
   recentOrders: [
     { id:"F93A9204", number:"F93A9204", created_at:1780969279, status:"paid", amount:2900 },
@@ -498,14 +498,14 @@ const PREV_PERIOD = {
   "/dans-signature-sounds/":      { pageviews:75,   uniques:25  },
 };
 const SC_PREV_30 = {
-  "Basic Monthly Membership": { count:298, revenue:864200 },
-  "$1 Trial Membership":      { count:856, revenue:85600  },
-  "4-Day Beginner Course":    { count:91,  revenue:245700 },
-  "27 MIDI File Bundle":      { count:59,  revenue:159300 },
-  "Dan's Signature Sounds":   { count:16,  revenue:75200  },
-  "April Focus Guide":        { count:40,  revenue:108000 },
-  "Piano Blueprint Session":  { count:3,   revenue:89100  },
-  "Mediant Drop 2":           { count:104, revenue:10400  },
+  "Basic Membership":                       { count:298, revenue:864200 },
+  "Basic Membership — 7 Day $1 Trial":      { count:856, revenue:85600  },
+  "Master Beginner Fundamentals in 4 Days": { count:91,  revenue:245700 },
+  "27 MIDI File Bundle":                    { count:59,  revenue:159300 },
+  "Dan's Signature Sounds":                 { count:16,  revenue:75200  },
+  "April Focus Guide":                      { count:40,  revenue:108000 },
+  "Piano Blueprint Session":                { count:3,   revenue:89100  },
+  "Mediant Drop 2":                         { count:104, revenue:10400  },
 };
 const LAST_UPDATED = "Jun 9, 8:13 AM";
 // [DASHBOARD-DATA-END]
@@ -514,15 +514,15 @@ const LAST_UPDATED = "Jun 9, 8:13 AM";
 // conv_target: expected checkout/signup page for this page (to compute Conv%)
 // sc_product:  matching key in SC_DATA.byProduct for revenue lookup
 const TRACKED = [
-  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"$1 Trial Membership"      },
-  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"         },
-  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Monthly Membership"  },
-  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"4-Day Beginner Course"     },
-  { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"       },
-  { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"         },
-  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"    },
-  { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"   },
-  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"            },
+  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial" },
+  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"                      },
+  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership"                       },
+  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days" },
+  { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                    },
+  { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                      },
+  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"                 },
+  { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"                },
+  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"                         },
   { name:"Ear Chart Lead Magnet",    slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Scales Charts",            slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Roadmap Lead",             slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"                                             },
@@ -755,13 +755,20 @@ function renderKPI() {
   const rh = document.getElementById("rev-col-header");
   if (rh) rh.textContent = currentPeriod==="daily"?"Today Rev":currentPeriod==="weekly"?"7-Day Rev":"YTD Rev";
 
+  // Period-matched revenue from Airtable byProductPeriod
+  const periodRows = SC_DATA?.byProductPeriod?.[currentPeriod] || [];
+  const periodRevTotal  = periodRows.reduce((s,[,d])=>s+(d.revenue||0), 0);
+  const periodOrdTotal  = periodRows.reduce((s,[,d])=>s+(d.count||0), 0);
+  const periodRevLabel  = currentPeriod==="daily"?"Yesterday Revenue":currentPeriod==="weekly"?"7-Day Revenue":"YTD Revenue";
+
   const cards = [
     { label:"Site Pageviews",   value:fmt(tot.pageviews),     sub:dateRange,              color:"#3b82f6" },
     { label:"Unique Visitors",  value:fmt(tot.uniques),       sub:dateRange,              color:"#8b5cf6" },
     { label:"$1 Trial Page",    value:fmt(trialD?.pageviews), sub:dateRange,              color:"#E8472A" },
     { label:"Beginner Course",  value:fmt(begD?.pageviews),   sub:dateRange,              color:"#f59e0b" },
-    { label:"Revenue Today",    value:scStats ? fmtUSD(scStats.today.revenue) : "—",
-      sub:`${scStats?.today.count??'—'} orders · ${getDateRange('daily')}`,              color:"#10b981" },
+    { label:periodRevLabel,
+      value: periodRevTotal>0 ? fmtUSD(periodRevTotal) : (periodRows.length?"$0":"—"),
+      sub:`${periodOrdTotal} orders · ${dateRange}`,                                      color:"#10b981" },
     { label:"Revenue 7-Day",    value:scStats ? fmtUSD(scStats.week.revenue) : "—",
       sub:`${scStats?.week.count??'—'} orders · ${getDateRange('weekly')}`,              color:"#10b981" },
   ];
@@ -952,21 +959,45 @@ function renderSales() {
     <!-- Monthly trend chart -->
     ${trendChart}
 
-    <!-- Revenue by product -->
-    <div class="section-card">
-      <div class="section-head"><span>Revenue by Product — Last 30 Days</span><span style="font-weight:400;font-size:10px">from SureCart</span></div>
-      ${byProduct.map(([name,data])=>{
-        const pct=maxRev>0?Math.min(100,(data.revenue/maxRev)*100):0;
-        return `<div class="product-row">
-          <div class="product-meta">
-            <span class="product-name">${name}</span>
-            <span class="product-count">${data.count}×</span>
-            <span class="product-rev">${fmtUSD(data.revenue)}</span>
-          </div>
-          <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
+    <!-- Revenue by product — period-matched -->
+    ${(()=>{
+      const periodRows = SC_DATA?.byProductPeriod?.[currentPeriod];
+      if (periodRows && periodRows.length) {
+        const periodLabel = currentPeriod==="daily"?"Yesterday (Prior Full Day)":currentPeriod==="weekly"?"Last 7 Days":"YTD 2026";
+        const maxPR = Math.max(1, ...periodRows.map(([,d])=>d.revenue));
+        return `<div class="section-card">
+          <div class="section-head"><span>Revenue by Product — ${periodLabel}</span><span style="font-weight:400;font-size:10px">from Airtable · SureCart-verified</span></div>
+          ${periodRows.map(([name,data])=>{
+            const pct=maxPR>0?Math.min(100,(data.revenue/maxPR)*100):0;
+            return `<div class="product-row">
+              <div class="product-meta">
+                <span class="product-name">${name}</span>
+                <span class="product-count">${data.count}×</span>
+                <span class="product-rev">${data.revenue>0?fmtUSD(data.revenue):"<span style=\'color:var(--dim);font-size:11px\'>free</span>"}</span>
+              </div>
+              <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
+            </div>`;
+          }).join("")}
         </div>`;
-      }).join("")}
-    </div>
+      } else {
+        // Fallback: show the carried-forward 30-day byProduct block
+        const maxRev2 = byProduct.length ? byProduct[0][1].revenue : 1;
+        return `<div class="section-card">
+          <div class="section-head"><span>Revenue by Product — Last 30 Days</span><span style="font-weight:400;font-size:10px">from SureCart · carried forward</span></div>
+          ${byProduct.map(([name,data])=>{
+            const pct=maxRev2>0?Math.min(100,(data.revenue/maxRev2)*100):0;
+            return `<div class="product-row">
+              <div class="product-meta">
+                <span class="product-name">${name}</span>
+                <span class="product-count">${data.count}×</span>
+                <span class="product-rev">${fmtUSD(data.revenue)}</span>
+              </div>
+              <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
+            </div>`;
+          }).join("")}
+        </div>`;
+      }
+    })()}
 
     <!-- Recent orders -->
     ${recentOrders?.length?`
@@ -1075,6 +1106,7 @@ function setPeriod(p) {
   renderAlerts();
   renderKPI();
   renderPages();
+  renderSales();
 }
 function setFilter(f) {
   currentFilter=f;
