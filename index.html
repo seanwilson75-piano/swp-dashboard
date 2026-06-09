@@ -554,6 +554,7 @@ const TYPE_COLORS = {
 };
 
 function getPageData(slug, period) {
+  if (!slug) return null;
   const map = period==="daily"?FATHOM_DAILY:period==="weekly"?FATHOM_WEEKLY:FATHOM_YTD;
   // Exact match first
   if (map[slug]) return map[slug];
@@ -790,7 +791,7 @@ function renderPages() {
     currentFilter==="lead"     ? p.price===0 :
     currentFilter==="checkout" ? p.cat==="checkout" : true
   );
-  const maxPvs = Math.max(1,...pages.map(p=>getPageData(p.slug,currentPeriod)?.pageviews||0));
+  const maxPvs = Math.max(1,...pages.map(p=>p.slug?getPageData(p.slug,currentPeriod)?.pageviews||0:0));
   const dateRange = getDateRange(currentPeriod);
 
   document.getElementById("pages-table-body").innerHTML = pages.map((page,i) => {
