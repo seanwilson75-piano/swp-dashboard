@@ -173,7 +173,7 @@
   .order-amount { font-size: 14px; font-weight: 800; }
 
   /* FUNNEL */
-  .funnel-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 14px; }
+  .funnel-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 14px; }
   .funnel-card { background: var(--surface); border: 1px solid var(--faint); border-radius: var(--radius); padding: 16px; }
   .funnel-title { font-size: 13px; font-weight: 800; margin-bottom: 14px; }
   .funnel-row { margin-bottom: 11px; }
@@ -249,25 +249,7 @@
     <div id="alerts-banner"></div>
     <!-- Date range label -->
     <div id="period-label" style="font-size:11px;color:var(--dim);font-weight:700;margin-bottom:10px;padding:2px 0;letter-spacing:.04em;"></div>
-    <div class="filter-bar">
-      <span class="filter-label">FILTER:</span>
-      <button class="filter-btn active" onclick="setFilter('all')">All</button>
-      <button class="filter-btn" onclick="setFilter('paid')">Paid</button>
-      <button class="filter-btn" onclick="setFilter('lead')">Lead Magnets</button>
-      <button class="filter-btn" onclick="setFilter('checkout')">Checkouts</button>
-    </div>
-    <div class="table-wrap">
-      <div class="table-head">
-        <div>Page / Product</div>
-        <div style="padding-left:4px">Traffic</div>
-        <div class="tr-right">Views</div>
-        <div class="tr-right">Uniques</div>
-        <div class="tr-center">Conv%</div>
-        <div class="tr-right" id="rev-col-header">Revenue</div>
-        <div class="tr-center">⬤</div>
-      </div>
-      <div id="pages-table-body"></div>
-    </div>
+    <div id="pages-sections"></div>
     <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;align-items:center">
       <span style="font-size:11px;color:var(--dim);font-weight:700">CONV%:</span>
       <div class="legend-item"><span class="conv-pill conv-high" style="font-size:10px;padding:1px 6px">3%+</span> Strong</div>
@@ -285,6 +267,14 @@
 
   <!-- Funnel panel -->
   <div class="panel" id="panel-funnel">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--dim);font-weight:700;letter-spacing:.04em" id="funnel-period-label"></div>
+      <div class="filter-bar" style="margin-bottom:0">
+        <span class="filter-label">VIEW:</span>
+        <button class="filter-btn funnel-period-btn active" data-period="weekly" onclick="setFunnelPeriod('weekly')">Weekly</button>
+        <button class="filter-btn funnel-period-btn" data-period="ytd" onclick="setFunnelPeriod('ytd')">YTD</button>
+      </div>
+    </div>
     <div class="funnel-grid" id="funnel-grid"></div>
   </div>
 
@@ -328,6 +318,9 @@ const FATHOM_DAILY = {
   "/join-membership-today/":         { pageviews:8,  uniques:4, avg_duration:18,    bounce_rate:0 },
   "/4-week-beginner-sales-page/":    { pageviews:35, uniques:7, avg_duration:19.57, bounce_rate:0 },
   "/standard-checkout-page/":        { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
+  "/premium-checkout-page/":         { pageviews:2,  uniques:1, avg_duration:0,     bounce_rate:0 },
+  "/annual-standard-checkout-page/": { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
+  "/annual-premium-checkout-page/":  { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
   "/27musicians/":                   { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
   "/april-focus-bundle-2026/":       { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
   "/dans-signature-sounds/":         { pageviews:0,  uniques:0, avg_duration:0,     bounce_rate:0 },
@@ -348,6 +341,9 @@ const FATHOM_WEEKLY = {
   "/join-membership-today/":         { pageviews:174,  uniques:78,  avg_duration:186.81, bounce_rate:5.41 },
   "/4-week-beginner-sales-page/":    { pageviews:1127, uniques:364, avg_duration:63.42,  bounce_rate:6.44 },
   "/standard-checkout-page/":        { pageviews:53,   uniques:24,  avg_duration:130.91, bounce_rate:0    },
+  "/premium-checkout-page/":         { pageviews:24,   uniques:8,   avg_duration:0,      bounce_rate:0    },
+  "/annual-standard-checkout-page/": { pageviews:8,    uniques:3,   avg_duration:0,      bounce_rate:0    },
+  "/annual-premium-checkout-page/":  { pageviews:2,    uniques:1,   avg_duration:0,      bounce_rate:0    },
   "/hear-any-chord/":                { pageviews:56,   uniques:23,  avg_duration:113.09, bounce_rate:0    },
   "/27musicians/":                   { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
   "/april-focus-bundle-2026/":       { pageviews:0,    uniques:0,   avg_duration:0,      bounce_rate:0    },
@@ -367,6 +363,9 @@ const FATHOM_YTD = {
   "/join-for-1-today/":              { pageviews:23275, uniques:10196, avg_duration:64.97,  bounce_rate:0.71 },
   "/join-membership-today/":         { pageviews:7887,  uniques:3296,  avg_duration:124.12, bounce_rate:0.36 },
   "/standard-checkout-page/":        { pageviews:1593,  uniques:667,   avg_duration:114.49, bounce_rate:0    },
+  "/premium-checkout-page/":         { pageviews:535,   uniques:226,   avg_duration:0,      bounce_rate:0    },
+  "/annual-standard-checkout-page/": { pageviews:75,    uniques:32,    avg_duration:0,      bounce_rate:0    },
+  "/annual-premium-checkout-page/":  { pageviews:70,    uniques:26,    avg_duration:0,      bounce_rate:0    },
   "/4-week-beginner-sales-page/":    { pageviews:7948,  uniques:2468,  avg_duration:76.16,  bounce_rate:3.21 },
   "/27musicians/":                   { pageviews:3481,  uniques:1429,  avg_duration:155.51, bounce_rate:0.14 },
   "/april-focus-bundle-2026/":       { pageviews:1479,  uniques:607,   avg_duration:93.71,  bounce_rate:0.49 },
@@ -428,20 +427,19 @@ const SC_DATA = {
   lastFetched: "Jun 11, 7:31 AM",
   byProductPeriod: {
     daily: [
-      ["Basic Membership — 7 Day $1 Trial",          { count:2,  revenue:5800   }],
-      ["Basic Membership",                           { count:1,  revenue:2900   }],
+      ["Basic Membership — 7 Day $1 Trial",          { count:2,  revenue:3000   }],
     ],
     weekly: [
-      ["Basic Membership — 7 Day $1 Trial",          { count:47, revenue:91400  }],
-      ["Basic Membership",                           { count:20, revenue:58000  }],
-      ["Premium Membership",                         { count:11, revenue:51700  }],
+      ["Basic Membership — 7 Day $1 Trial",          { count:35, revenue:70800  }],
+      ["Basic Membership",                           { count:19, revenue:55100  }],
+      ["Premium Membership",                         { count:9,  revenue:42300  }],
       ["Annual Standard Membership",                 { count:1,  revenue:29000  }],
       ["Master Beginner Fundamentals in 4 Days",     { count:4,  revenue:10800  }],
       ["Beginner Practice Plan - for 4 Songs",       { count:3,  revenue:3600   }],
       ["I Will Bless The Lord (Gb) — Lucas Version", { count:1,  revenue:2500   }],
       ["Your First 30 Days: Member Practice Guide",  { count:1,  revenue:1700   }],
       ["Dan's Signature Sounds",                     { count:1,  revenue:800    }],
-      ["Hear Any Chord — Free Ear Training Chart",   { count:10, revenue:0      }],
+      ["Hear Any Chord — Free Ear Training Chart",   { count:8,  revenue:0      }],
     ],
     ytd: [
       ["Basic Membership — 7 Day $1 Trial",          { count:67, revenue:146000 }],
@@ -495,16 +493,67 @@ const SC_PREV_30 = {
 const LAST_UPDATED = "Jun 11, 7:31 AM";
 // [DASHBOARD-DATA-END]
 
+// [FUNNEL-CHAINS-START]
+// FUNNEL_CHAINS — from Airtable "Funnel Chains" table (tbl7QFUxVZHuSy6e4).
+// Updated weekly during the Sunday rollup: refresh `analysis` from the
+// "Analysis Notes" field, and add/edit entries if bumps/upsells change.
+// `parent` must match the product name used in SC_DATA.byProduct / byProductPeriod.
+// Bump/upsell take rates are computed live: bump count ÷ parent count for the period.
+const FUNNEL_CHAINS = [
+  { parent:"Basic Membership — 7 Day $1 Trial", slug:"/join-for-1-today/",
+    bumps:[ { name:"Your First 30 Days: Member Practice Guide", price:17 } ],
+    upsells:[ { name:"Piano Blueprint Session", price:297 } ],
+    analysis:"Your highest-volume funnel and main paid-ad target. Bump take rate is low (~3%) relative to the $17 price — worth testing a cheaper or more relevant bump. Piano Blueprint upsell ($297) had no takers this week; consider a lower-priced upsell step before the $297 offer." },
+  { parent:"Basic Membership", slug:"/standard-checkout-page/",
+    bumps:[ { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:null } ],
+    upsells:[],
+    analysis:"Solid organic checkout volume (19 orders this week) with very little direct traffic of its own — most buyers likely arrive via the $1 Trial upgrade path. Bump take rate currently not tracked in Airtable; add it to the daily write to evaluate." },
+  { parent:"Premium Membership", slug:"/premium-checkout-page/",
+    bumps:[], upsells:[],
+    analysis:"9 orders this week from only 8 weekly checkout views — most Premium buyers are upgrading from inside the member area, not landing on this page directly. No bumps configured; a member-only upsell could capture extra revenue here." },
+  { parent:"Annual Standard Membership", slug:"/annual-standard-checkout-page/",
+    bumps:[ { name:"Master Beginner Fundamentals in 4 Days", price:0 }, { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:22 } ],
+    upsells:[],
+    analysis:"Only reachable via the toggle on the main sales page — 1 sale this week from 3 weekly uniques is a strong signal if it holds up. Worth testing a direct link to this page from email/ManyChat to see if annual plans convert better with intent traffic." },
+  { parent:"Annual Premium Membership", slug:"/annual-premium-checkout-page/",
+    bumps:[ { name:"Master Beginner Fundamentals in 4 Days", price:0 } ],
+    upsells:[],
+    analysis:"No sales recorded yet and very little traffic (1 weekly unique). Too early to judge — keep an eye on this once Premium members are aware the annual option exists." },
+  { parent:"Master Beginner Fundamentals in 4 Days", slug:"/4-week-beginner-sales-page/",
+    bumps:[ { name:"Beginner Practice Plan - for 4 Songs", price:12 }, { name:"Master Beginner Fundamentals in 4 Days", price:0 } ],
+    upsells:[],
+    analysis:"Beginner Practice Plan bump is converting very well (3 of 4 buyers this week, ~75%) — this is your strongest bump on the site. With ~370 weekly uniques on the sales page but only 4 sales, the page → checkout step is the bottleneck, not the bump." },
+  { parent:"27 Musicians Pro Musicians Bundle Pack", slug:"/27musicians/",
+    bumps:[ { name:"Travis Sayles Organ Runs – Custom MIDI Transcription", price:14 }, { name:"27 Musicians Guided Study Session", price:9 } ],
+    upsells:[],
+    analysis:"No sales this week despite ManyChat traffic arriving on the page — both bumps are unproven with zero orders to test against. Needs a sales push or fresh promo before the bumps can be evaluated." },
+  { parent:"April Focus Guide", slug:"/april-focus-bundle-2026/",
+    bumps:[], upsells:[],
+    analysis:"No traffic or sales this week — likely past its promotional window. Consider retiring the page or repurposing for the next monthly focus guide." },
+  { parent:"Dan's Signature Sounds", slug:"/dans-signature-sounds/",
+    bumps:[ { name:"Dan's Signature Sounds - Logic Sessions Pack", price:null } ],
+    upsells:[],
+    analysis:"1 sale this week from a high-intent page (avg time on page over 10 minutes). Logic Sessions Pack bump take rate isn't tracked yet — add it to the daily Airtable write to see if it's pulling its weight." },
+  { parent:"Mediant Drop 2 Exercise", slug:"/drop-2-exercise-download-page/",
+    bumps:[], upsells:[],
+    analysis:"Quiet this week — no views or sales. This $1 exercise has historically had your highest bump conversion rate; worth a traffic push (ManyChat keyword 'mediant') to re-test." },
+  { parent:"Piano Blueprint Session", slug:"/break",
+    bumps:[], upsells:[],
+    analysis:"$297 coaching offer — primarily sold as the $1 Trial upsell rather than direct traffic. 2 page views this week with no direct sales; track upsell acceptance on the $1 Trial funnel instead." },
+];
+// [FUNNEL-CHAINS-END]
+
 // ─── TRACKED PAGES with conversion targets ────────────────────────────────────
 // conv_target: expected checkout/signup page for this page (to compute Conv%)
 // sc_product:  matching key in SC_DATA.byProduct for revenue lookup
 const TRACKED = [
-  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial",  recurring:true  },
-  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/"                                   },
+  { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial",  recurring:true,  paid:true },
+  { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/",                                    paid:true },
   { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership",                   recurring:true  },
-  { name:"Premium Membership",       slug:null,                              type:"Subscription", price:47,  cat:"checkout", sc_product:"Premium Membership",                 recurring:true  },
-  { name:"Annual Membership",        slug:null,                              type:"Subscription", price:290, cat:"checkout", sc_product:"Annual Standard Membership",          recurring:true  },
-  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days"              },
+  { name:"Premium Membership",       slug:"/premium-checkout-page/",         type:"Subscription", price:47,  cat:"checkout", sc_product:"Premium Membership",                 recurring:true  },
+  { name:"Annual Standard Membership", slug:"/annual-standard-checkout-page/", type:"Subscription", price:290, cat:"checkout", sc_product:"Annual Standard Membership",       recurring:true  },
+  { name:"Annual Premium Membership",  slug:"/annual-premium-checkout-page/", type:"Subscription", price:470, cat:"checkout", sc_product:"Annual Premium Membership",         recurring:true  },
+  { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days",               paid:true },
   { name:"Beginner Practice Plan",   slug:null,                              type:"Product",      price:12,  cat:"checkout", sc_product:"Beginner Practice Plan - for 4 Songs"               },
   { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                                 },
   { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                                   },
@@ -562,21 +611,28 @@ function getConvRate(page, period) {
   if (!d || !d.uniques) return null;
 
   if (page.conv_slug) {
-    // Sales page → downstream checkout
+    // Sales page → downstream checkout. If the checkout page has more
+    // uniques than this page, its traffic comes mostly from elsewhere
+    // (paid ads, direct links) — the ratio isn't a meaningful funnel rate.
     const downstream = getPageData(page.conv_slug, period);
     if (!downstream || !downstream.uniques) return null;
+    if (downstream.uniques > d.uniques) return null;
     return (downstream.uniques / d.uniques) * 100;
   }
-  if (page.sc_product && SC_DATA) {
-    // Checkout/product page: orders / page uniques
-    const sc = getScProduct(page.sc_product);
-    if (!sc) return null;
-    // Scale sc.count to period (sc is ~30-day, scale by period ratio)
-    const periodDays = period==="daily"?1:period==="weekly"?7:157;
-    const scaledCount = sc.count * (periodDays / 30);
-    return (scaledCount / d.uniques) * 100;
+  if (page.sc_product && SC_DATA?.byProductPeriod) {
+    // Checkout/product page: period-matched orders / page uniques
+    const periodRows = SC_DATA.byProductPeriod[period] || [];
+    const entry = periodRows.find(([n]) => n === page.sc_product);
+    if (!entry) return null;
+    return (entry[1].count / d.uniques) * 100;
   }
   return null;
+}
+
+function fmtConv(rate) {
+  if (rate===null) return "—";
+  if (rate>100) return "100%+";
+  return rate.toFixed(1)+"%";
 }
 
 function convClass(rate) {
@@ -594,9 +650,9 @@ function signalColor(views, cat) {
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let currentPeriod = "weekly";
-let currentFilter = "all";
 let currentTab    = "pages";
 let isDark        = true;
+let funnelPeriod  = "weekly";
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderAlerts() {
@@ -770,76 +826,95 @@ function renderKPI() {
     </div>`).join("");
 }
 
-function renderPages() {
-  const pages = TRACKED.filter(p =>
-    currentFilter==="all"      ? true :
-    currentFilter==="paid"     ? p.price>0 :
-    currentFilter==="lead"     ? p.price===0 :
-    currentFilter==="checkout" ? p.cat==="checkout" : true
-  );
-  const maxPvs = Math.max(1,...pages.map(p=>p.slug?getPageData(p.slug,currentPeriod)?.pageviews||0:0));
-  const dateRange = getDateRange(currentPeriod);
+function renderPageRow(page, maxPvs) {
+  const noSlug = !page.slug;
+  const d    = noSlug ? null : getPageData(page.slug, currentPeriod);
+  const pvs  = d?.pageviews||0;
+  const uniq = d?.uniques||0;
+  const pct  = maxPvs>0 ? Math.min(100,(pvs/maxPvs)*100) : 0;
+  const sc   = noSlug ? "var(--border)" : signalColor(pvs, page.cat);
+  const tc   = TYPE_COLORS[page.type]||"#64748b";
+  const conv = noSlug ? null : getConvRate(page, currentPeriod);
+  const convRate = fmtConv(conv);
+  const cClass   = convClass(conv);
 
-  document.getElementById("pages-table-body").innerHTML = pages.map((page,i) => {
-    const noSlug = !page.slug;
-    const d    = noSlug ? null : getPageData(page.slug, currentPeriod);
-    const pvs  = d?.pageviews||0;
-    const uniq = d?.uniques||0;
-    const pct  = maxPvs>0 ? Math.min(100,(pvs/maxPvs)*100) : 0;
-    const sc   = noSlug ? "var(--border)" : signalColor(pvs, page.cat);
-    const tc   = TYPE_COLORS[page.type]||"#64748b";
-    const conv = noSlug ? null : getConvRate(page, currentPeriod);
-    const convRate = conv!==null ? conv.toFixed(1)+"%" : "—";
-    const cClass   = convClass(conv);
-
-    // Period-matched revenue from Airtable via SC_DATA.byProductPeriod
-    let revDisplay = "";
-    if (page.price === 0) {
-      revDisplay = `<div class="tr-right" style="font-size:11px;color:var(--dim)">free</div>`;
-    } else if (page.sc_product && SC_DATA?.byProductPeriod) {
-      const periodData = SC_DATA.byProductPeriod[currentPeriod];
-      const entry = periodData?.find(([n]) => n === page.sc_product);
-      if (entry) {
-        // For subscription products, show new vs recurring split if available
-        const newCount     = entry[1].newCount     ?? null;
-        const recurCount   = entry[1].recurCount   ?? null;
-        const splitLine    = (page.recurring && newCount!==null && recurCount!==null)
-          ? `<div style="font-size:10px;color:var(--dim);margin-top:1px">🟢 ${newCount} new · 🔄 ${recurCount} renew</div>`
-          : `<div style="font-size:10px;color:var(--dim);margin-top:1px">${entry[1].count} orders</div>`;
-        revDisplay = `
-          <div class="tr-right">
-            <div style="font-size:13px;font-weight:800;color:var(--green)">${entry[1].revenue>0?fmtUSD(entry[1].revenue):"$0"}</div>
-            ${splitLine}
-          </div>`;
-      } else {
-        revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
-      }
+  // Period-matched revenue from Airtable via SC_DATA.byProductPeriod
+  let revDisplay = "";
+  if (page.price === 0) {
+    revDisplay = `<div class="tr-right" style="font-size:11px;color:var(--dim)">free</div>`;
+  } else if (page.sc_product && SC_DATA?.byProductPeriod) {
+    const periodData = SC_DATA.byProductPeriod[currentPeriod];
+    const entry = periodData?.find(([n]) => n === page.sc_product);
+    if (entry) {
+      // For subscription products, show new vs recurring split if available
+      const newCount     = entry[1].newCount     ?? null;
+      const recurCount   = entry[1].recurCount   ?? null;
+      const splitLine    = (page.recurring && newCount!==null && recurCount!==null)
+        ? `<div style="font-size:10px;color:var(--dim);margin-top:1px">🟢 ${newCount} new · 🔄 ${recurCount} renew</div>`
+        : `<div style="font-size:10px;color:var(--dim);margin-top:1px">${entry[1].count} orders</div>`;
+      revDisplay = `
+        <div class="tr-right">
+          <div style="font-size:13px;font-weight:800;color:var(--green)">${entry[1].revenue>0?fmtUSD(entry[1].revenue):"$0"}</div>
+          ${splitLine}
+        </div>`;
     } else {
       revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
     }
+  } else {
+    revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
+  }
 
-    return `
-      <div class="table-row">
-        <div class="page-name-cell">
-          <div class="page-name-top">
-            <span class="badge" style="background:${tc}22;color:${tc}">${page.type}</span>
-            ${page.price>0?`<span class="price-tag">$${page.price}</span>`:""}
-            ${page.recurring?`<span style="font-size:9px;font-weight:700;color:var(--blue);background:rgba(59,130,246,.12);border-radius:4px;padding:1px 5px;margin-left:2px">↻ sub</span>`:""}
-          </div>
-          <div class="page-name" title="${page.name}">${page.name}</div>
+  return `
+    <div class="table-row">
+      <div class="page-name-cell">
+        <div class="page-name-top">
+          <span class="badge" style="background:${tc}22;color:${tc}">${page.type}</span>
+          ${page.price>0?`<span class="price-tag">$${page.price}</span>`:""}
+          ${page.recurring?`<span style="font-size:9px;font-weight:700;color:var(--blue);background:rgba(59,130,246,.12);border-radius:4px;padding:1px 5px;margin-left:2px">↻ sub</span>`:""}
         </div>
-        <div class="bar-cell">
-          ${noSlug
-            ? `<div style="font-size:11px;color:var(--dim);padding-left:4px">no landing page</div>`
-            : `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>`}
+        <div class="page-name" title="${page.name}">${page.name}</div>
+      </div>
+      <div class="bar-cell">
+        ${noSlug
+          ? `<div style="font-size:11px;color:var(--dim);padding-left:4px">no landing page</div>`
+          : `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>`}
+      </div>
+      <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${noSlug?"—":fmt(pvs)}</div>
+      <div class="tr-right" style="font-size:12px;color:var(--muted)">${noSlug?"—":uniq>0?fmt(uniq):"—"}</div>
+      <div class="tr-center"><span class="conv-pill ${cClass}">${convRate}</span></div>
+      ${revDisplay}
+      <div class="tr-center"><div class="signal-dot" style="background:${sc};box-shadow:${pvs>1000?"0 0 7px "+sc:"none"}"></div></div>
+    </div>`;
+}
+
+function renderPageTable(title, subtitle, pages) {
+  const revHeader = currentPeriod==="daily"?"Today Rev":currentPeriod==="weekly"?"7-Day Rev":"YTD Rev";
+  const maxPvs = Math.max(1,...pages.map(p=>p.slug?getPageData(p.slug,currentPeriod)?.pageviews||0:0));
+  return `
+    <div class="section-card" style="margin-bottom:16px">
+      <div class="section-head"><span>${title}</span><span style="font-weight:400;font-size:10px">${subtitle}</span></div>
+      <div class="table-wrap">
+        <div class="table-head">
+          <div>Page / Product</div>
+          <div style="padding-left:4px">Traffic</div>
+          <div class="tr-right">Views</div>
+          <div class="tr-right">Uniques</div>
+          <div class="tr-center">Conv%</div>
+          <div class="tr-right">${revHeader}</div>
+          <div class="tr-center">⬤</div>
         </div>
-        <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${noSlug?"—":fmt(pvs)}</div>
-        <div class="tr-right" style="font-size:12px;color:var(--muted)">${noSlug?"—":uniq>0?fmt(uniq):"—"}</div>
-        <div class="tr-center"><span class="conv-pill ${cClass}">${convRate}</span></div>
-        ${revDisplay}
-        <div class="tr-center"><div class="signal-dot" style="background:${sc};box-shadow:${pvs>1000?"0 0 7px "+sc:"none"}"></div></div>
-      </div>`;
-  }).join("");
+        <div>${pages.map(p=>renderPageRow(p,maxPvs)).join("")}</div>
+      </div>
+    </div>`;
+}
+
+function renderPages() {
+  const paidPages    = TRACKED.filter(p => p.paid);
+  const organicPages = TRACKED.filter(p => !p.paid);
+
+  document.getElementById("pages-sections").innerHTML =
+    renderPageTable("🎯 Paid Funnel", "$1 Trial + Beginner Course — paid-ad traffic", paidPages) +
+    renderPageTable("🌱 Organic Traffic", "everything else — content, email, ManyChat", organicPages);
 }
 
 function renderSales() {
@@ -848,15 +923,75 @@ function renderSales() {
     el.innerHTML = `<div class="sc-pending"><div class="sc-pending-icon">🛒</div><div class="sc-pending-title">SureCart data pending</div><div class="sc-pending-sub">Cowork will inject live data on next 8 AM refresh.</div></div>`;
     return;
   }
-  const { stats, byProduct, recentOrders, growth } = SC_DATA;
+  const { growth } = SC_DATA;
+  const dateRange  = getDateRange(currentPeriod);
+  const periodRows = SC_DATA.byProductPeriod?.[currentPeriod] || [];
+  const findRow    = name => periodRows.find(([n]) => n === name);
 
-  // ── Revenue KPIs ──
+  // ── 8 always-shown KPI cards: views + conv% + $ for the period ──
+  function pageKpi(label, slug, scProduct, color) {
+    const d = getPageData(slug, currentPeriod);
+    const views = d?.pageviews || 0;
+    const page = TRACKED.find(p => p.slug === slug);
+    const conv = page ? getConvRate(page, currentPeriod) : null;
+    const entry = scProduct ? findRow(scProduct) : null;
+    const rev = entry ? fmtUSD(entry[1].revenue) : "$0";
+    const convStr = fmtConv(conv);
+    return { label, value: fmt(views), sub: `${convStr} conv · ${rev}`, color };
+  }
+  function leadKpi(label, slug, color) {
+    const d = getPageData(slug, currentPeriod);
+    return { label, value: fmt(d?.pageviews || 0), sub: `views · ${dateRange}`, color };
+  }
+  const tot = SITE_TOTALS[currentPeriod] || {};
   const scKPIs = [
-    { label:"Today",    value:fmtUSD(stats.today.revenue), sub:`${stats.today.count} orders`,      color:"#10b981" },
-    { label:"7-Day",    value:fmtUSD(stats.week.revenue),  sub:`${stats.week.count} orders`,       color:"#3b82f6" },
-    { label:"30-Day",   value:fmtUSD(stats.month.revenue), sub:`${stats.month.count} orders`,      color:"#E8472A" },
-    { label:"YTD 2026", value:fmtUSD(stats.ytd?.revenue||0), sub:`${stats.ytd?.count||0} orders`, color:"#8b5cf6" },
+    { label:"Pageviews",        value:fmt(tot.pageviews), sub:dateRange, color:"#3b82f6" },
+    { label:"Unique Visitors",  value:fmt(tot.uniques),   sub:dateRange, color:"#8b5cf6" },
+    pageKpi("$1 Trial Page Views",       "/join-for-1-today/",            "Basic Membership — 7 Day $1 Trial",      "#E8472A"),
+    pageKpi("Beginner Course Page Views","/4-week-beginner-sales-page/",  "Master Beginner Fundamentals in 4 Days", "#f59e0b"),
+    pageKpi("Standard Membership Sales", "/standard-checkout-page/",      "Basic Membership",                       "#3b82f6"),
+    pageKpi("Premium Membership Sales",  "/premium-checkout-page/",       "Premium Membership",                     "#8b5cf6"),
+    leadKpi("Hear Any Chord — Views",      "/hear-any-chord/", "#10b981"),
+    leadKpi("Scales/Harmony Chart — Views","/scales-charts/",  "#06b6d4"),
   ];
+
+  // ── Bump / upsell take-rate badges from FUNNEL_CHAINS ──
+  function bumpBadges(productName) {
+    const chain = FUNNEL_CHAINS.find(f => f.parent === productName);
+    if (!chain || (!chain.bumps.length && !chain.upsells.length)) return "";
+    const parentEntry = findRow(productName);
+    const parentCount = parentEntry?.[1]?.count || 0;
+    const items = [
+      ...chain.bumps.map(b => ({ ...b, kind:"⚡ Bump" })),
+      ...chain.upsells.map(u => ({ ...u, kind:"⬆ Upsell" })),
+    ];
+    return `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">` + items.map(it => {
+      const e = findRow(it.name);
+      const rate = (parentCount && e) ? (e[1].count / parentCount * 100) : null;
+      return `<span class="conv-pill ${convClass(rate)}" title="${it.name}" style="font-size:10px">${it.kind}: ${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}</span>`;
+    }).join("") + `</div>`;
+  }
+
+  // ── Subscription / One-Time product rows: views, conv%, sales ──
+  function productRow(page) {
+    const d = page.slug ? getPageData(page.slug, currentPeriod) : null;
+    const views = d?.pageviews || 0;
+    const conv = page.slug ? getConvRate(page, currentPeriod) : null;
+    const convStr = fmtConv(conv);
+    const entry = findRow(page.sc_product);
+    const salesStr = entry ? `${fmtUSD(entry[1].revenue)} · ${entry[1].count}×` : "$0 · 0×";
+    return `<div class="product-row">
+      <div class="product-meta">
+        <span class="product-name">${page.name}</span>
+        <span style="font-size:10px;color:var(--dim);margin-left:8px">${page.slug?fmt(views)+" views":"no page"}</span>
+        <span class="conv-pill ${convClass(conv)}" style="font-size:10px;margin-left:6px">${convStr}</span>
+        <span class="product-rev" style="margin-left:auto">${salesStr}</span>
+      </div>
+      ${bumpBadges(page.sc_product)}
+    </div>`;
+  }
+  const RECURRING_PAGES = TRACKED.filter(p => p.recurring);
+  const ONE_TIME_PAGES  = TRACKED.filter(p => !p.recurring && p.sc_product && p.price > 0);
 
   // ── Growth split rows ──
   function growthRow(g) {
@@ -920,10 +1055,8 @@ function renderSales() {
     { key:"ytd",   label:"YTD 2026", g:growth?.ytd   },
   ];
 
-  const maxRev = byProduct.length ? byProduct[0][1].revenue : 1;
-
   el.innerHTML = `
-    <!-- Revenue KPIs -->
+    <!-- Sales KPIs -->
     <div class="sc-kpi-grid">
       ${scKPIs.map(c=>`
         <div class="kpi-card" style="--card-color:${c.color}">
@@ -958,153 +1091,81 @@ function renderSales() {
     <!-- Monthly trend chart -->
     ${trendChart}
 
-    <!-- Revenue by product — period-matched -->
-    ${(()=>{
-      const periodRows = SC_DATA?.byProductPeriod?.[currentPeriod];
-      const periodLabel = currentPeriod==="daily"?"Yesterday (Prior Full Day)":currentPeriod==="weekly"?"Last 7 Days":"YTD 2026";
-      const dateStamp   = currentPeriod==="daily"
-        ? `<div style="font-size:18px;font-weight:900;color:var(--green);letter-spacing:-.02em;margin-bottom:2px">${getDateRange('daily')}</div>`
-        : `<div style="font-size:18px;font-weight:900;color:var(--accent);letter-spacing:-.02em;margin-bottom:2px">${getDateRange(currentPeriod)}</div>`;
-
-      if (periodRows && periodRows.length) {
-        // Separate subscriptions, one-time products, and bumps
-        const SUBSCRIPTION_PRODUCTS = ["Basic Membership — 7 Day $1 Trial","Basic Membership","Premium Membership","Annual Standard Membership"];
-        const BUMP_PRODUCTS         = ["Beginner Practice Plan - for 4 Songs","Mediant Drop 2"];
-        const subs    = periodRows.filter(([n])=> SUBSCRIPTION_PRODUCTS.includes(n));
-        const bumps   = periodRows.filter(([n])=> BUMP_PRODUCTS.includes(n));
-        const oneTime = periodRows.filter(([n])=> !SUBSCRIPTION_PRODUCTS.includes(n) && !BUMP_PRODUCTS.includes(n));
-        const maxPR   = Math.max(1, ...periodRows.map(([,d])=>d.revenue));
-
-        function productBlock(rows, sectionLabel, accentColor) {
-          if (!rows.length) return "";
-          return `
-            <div style="margin-bottom:6px">
-              <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:${accentColor};margin:14px 0 8px">${sectionLabel}</div>
-              ${rows.map(([name,data])=>{
-                const pct = maxPR>0 ? Math.min(100,(data.revenue/maxPR)*100) : 0;
-                const isRecurring = SUBSCRIPTION_PRODUCTS.includes(name);
-                const newCount   = data.newCount   ?? null;
-                const recurCount = data.recurCount ?? null;
-                const splitBadge = (isRecurring && newCount!==null && recurCount!==null)
-                  ? `<span style="font-size:10px;color:var(--dim);margin-left:6px">🟢 ${newCount} new · 🔄 ${recurCount} renew</span>`
-                  : `<span style="font-size:10px;color:var(--dim);margin-left:6px">${data.count}×</span>`;
-                return `<div class="product-row">
-                  <div class="product-meta">
-                    <span class="product-name">${name}</span>
-                    ${splitBadge}
-                    <span class="product-rev" style="margin-left:auto">${data.revenue>0?fmtUSD(data.revenue):'<span style="color:var(--dim);font-size:11px">$0</span>'}</span>
-                  </div>
-                  <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${accentColor}"></div></div>
-                </div>`;
-              }).join("")}
-            </div>`;
-        }
-
-        const subTotal  = subs.reduce((s,[,d])=>s+d.revenue,0);
-        const oneTotal  = oneTime.reduce((s,[,d])=>s+d.revenue,0);
-        const bumpTotal = bumps.reduce((s,[,d])=>s+d.revenue,0);
-        const grandTotal = subTotal + oneTotal + bumpTotal;
-
-        return `<div class="section-card">
-          <div class="section-head">
-            <span>Revenue by Product — ${periodLabel}</span>
-            <span style="font-weight:400;font-size:10px">Airtable · SureCart-verified</span>
-          </div>
-          <div style="padding:14px 16px 4px">
-            ${dateStamp}
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">${fmtUSD(grandTotal)} total · ${periodRows.reduce((s,[,d])=>s+d.count,0)} orders</div>
-            ${productBlock(subs,    "↻ Subscriptions",  "#3b82f6")}
-            ${productBlock(oneTime, "📦 One-Time Products", "#10b981")}
-            ${productBlock(bumps,   "⚡ Bumps",          "#f59e0b")}
-          </div>
-        </div>`;
-      } else {
-        // Fallback: show the carried-forward 30-day byProduct block
-        const maxRev2 = byProduct.length ? byProduct[0][1].revenue : 1;
-        return `<div class="section-card">
-          <div class="section-head"><span>Revenue by Product — Last 30 Days</span><span style="font-weight:400;font-size:10px">from SureCart · carried forward</span></div>
-          <div style="padding:14px 16px 4px">
-            ${dateStamp}
-          </div>
-          ${byProduct.map(([name,data])=>{
-            const pct=maxRev2>0?Math.min(100,(data.revenue/maxRev2)*100):0;
-            return `<div class="product-row">
-              <div class="product-meta">
-                <span class="product-name">${name}</span>
-                <span class="product-count">${data.count}×</span>
-                <span class="product-rev">${fmtUSD(data.revenue)}</span>
-              </div>
-              <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:var(--green)"></div></div>
-            </div>`;
-          }).join("")}
-        </div>`;
-      }
-    })()}
-
-    <!-- Recent orders -->
-    ${recentOrders?.length?`
+    <!-- Recurring Subscriptions -->
     <div class="section-card">
-      <div class="section-head"><span>Recent Orders</span><span style="font-weight:400;font-size:10px">fetched ${SC_DATA.lastFetched}</span></div>
-      ${recentOrders.slice(0,8).map(o=>{
-        const date=new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-        const paid=o.status==="paid";
-        return `<div class="order-row">
-          <div><div class="order-id">#${o.number||o.id?.slice(0,8)}</div><div class="order-date">${date}</div></div>
-          <div class="order-right">
-            <span class="status-badge ${paid?"status-paid":"status-other"}">${o.status}</span>
-            <span class="order-amount" style="color:${paid?"var(--green)":"var(--muted)"}">${fmtUSD(o.amount)}</span>
-          </div>
-        </div>`;
-      }).join("")}
-    </div>`:""}`;
+      <div class="section-head">
+        <span>↻ Recurring Subscriptions</span>
+        <span style="font-weight:400;font-size:10px">${dateRange} · views · conv% · sales</span>
+      </div>
+      <div style="padding:6px 16px 10px">
+        ${RECURRING_PAGES.map(productRow).join("")}
+      </div>
+    </div>
+
+    <!-- One-Time Sales -->
+    <div class="section-card">
+      <div class="section-head">
+        <span>📦 One-Time Sales</span>
+        <span style="font-weight:400;font-size:10px">${dateRange} · views · conv% · sales</span>
+      </div>
+      <div style="padding:6px 16px 10px">
+        ${ONE_TIME_PAGES.map(productRow).join("")}
+      </div>
+    </div>`;
+}
+
+function setFunnelPeriod(p) {
+  funnelPeriod = p;
+  document.querySelectorAll(".funnel-period-btn").forEach(b=>b.classList.toggle("active", b.dataset.period===p));
+  renderFunnel();
 }
 
 function renderFunnel() {
-  const stages = [
-    { title:"🔍 Lead Magnets", color:"#10b981", items:[
-      { name:"Ear Chart Landing",   views:FATHOM_YTD["/hear-any-chord/"]?.pageviews||0 },
-      { name:"Roadmap Offer",       views:FATHOM_YTD["/our-roadmap-offer/"]?.pageviews||0 },
-      { name:"Major vs Minor Quiz", views:FATHOM_YTD["/major-vs-minor-quiz/"]?.pageviews||0 },
-      { name:"Scales Charts",       views:FATHOM_YTD["/scales-charts/"]?.pageviews||0 },
-      { name:"Available Bridge",    views:FATHOM_YTD["/available-to-you/"]?.pageviews||0 },
-      { name:"27 Bundle Waitlist",  views:FATHOM_YTD["/27-bundle-waitlist/"]?.pageviews||0 },
-    ]},
-    { title:"💡 Sales Pages", color:"#3b82f6", items:[
-      { name:"Main Trial Sales",       views:FATHOM_YTD["/join-membership-today/"]?.pageviews||0 },
-      { name:"$1 Trial Checkout",      views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
-      { name:"4-Day Beginner Sales",   views:FATHOM_YTD["/4-week-beginner-sales-page/"]?.pageviews||0 },
-      { name:"Dan's Signature Sounds", views:FATHOM_YTD["/dans-signature-sounds/"]?.pageviews||0 },
-      { name:"27 MIDI Bundle",         views:FATHOM_YTD["/27musicians/"]?.pageviews||0 },
-      { name:"April Focus Guide",      views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
-    ]},
-    { title:"💳 Checkouts", color:"#E8472A", items:[
-      { name:"$1 Trial",          views:FATHOM_YTD["/join-for-1-today/"]?.pageviews||0 },
-      { name:"Basic Monthly",     views:FATHOM_YTD["/standard-checkout-page/"]?.pageviews||0 },
-      { name:"Drop 2 ($1)",       views:FATHOM_YTD["/drop-2-exercise-download-page/"]?.pageviews||0 },
-      { name:"April Focus ($27)", views:FATHOM_YTD["/april-focus-bundle-2026/"]?.pageviews||0 },
-    ]},
-    { title:"⚠️ Action Needed", color:"#f59e0b", items:[
-      { name:"76 — embed on site + add bumps",  views:0, note:"1,000+ comments · IG 68.5% CTR", action:true },
-      { name:"Evil Laugh — needs site embed",   views:0, note:"89.6% CTR · 48 runs",            action:true },
-      { name:"Adore Him — raw Loom URL",        views:0, note:"No landing page yet",             action:true },
-      { name:"Inverted Dominant — confirm URL", views:0, note:"Two URLs still open",             action:true },
-    ]},
-  ];
-  document.getElementById("funnel-grid").innerHTML = stages.map(s=>{
-    const maxV=Math.max(1,...s.items.map(x=>x.views||0));
-    return `<div class="funnel-card" style="border-top:2px solid ${s.color}40">
-      <div class="funnel-title" style="color:${s.color}">${s.title}</div>
-      ${s.items.map(item=>{
-        const pct=maxV>0?Math.min(100,(item.views/maxV)*100):0;
-        return `<div class="funnel-row">
-          <div class="funnel-row-top">
-            <span class="funnel-name ${item.action?"action":""}">${item.action?"⚠️ ":""}${item.name}</span>
-            <span class="funnel-val" style="color:${item.views>0?"var(--text)":"var(--faint)"}">${item.views>0?fmt(item.views):"—"}</span>
-          </div>
-          ${item.note?`<div class="funnel-note">${item.note}</div>`:""}
-          ${!item.action?`<div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${s.color}"></div></div>`:""}
-        </div>`;
-      }).join("")}
+  const periodRows = SC_DATA?.byProductPeriod?.[funnelPeriod] || [];
+  const findRow = name => periodRows.find(([n]) => n === name);
+  const periodLabel = funnelPeriod==="weekly" ? `Last 7 Days · ${getDateRange("weekly")}` : `Year to Date 2026`;
+
+  const lbl = document.getElementById("funnel-period-label");
+  if (lbl) lbl.textContent = periodLabel;
+
+  document.getElementById("funnel-grid").innerHTML = FUNNEL_CHAINS.map(f => {
+    const d = (f.slug && f.slug !== "/break") ? getPageData(f.slug, funnelPeriod) : null;
+    const views   = d?.pageviews || 0;
+    const uniques = d?.uniques || 0;
+    const entry   = findRow(f.parent);
+    const sales   = entry?.[1]?.count || 0;
+    const revenue = entry?.[1]?.revenue || 0;
+    const conv    = (uniques && sales) ? (sales / uniques * 100) : null;
+
+    const offerRows = [
+      ...f.bumps.map(b => ({ ...b, kind:"⚡ Bump" })),
+      ...f.upsells.map(u => ({ ...u, kind:"⬆ Upsell" })),
+    ].map(it => {
+      const e = findRow(it.name);
+      const cnt = e?.[1]?.count || 0;
+      const rate = sales ? (cnt / sales * 100) : null;
+      return `<div class="funnel-row">
+        <div class="funnel-row-top">
+          <span class="funnel-name">${it.kind}: ${it.name}${it.price?` ($${it.price})`:""}</span>
+          <span class="funnel-val">${cnt}× <span class="conv-pill ${convClass(rate)}" style="font-size:10px">${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}</span></span>
+        </div>
+      </div>`;
+    }).join("");
+
+    return `<div class="funnel-card" style="border-top:2px solid var(--accent)40">
+      <div class="funnel-title">${f.parent}</div>
+      <div class="funnel-row">
+        <div class="funnel-row-top"><span class="funnel-name">Page Views</span><span class="funnel-val" style="color:${views>0?"var(--text)":"var(--faint)"}">${views>0?fmt(views):"—"}</span></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-row-top"><span class="funnel-name">Uniques</span><span class="funnel-val" style="color:${uniques>0?"var(--text)":"var(--faint)"}">${uniques>0?fmt(uniques):"—"}</span></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-row-top"><span class="funnel-name">Sales / Revenue</span><span class="funnel-val" style="color:var(--green)">${sales}× · ${fmtUSD(revenue)}</span></div>
+        ${conv!==null?`<div class="funnel-note">Conv ${fmtConv(conv)} (sales ÷ uniques)</div>`:""}
+      </div>
+      ${offerRows}
+      ${f.analysis?`<div style="margin-top:10px;padding:10px 12px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:8px;font-size:11px;line-height:1.5;color:var(--muted)">💡 ${f.analysis}</div>`:""}
     </div>`;
   }).join("");
 }
@@ -1149,11 +1210,6 @@ function setPeriod(p) {
   renderKPI();
   renderPages();
   renderSales();
-}
-function setFilter(f) {
-  currentFilter=f;
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b.textContent.trim().toLowerCase().replace(" ","")===f||(f==="all"&&b.textContent.trim()==="All")||(f==="paid"&&b.textContent.trim()==="Paid")||(f==="lead"&&b.textContent.trim()==="Lead Magnets")||(f==="checkout"&&b.textContent.trim()==="Checkouts")));
-  renderPages();
 }
 function setTab(t) {
   currentTab=t;
