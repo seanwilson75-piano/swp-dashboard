@@ -480,6 +480,14 @@ const PREV_PERIOD = {
   "/dans-signature-sounds/":         { pageviews:75,   uniques:26  },
   "/drop-2-exercise-download-page/": { pageviews:28,   uniques:11  },
 };
+// SPIKE_REFERRERS — only populated for pages whose weekly views are >=2x the
+// prior week (see renderAlerts spike check below). For each spiking pathname,
+// list the top 1-2 traffic sources for that page over the spike week, pulled
+// from Fathom's referrer/UTM breakdown (Cowork Step 1A, Call 7 — on-demand,
+// spike pages only). Example:
+// "/dans-signature-sounds/": [{ source:"youtube.com/watch?v=abc123", views:45 }],
+const SPIKE_REFERRERS = {
+};
 const SC_PREV_30 = {
   "Basic Membership":                       { count:298, revenue:864200 },
   "Basic Membership — 7 Day $1 Trial":      { count:856, revenue:85600  },
@@ -499,47 +507,52 @@ const LAST_UPDATED = "Jun 11, 7:31 AM";
 // "Analysis Notes" field, and add/edit entries if bumps/upsells change.
 // `parent` must match the product name used in SC_DATA.byProduct / byProductPeriod.
 // Bump/upsell take rates are computed live: bump count ÷ parent count for the period.
+// Bump/upsell `accepted` and `offers` come from SureCart Reports → Bumps /
+// Reports → Upsells (the ONLY accurate source — byProductPeriod order counts
+// are per-PRODUCT, not per-bump, and collide when a product is also sold as a
+// bump elsewhere). Take rate = accepted / parent's order count (byProductPeriod).
+// Update accepted/offers weekly during the Sunday rollup from those two reports.
 const FUNNEL_CHAINS = [
   { parent:"Basic Membership — 7 Day $1 Trial", slug:"/join-for-1-today/",
-    bumps:[ { name:"Your First 30 Days: Member Practice Guide", price:17 } ],
-    upsells:[ { name:"Piano Blueprint Session", price:297 } ],
-    analysis:"Your highest-volume funnel and main paid-ad target. Bump take rate is low (~3%) relative to the $17 price — worth testing a cheaper or more relevant bump. Piano Blueprint upsell ($297) had no takers this week; consider a lower-priced upsell step before the $297 offer." },
+    bumps:[ { name:"Your First 30 Days: Member Practice Guide", price:17, accepted:1, offers:259 } ],
+    upsells:[ { name:"Piano Blueprint Session", price:297, accepted:0, offers:0 } ],
+    analysis:"Your highest-volume funnel and main paid-ad target. Bump take rate is low (~3%, 1 of 259 offers this week per SureCart Bumps report — appears in SureCart as '30 Day Guided Practice Plan for Every Level') relative to the $17 price — worth testing a cheaper or more relevant bump. Piano Blueprint upsell ($297) shows 0 offers in the Upsells report this week — verify the upsell step is actually presenting at checkout." },
   { parent:"Basic Membership", slug:"/standard-checkout-page/",
-    bumps:[ { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:null } ],
+    bumps:[ { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:null, accepted:0, offers:56 } ],
     upsells:[],
-    analysis:"Solid organic checkout volume (19 orders this week) with very little direct traffic of its own — most buyers likely arrive via the $1 Trial upgrade path. Bump take rate currently not tracked in Airtable; add it to the daily write to evaluate." },
+    analysis:"Solid organic checkout volume (19 orders this week) with very little direct traffic of its own — most buyers likely arrive via the $1 Trial upgrade path. MIDI Bundle bump: 0 of 56 offers accepted this week (shared bump, also offered on Annual Standard checkout)." },
   { parent:"Premium Membership", slug:"/premium-checkout-page/",
     bumps:[], upsells:[],
-    analysis:"9 orders this week from only 8 weekly checkout views — most Premium buyers are upgrading from inside the member area, not landing on this page directly. No bumps configured; a member-only upsell could capture extra revenue here." },
+    analysis:"9 orders this week from only 8 weekly checkout views — most Premium buyers are upgrading from inside the member area, not landing on this page directly. The new '4-Day Beginner Course → Premium Membership' upsell (added Jun 11) had 0 of 2 offers accepted this week, so these sales aren't coming from that upsell yet." },
   { parent:"Annual Standard Membership", slug:"/annual-standard-checkout-page/",
-    bumps:[ { name:"Master Beginner Fundamentals in 4 Days", price:0 }, { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:22 } ],
+    bumps:[ { name:"Master Your Foundation in 4 Days", price:0, accepted:0, offers:58 }, { name:"Play Like Them: MIDI File Bundle 🎹🔥", price:22, accepted:0, offers:56 } ],
     upsells:[],
-    analysis:"Only reachable via the toggle on the main sales page — 1 sale this week from 3 weekly uniques is a strong signal if it holds up. Worth testing a direct link to this page from email/ManyChat to see if annual plans convert better with intent traffic." },
+    analysis:"Only reachable via the toggle on the main sales page — 1 sale this week from 3 weekly uniques is a strong signal if it holds up. Both bumps (Master Your Foundation in 4 Days, MIDI Bundle) show 0 accepted this week per SureCart's Bumps report. Worth testing a direct link to this page from email/ManyChat to see if annual plans convert better with intent traffic." },
   { parent:"Annual Premium Membership", slug:"/annual-premium-checkout-page/",
-    bumps:[ { name:"Master Beginner Fundamentals in 4 Days", price:0 } ],
+    bumps:[ { name:"Master Your Foundation in 4 Days", price:0, accepted:0, offers:58 } ],
     upsells:[],
     analysis:"No sales recorded yet and very little traffic (1 weekly unique). Too early to judge — keep an eye on this once Premium members are aware the annual option exists." },
   { parent:"Master Beginner Fundamentals in 4 Days", slug:"/4-week-beginner-sales-page/",
-    bumps:[ { name:"Beginner Practice Plan - for 4 Songs", price:12 }, { name:"Master Beginner Fundamentals in 4 Days", price:0 } ],
-    upsells:[],
-    analysis:"Beginner Practice Plan bump is converting very well (3 of 4 buyers this week, ~75%) — this is your strongest bump on the site. With ~370 weekly uniques on the sales page but only 4 sales, the page → checkout step is the bottleneck, not the bump." },
+    bumps:[ { name:"Beginner Practice Plan - for 4 Songs", price:12, accepted:3, offers:257 } ],
+    upsells:[ { name:"Premium Membership", price:47, accepted:0, offers:2 } ],
+    analysis:"Beginner Practice Plan bump is converting very well (3 of 257 offers this week per SureCart Bumps report, ~75% of buyers — appears in SureCart as 'Daily Workbook Guide for Beginner Course') — this is your strongest bump on the site. With ~370 weekly uniques on the sales page but only 4 sales, the page → checkout step is the bottleneck, not the bump. Premium Membership upsell added Jun 11 — 0 of 2 offers accepted so far, too early to evaluate." },
   { parent:"27 Musicians Pro Musicians Bundle Pack", slug:"/27musicians/",
-    bumps:[ { name:"Travis Sayles Organ Runs – Custom MIDI Transcription", price:14 }, { name:"27 Musicians Guided Study Session", price:9 } ],
+    bumps:[ { name:"Travis Sayles Organ Runs – Custom MIDI Transcription", price:14, accepted:0, offers:9 }, { name:"27 Musicians Guided Study Session", price:9, accepted:0, offers:9 } ],
     upsells:[],
-    analysis:"No sales this week despite ManyChat traffic arriving on the page — both bumps are unproven with zero orders to test against. Needs a sales push or fresh promo before the bumps can be evaluated." },
+    analysis:"No sales this week despite ManyChat traffic arriving on the page — both bumps show 0 of 9 offers accepted in the SureCart Bumps report. Needs a sales push or fresh promo before the bumps can be evaluated." },
   { parent:"April Focus Guide", slug:"/april-focus-bundle-2026/",
     bumps:[], upsells:[],
     analysis:"No traffic or sales this week — likely past its promotional window. Consider retiring the page or repurposing for the next monthly focus guide." },
   { parent:"Dan's Signature Sounds", slug:"/dans-signature-sounds/",
-    bumps:[ { name:"Dan's Signature Sounds - Logic Sessions Pack", price:null } ],
+    bumps:[ { name:"Dan's Signature Sounds - Logic Sessions Pack", price:null, accepted:0, offers:16 } ],
     upsells:[],
-    analysis:"1 sale this week from a high-intent page (avg time on page over 10 minutes). Logic Sessions Pack bump take rate isn't tracked yet — add it to the daily Airtable write to see if it's pulling its weight." },
+    analysis:"1 sale this week from a high-intent page (avg time on page over 10 minutes) — but that sale was a standalone purchase, not via the bump (0 of 16 bump offers accepted per SureCart this week)." },
   { parent:"Mediant Drop 2 Exercise", slug:"/drop-2-exercise-download-page/",
     bumps:[], upsells:[],
     analysis:"Quiet this week — no views or sales. This $1 exercise has historically had your highest bump conversion rate; worth a traffic push (ManyChat keyword 'mediant') to re-test." },
   { parent:"Piano Blueprint Session", slug:"/break",
     bumps:[], upsells:[],
-    analysis:"$297 coaching offer — primarily sold as the $1 Trial upsell rather than direct traffic. 2 page views this week with no direct sales; track upsell acceptance on the $1 Trial funnel instead." },
+    analysis:"$297 coaching offer — sold both as the $1 Trial upsell AND via a direct 'Apply for Your Blueprint' CTA on the homepage, so it's not upsell-only. 2 page views this week with no direct sales; once a dedicated checkout/application slug is tracked in Fathom, add it here to separate homepage-direct vs. upsell conversions." },
 ];
 // [FUNNEL-CHAINS-END]
 
@@ -549,10 +562,10 @@ const FUNNEL_CHAINS = [
 const TRACKED = [
   { name:"$1 Trial Membership",      slug:"/join-for-1-today/",              type:"Subscription", price:1,   cat:"checkout", sc_product:"Basic Membership — 7 Day $1 Trial",  recurring:true,  paid:true },
   { name:"Main Trial Sales Page",    slug:"/join-membership-today/",         type:"Sales Page",   price:0,   cat:"funnel",   conv_slug:"/join-for-1-today/",                                    paid:true },
-  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership",                   recurring:true  },
-  { name:"Premium Membership",       slug:"/premium-checkout-page/",         type:"Subscription", price:47,  cat:"checkout", sc_product:"Premium Membership",                 recurring:true  },
-  { name:"Annual Standard Membership", slug:"/annual-standard-checkout-page/", type:"Subscription", price:290, cat:"checkout", sc_product:"Annual Standard Membership",       recurring:true  },
-  { name:"Annual Premium Membership",  slug:"/annual-premium-checkout-page/", type:"Subscription", price:470, cat:"checkout", sc_product:"Annual Premium Membership",         recurring:true  },
+  { name:"Basic Monthly Checkout",   slug:"/standard-checkout-page/",        type:"Subscription", price:29,  cat:"checkout", sc_product:"Basic Membership",                   recurring:true,  goal:160 },
+  { name:"Premium Membership",       slug:"/premium-checkout-page/",         type:"Subscription", price:47,  cat:"checkout", sc_product:"Premium Membership",                 recurring:true,  goal:160 },
+  { name:"Annual Standard Membership", slug:"/annual-standard-checkout-page/", type:"Subscription", price:290, cat:"checkout", sc_product:"Annual Standard Membership",       recurring:true,  goal:160 },
+  { name:"Annual Premium Membership",  slug:"/annual-premium-checkout-page/", type:"Subscription", price:470, cat:"checkout", sc_product:"Annual Premium Membership",         recurring:true,  goal:160 },
   { name:"4-Day Beginner Course",    slug:"/4-week-beginner-sales-page/",    type:"Product",      price:27,  cat:"sales",    sc_product:"Master Beginner Fundamentals in 4 Days",               paid:true },
   { name:"Beginner Practice Plan",   slug:null,                              type:"Product",      price:12,  cat:"checkout", sc_product:"Beginner Practice Plan - for 4 Songs"               },
   { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                                 },
@@ -676,7 +689,11 @@ function renderAlerts() {
       const ratio = curr.pageviews / prevD.pageviews;
       if (ratio >= 2) {
         const pct = Math.round((ratio - 1) * 100);
-        alerts.push({ type:"positive", msg:`📈 ${page.name}: ${fmt(curr.pageviews)} views this week — ${pct}% above prior week (${fmt(prevD.pageviews)}). Check what you posted 1–2 days before the spike.` });
+        const sources = SPIKE_REFERRERS[page.slug];
+        const sourceMsg = sources?.length
+          ? ` Top source: ${sources.map(s=>`${s.source} (${fmt(s.views)} views)`).join(", ")}.`
+          : ` Check Fathom → Referrers for this page this week to see what drove it.`;
+        alerts.push({ type:"positive", msg:`📈 ${page.name}: ${fmt(curr.pageviews)} views this week — ${pct}% above prior week (${fmt(prevD.pageviews)}).${sourceMsg}` });
       }
     });
   }
@@ -864,6 +881,26 @@ function renderPageRow(page, maxPvs) {
     revDisplay = `<div class="tr-right" style="font-size:12px;color:var(--dim);font-style:italic">—</div>`;
   }
 
+  // Weekly view-goal bar: for pages with a `goal` (e.g. 160 views/wk),
+  // the bar is scaled 0–goal instead of 0–maxPvs, so the fill itself shows
+  // progress toward goal. Accent while below goal, green once met/exceeded
+  // (fill stays full past 100% — the label shows how far past).
+  const useGoalBar = !noSlug && currentPeriod==="weekly" && page.goal;
+  let barHTML;
+  if (noSlug) {
+    barHTML = `<div style="font-size:11px;color:var(--dim);padding-left:4px">no landing page</div>`;
+  } else if (useGoalBar) {
+    const goalPct = Math.min(100,(pvs/page.goal)*100);
+    const met = pvs >= page.goal;
+    const goalColor = met ? "var(--green)" : "var(--accent)";
+    const label = met ? `${fmt(pvs)}/${fmt(page.goal)} ✓` : `${fmt(pvs)}/${fmt(page.goal)} this wk`;
+    barHTML = `
+      <div class="bar-track"><div class="bar-fill" style="width:${goalPct}%;background:${goalColor}"></div></div>
+      <div style="font-size:9px;font-weight:700;color:${goalColor};margin-top:3px;text-align:right">${label}</div>`;
+  } else {
+    barHTML = `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>`;
+  }
+
   return `
     <div class="table-row">
       <div class="page-name-cell">
@@ -874,11 +911,7 @@ function renderPageRow(page, maxPvs) {
         </div>
         <div class="page-name" title="${page.name}">${page.name}</div>
       </div>
-      <div class="bar-cell">
-        ${noSlug
-          ? `<div style="font-size:11px;color:var(--dim);padding-left:4px">no landing page</div>`
-          : `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${sc}"></div></div>`}
-      </div>
+      <div class="bar-cell">${barHTML}</div>
       <div class="tr-right" style="font-size:14px;font-weight:800;color:${pvs>0?"var(--text)":"var(--faint)"}">${noSlug?"—":fmt(pvs)}</div>
       <div class="tr-right" style="font-size:12px;color:var(--muted)">${noSlug?"—":uniq>0?fmt(uniq):"—"}</div>
       <div class="tr-center"><span class="conv-pill ${cClass}">${convRate}</span></div>
@@ -966,9 +999,10 @@ function renderSales() {
       ...chain.upsells.map(u => ({ ...u, kind:"⬆ Upsell" })),
     ];
     return `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">` + items.map(it => {
-      const e = findRow(it.name);
-      const rate = (parentCount && e) ? (e[1].count / parentCount * 100) : null;
-      return `<span class="conv-pill ${convClass(rate)}" title="${it.name}" style="font-size:10px">${it.kind}: ${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}</span>`;
+      const cnt  = it.accepted ?? 0;
+      const rate = parentCount ? (cnt / parentCount * 100) : null;
+      const detail = it.offers ? `${cnt}/${it.offers}` : `${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}`;
+      return `<span class="conv-pill ${convClass(rate)}" title="${it.name} — ${cnt}${it.offers?` of ${it.offers} offers`:""} accepted">${it.kind}: ${detail}</span>`;
     }).join("") + `</div>`;
   }
 
@@ -1141,13 +1175,13 @@ function renderFunnel() {
       ...f.bumps.map(b => ({ ...b, kind:"⚡ Bump" })),
       ...f.upsells.map(u => ({ ...u, kind:"⬆ Upsell" })),
     ].map(it => {
-      const e = findRow(it.name);
-      const cnt = e?.[1]?.count || 0;
+      const cnt  = it.accepted ?? 0;
       const rate = sales ? (cnt / sales * 100) : null;
+      const detail = it.offers ? `${cnt}/${it.offers} offers` : `${cnt}×`;
       return `<div class="funnel-row">
         <div class="funnel-row-top">
           <span class="funnel-name">${it.kind}: ${it.name}${it.price?` ($${it.price})`:""}</span>
-          <span class="funnel-val">${cnt}× <span class="conv-pill ${convClass(rate)}" style="font-size:10px">${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}</span></span>
+          <span class="funnel-val">${detail} <span class="conv-pill ${convClass(rate)}" style="font-size:10px">${rate!==null?(rate>100?"100%+":rate.toFixed(0)+"%"):"—"}</span></span>
         </div>
       </div>`;
     }).join("");

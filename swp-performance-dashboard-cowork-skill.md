@@ -84,6 +84,28 @@ timezone: America/New_York
 **Call 6 — Prior week (for spike detection):**
 Same as weekly but date_from: 14 days ago, date_to: 8 days ago
 
+**Call 7 — Spike source attribution (conditional, run AFTER Calls 2 & 6):**
+For each TRACKED page whose weekly pageviews (Call 2) are >= 2x its prior-week
+pageviews (Call 6) — same threshold the dashboard uses for its spike alert —
+run one extra Fathom call to find what drove it:
+```
+entity: pageview, entity_id: BCWEGICN
+aggregates: pageviews
+date_from: 7 days ago, date_to: yesterday
+field_grouping: pathname,referrer_hostname,utm_source,utm_campaign
+filters: [{ property: "pathname", operator: "is", value: "[SPIKING SLUG]" }]
+sort_by: pageviews:desc, limit: 5
+timezone: America/New_York
+```
+Take the top 1-2 rows (by pageviews) and turn each into a short human-readable
+source label, e.g.:
+- if `utm_source`/`utm_campaign` present → `"youtube: [utm_campaign]"` or `"manychat: [utm_campaign]"`
+- else if `referrer_hostname` present → that hostname (e.g. `"youtube.com"`)
+- else → `"direct/unknown"`
+
+Store as `{ source: "...", views: N }` per spiking page — written into
+`SPIKE_REFERRERS` in Step 3. If no pages spiked, `SPIKE_REFERRERS = {}`.
+
 ---
 
 ## Step 1B — SureCart Orders & Revenue
@@ -303,6 +325,9 @@ const FATHOM_YTD     = { /* YTD per pathname */ };
 const SITE_TOTALS    = { daily:{...}, weekly:{...}, ytd:{...} };
 const MONTHLY        = [ {month:"Jan", pageviews:N, uniques:N}, ... ];
 const PREV_PERIOD    = { /* prior 7-day per pathname for spike detection */ };
+const SPIKE_REFERRERS = { /* from Step 1A Call 7 — only for pages that spiked this week */
+  // "/dans-signature-sounds/": [{ source:"youtube: video-title-utm", views:45 }],
+};
 const SC_PREV_30     = { /* prior 30-day per product for spike detection */ };
 const SC_DATA = {
   stats: {
