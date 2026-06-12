@@ -388,19 +388,37 @@ On Sunday runs, after completing Steps 1–6, sync the `FUNNEL_CHAINS[].analysis
 
 1. Overwrite: `~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html`
 2. Save snapshot: `~/Documents/Claude/swp-dashboard-snapshot-[YESTERDAY-DATE].html`
+3. Save a dated copy in `~/Documents/Claude/Artifacts/swp-performance-dashboard/versions/[YYYY-MM-DD-HHMM].html` (create the `versions/` dir if missing)
 
 ---
 
-## Step 5 — Publish (launchd handles this separately)
+## Step 5 — Publish (Cowork runs this directly — do NOT skip)
 
-Cowork does NOT run the push script. Publishing is handled by a separate launchd job:
-- **Job:** `com.seanwilson.swp-dashboard-push`
-- **Fires:** daily at 8:00 AM ET automatically
-- **Does:** git commit + push → GitHub → Vercel auto-deploys
-- **Live URL:** https://swp-dashboard-five.vercel.app/
-- **Logs:** `~/Library/Logs/swp-dashboard-push.log`
+**⚠️ Historical note:** publishing used to be handled by a separate launchd job
+(`com.seanwilson.swp-dashboard-push`). That job has been disabled — it ran a bare
+`/bin/bash` script that macOS's Files & Folders privacy protection (TCC) blocked
+from touching anything under `~/Documents` (`cp: index.html: Operation not
+permitted`), so it silently failed every morning since ~June 8 and never reached
+`git push`. Cowork's own process already has Documents access (it just wrote
+`index.html` in Step 4), so Cowork now does the publish itself.
 
-⚠️ Timing: this task runs at ~7:30 AM. The push fires at 8:00 AM — 30 min buffer. Do not change either schedule without adjusting both.
+After Step 4, run these commands in `~/Documents/Claude/Artifacts/swp-performance-dashboard`:
+
+```bash
+cd ~/Documents/Claude/Artifacts/swp-performance-dashboard
+git add index.html versions/
+git pull --rebase origin main   # picks up any same-day manual commits cleanly
+git commit -m "Dashboard refresh $(date +%Y-%m-%d)"   # skip if nothing staged
+git push origin main
+```
+
+- If `git pull --rebase` reports a conflict, STOP and report it to Sean — do not
+  force-push or discard either side. This should be rare since the daily replace
+  only touches the `[DASHBOARD-DATA-START]`/`[DASHBOARD-DATA-END]` block.
+- If `git push` fails for any other reason, report the exact error in the run
+  summary — don't silently retry or swallow it.
+- On success, confirm in the run summary: "Pushed to GitHub → Vercel will
+  auto-deploy. Live: https://swp-dashboard-five.vercel.app/"
 
 ---
 
@@ -435,6 +453,8 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 | Airtable revenue in dollars | Multiply × 100 when building byProductPeriod |
 | Product not found in Airtable | Omit from byProductPeriod — dashboard shows N/A |
 | Bump not in Bumps Report today | Write 0 for Orders, Revenue, Parent Orders |
+| `git pull --rebase` conflict (Step 5) | Stop, do not force-resolve — report to Sean |
+| `git push` fails (Step 5) | Report exact error to Sean — dashboard file is still saved locally, just not live |
 
 ---
 
@@ -444,7 +464,7 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 |---|---|---|
 | Full data refresh + Airtable write + inject | 7:30 AM ET daily | Cowork |
 | New signups growth query | Sundays only | Cowork |
-| Git push → Vercel deploy | 8:00 AM ET daily | launchd |
+| Git commit + push → Vercel deploy (Step 5) | Immediately after inject, same run | Cowork |
 | On demand | "refresh dashboard" | Cowork |
 
 ---
@@ -473,7 +493,8 @@ All tools already connected on Mac Studio. No API keys needed.
 
 ---
 
-*Version: 6.1*
-*Last updated: 2026-06-11 — added Premium/Annual Membership tracking, FUNNEL_CHAINS marker block (preserved across daily runs), and weekly Funnel Chains analysis sync (Step 3B)*
+*Version: 6.2*
+*Last updated: 2026-06-11 — Cowork now publishes directly (Step 5): git commit + push every run, no more reliance on the broken `com.seanwilson.swp-dashboard-push` launchd job (disabled — TCC blocked it from `~/Documents`)*
+*v6.1: added Premium/Annual Membership tracking, FUNNEL_CHAINS marker block (preserved across daily runs), and weekly Funnel Chains analysis sync (Step 3B)*
 *Base: SWP Performance Data (`appGGzkWDtvCU3wGk`)*
 *Dashboard: ~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html*
