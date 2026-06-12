@@ -60,7 +60,7 @@ Call `fathom-analytics:get-aggregation` five times simultaneously.
 entity: pageview, entity_id: BCWEGICN
 aggregates: pageviews,uniques,visits,avg_duration,bounce_rate
 date_from: [YESTERDAY], date_to: [YESTERDAY]
-field_grouping: pathname, sort_by: pageviews:desc, limit: 100
+field_grouping: pathname, sort_by: pageviews:desc, limit: 25
 timezone: America/New_York
 ```
 
@@ -386,9 +386,10 @@ On Sunday runs, after completing Steps 1–6, sync the `FUNNEL_CHAINS[].analysis
 
 ## Step 4 — Save Files
 
-1. Overwrite: `~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html`
-2. Save snapshot: `~/Documents/Claude/swp-dashboard-snapshot-[YESTERDAY-DATE].html`
-3. Save a dated copy in `~/Documents/Claude/Artifacts/swp-performance-dashboard/versions/[YYYY-MM-DD-HHMM].html` (create the `versions/` dir if missing)
+Overwrite: `~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html`
+
+(Snapshots, versioned copies, and the git commit are all handled by the push
+script in Step 5 — don't duplicate them here.)
 
 ---
 
@@ -402,21 +403,24 @@ permitted`), so it silently failed every morning since ~June 8 and never reached
 `git push`. Cowork's own process already has Documents access (it just wrote
 `index.html` in Step 4), so Cowork now does the publish itself.
 
-After Step 4, run these commands in `~/Documents/Claude/Artifacts/swp-performance-dashboard`:
+After Step 4, run:
 
 ```bash
-cd ~/Documents/Claude/Artifacts/swp-performance-dashboard
-git add index.html versions/
-git pull --rebase origin main   # picks up any same-day manual commits cleanly
-git commit -m "Dashboard refresh $(date +%Y-%m-%d)"   # skip if nothing staged
-git push origin main
+git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard pull --rebase origin main
+~/swp-dashboard-push.sh
 ```
 
-- If `git pull --rebase` reports a conflict, STOP and report it to Sean — do not
-  force-push or discard either side. This should be rare since the daily replace
-  only touches the `[DASHBOARD-DATA-START]`/`[DASHBOARD-DATA-END]` block.
-- If `git push` fails for any other reason, report the exact error in the run
-  summary — don't silently retry or swallow it.
+`~/swp-dashboard-push.sh` already exists and does the right thing: copies
+`index.html` into `versions/[timestamp].html` and
+`~/Documents/Claude/swp-dashboard-snapshot-[date].html`, commits (skipping if
+nothing changed), and pushes to `origin main`.
+
+- The `git pull --rebase` first picks up any same-day manual commits cleanly.
+  If it reports a conflict, STOP and report it to Sean — do not force-push or
+  discard either side. This should be rare since the daily replace only
+  touches the `[DASHBOARD-DATA-START]`/`[DASHBOARD-DATA-END]` block.
+- If `swp-dashboard-push.sh` exits non-zero for any reason, report the exact
+  error/output in the run summary — don't silently retry or swallow it.
 - On success, confirm in the run summary: "Pushed to GitHub → Vercel will
   auto-deploy. Live: https://swp-dashboard-five.vercel.app/"
 
@@ -446,6 +450,7 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 | Failure | Action |
 |---|---|
 | Fathom returns no data for a pathname | Set entry to `{pageviews:0, uniques:0, avg_duration:0, bounce_rate:0}` |
+| Fathom `get-aggregation` response too large / call errors out | `limit:25` (already set in Calls 1-3,6) should keep responses well under the ~21 tracked pathnames. If a call still fails, split it into two calls covering different pathname groups (e.g. checkout pages vs. content/lead-magnet pages) using `filters: [{property:"pathname", operator:"is", value:"..."}]` per group — do NOT drop tracked pathnames or fall back to manual/Python workarounds, and do NOT skip Step 5 because of this. |
 | SureCart Abilities unavailable | Set `SC_DATA = null` — Sales tab shows "pending" |
 | Airtable write fails | Log error, report to Sean, do not block dashboard inject |
 | Growth query fails (non-Sunday) | Carry forward previous growth block unchanged |
