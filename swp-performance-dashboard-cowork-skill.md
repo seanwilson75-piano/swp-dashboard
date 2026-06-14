@@ -393,6 +393,42 @@ script in Step 5 — don't duplicate them here.)
 
 ---
 
+## Step 4.5 — Pre-Publish Sanity Check (MANDATORY — do not skip)
+
+**This check exists because a previous run silently committed a data block that
+was missing several required structures, breaking the live dashboard's 7-Day,
+YTD, Growth, Funnel, and Monthly views for hours before it was caught. Do not
+let this happen again.**
+
+Before running Step 5, run:
+
+```bash
+grep -c -E "^const (FATHOM_DAILY|FATHOM_WEEKLY|FATHOM_YTD|SITE_TOTALS|MONTHLY|PREV_PERIOD|SPIKE_REFERRERS|SC_PREV_30|SC_DATA|LAST_UPDATED)\b" ~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html
+```
+
+This should report **10** (one per required `const`). Also confirm each of
+these substrings is present in the new data block: `byProductPeriod`,
+`recentOrders`, `lastFetched`, `growth:`, `monthlyNewSignups`, and that
+`[FUNNEL-CHAINS-START]` / `FUNNEL_CHAINS = [` / `[FUNNEL-CHAINS-END]` are still
+present and unchanged in size/shape from before this run's edit.
+
+**If anything is missing:**
+- Do NOT proceed to Step 5 (no commit, no push).
+- Run `git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard checkout -- index.html`
+  to discard the broken edit and restore the last-good committed version.
+- Report to Sean exactly which structure(s) were missing and that the dashboard
+  file was reverted to the last good commit (so the live site is unaffected).
+- It is far better to leave the dashboard one day stale than to push a file
+  that's missing required data structures.
+
+Optionally, also do a quick syntax check:
+```bash
+node -e "const fs=require('fs'); const html=fs.readFileSync(process.env.HOME+'/Documents/Claude/Artifacts/swp-performance-dashboard/index.html','utf8'); const block=html.split('// [DASHBOARD-DATA-START]')[1].split('// [DASHBOARD-DATA-END]')[0]; new Function(block)(); console.log('OK - data block parses');"
+```
+If this errors, treat it the same as a missing-structure failure above.
+
+---
+
 ## Step 5 — Publish (Cowork runs this directly — do NOT skip)
 
 **⚠️ Historical note:** publishing used to be handled by a separate launchd job
@@ -403,7 +439,8 @@ permitted`), so it silently failed every morning since ~June 8 and never reached
 `git push`. Cowork's own process already has Documents access (it just wrote
 `index.html` in Step 4), so Cowork now does the publish itself.
 
-After Step 4, run:
+**Only proceed past this point if Step 4.5 passed.** After Step 4 (and a
+passing Step 4.5), run:
 
 ```bash
 git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard pull --rebase origin main
@@ -498,8 +535,9 @@ All tools already connected on Mac Studio. No API keys needed.
 
 ---
 
-*Version: 6.2*
-*Last updated: 2026-06-11 — Cowork now publishes directly (Step 5): git commit + push every run, no more reliance on the broken `com.seanwilson.swp-dashboard-push` launchd job (disabled — TCC blocked it from `~/Documents`)*
+*Version: 6.3*
+*Last updated: 2026-06-14 — Added mandatory Step 4.5 pre-publish sanity check: a 2026-06-13 run silently dropped FATHOM_WEEKLY/FATHOM_YTD/MONTHLY/SC_DATA.growth/byProductPeriod/PREV_PERIOD/SPIKE_REFERRERS/SC_PREV_30 and pushed the broken file to production. Cowork must now verify all required `const` declarations are present (and the data block parses) before committing/pushing — if not, revert index.html and report to Sean instead of publishing.*
+*v6.2: Cowork now publishes directly (Step 5): git commit + push every run, no more reliance on the broken `com.seanwilson.swp-dashboard-push` launchd job (disabled — TCC blocked it from `~/Documents`)*
 *v6.1: added Premium/Annual Membership tracking, FUNNEL_CHAINS marker block (preserved across daily runs), and weekly Funnel Chains analysis sync (Step 3B)*
 *Base: SWP Performance Data (`appGGzkWDtvCU3wGk`)*
 *Dashboard: ~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html*
