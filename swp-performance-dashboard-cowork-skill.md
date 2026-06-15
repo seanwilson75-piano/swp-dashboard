@@ -1,11 +1,11 @@
 ---
-name: swp-performance-dashboard
-description: "Use this skill when Dispatch triggers the daily performance dashboard refresh, or when Sean says 'refresh the dashboard', 'update performance data', or 'run dashboard'. This skill pulls live Fathom + SureCart data, writes to Airtable, and injects into the performance dashboard HTML file on disk."
+name: swp-performance-dashboard-refresh
+description: "Daily SWP performance dashboard refresh — pulls Fathom + SureCart data and updates the dashboard HTML. Use this skill when Dispatch triggers the daily performance dashboard refresh, or when Sean says 'refresh the dashboard', 'update performance data', or 'run dashboard'."
 ---
 
-# SWP Performance Dashboard — Cowork Skill v6
+# SWP Performance Dashboard — Cowork Skill v6.4
 
-Refreshes the Sean Wilson Piano performance dashboard with live Fathom Analytics and SureCart data. Runs daily at 7:30 AM ET. Writes to Airtable. Pushes to Vercel via launchd at 8:00 AM ET.
+Refreshes the Sean Wilson Piano performance dashboard with live Fathom Analytics and SureCart data. Runs daily at 7:30 AM ET. Writes to Airtable.
 
 **Output file:** `~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html`
 **Snapshot file:** `~/Documents/Claude/swp-dashboard-snapshot-[YYYY-MM-DD].html`
@@ -23,6 +23,8 @@ Refreshes the Sean Wilson Piano performance dashboard with live Fathom Analytics
 5. Build SC_DATA.byProductPeriod from Airtable records
 6. Inject everything into index.html
 7. Save files
+8. Pre-publish sanity check — structure + values (MANDATORY)
+9. Publish (git commit + push), or hold + flag if Step 8 found issues
 
 ---
 
@@ -336,7 +338,7 @@ const SC_DATA = {
     month:  { count: N, revenue: N },
     ytd:    { count: N, revenue: N },
   },
-  byProduct: [ ["Product Name", {count:N, revenue:N}], ... ],  // 30-day, CENTS
+  byProduct: [ ["Product Name", {count:N, revenue:N}], ... ],  // same as byProductPeriod.ytd below (Airtable cumulative-to-date), CENTS
   byProductPeriod: {
     daily:  [ ["Product Name", {count:N, revenue:N}], ... ],   // CENTS
     weekly: [ ... ],
@@ -429,6 +431,68 @@ If this errors, treat it the same as a missing-structure failure above.
 
 ---
 
+## Step 4.6 — Run-to-Run Anomaly Check (MANDATORY — do not skip)
+
+**This check exists because the 2026-06-15 run hit a transient SureCart outage
+and wrote a data block that PASSED Step 4.5 (all required `const`s present,
+file parses) but had `SC_DATA.stats`, `byProduct`, `byProductPeriod`,
+`recentOrders` amounts, `growth`, `PREV_PERIOD`, and `SC_PREV_30` all nulled
+out or emptied. Step 4.5 catches missing structures; this step catches
+degraded *values* inside structures that are present.**
+
+Before running Step 5, compare your new data block against the CURRENTLY LIVE
+version:
+
+```bash
+git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard show origin/main:index.html > /tmp/live-index.html
+```
+
+For each of the following, compare the LIVE (origin/main) value to the NEW
+value you just wrote:
+
+- `SC_DATA.stats.{today,week,month,ytd}.{count,revenue}`
+- `SC_DATA.byProduct` (array length)
+- `SC_DATA.byProductPeriod.ytd` (array length — `daily`/`weekly` MAY
+  legitimately be empty on a no-order day, don't flag those)
+- `SC_DATA.recentOrders` — count of entries with non-null `amount`
+- `SC_DATA.growth.{week,month,ytd}.*`
+- `PREV_PERIOD` — count of pathnames with non-zero `pageviews`
+- `SC_PREV_30` (object key count)
+
+**Flag as DEGRADED** if the LIVE value was real (non-null, non-zero,
+non-empty) and the NEW value is `null`, `0`, `[]`, or `{}` for the SAME field.
+
+If you correctly applied the carry-forward rule above for a SureCart/Airtable
+outage, NEW should equal (or closely match) LIVE for these fields — a
+correctly-applied carry-forward passes this check. This step exists to catch
+the case where carry-forward was skipped and fields were nulled instead.
+
+**If DEGRADED:**
+1. `git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard checkout -- index.html`
+   — discard the bad write; origin/main stays live and unaffected.
+2. Do NOT proceed to Step 5.
+3. Write/overwrite `~/Documents/Claude/Scheduled/swp-performance-dashboard-refresh/LAST_RUN_STATUS.md`:
+```markdown
+# Dashboard Refresh — [date/time]
+**Status:** DEGRADED — not published
+**Reason:** [which field(s) went from a real value to null/0/empty, old -> new]
+**Action needed:** Sean (or a follow-up Cowork session) should re-pull the
+affected source(s) and publish manually.
+```
+4. Stop. Report this clearly in your run summary.
+
+**If OK (nothing degraded):**
+1. Proceed to Step 5 (Publish).
+2. After a successful push, write/overwrite the same status file:
+```markdown
+# Dashboard Refresh — [date/time]
+**Status:** OK — published
+**Commit:** [commit hash]
+**Summary:** [one line, e.g. "14 orders, $412 revenue, traffic flat vs last week"]
+```
+
+---
+
 ## Step 5 — Publish (Cowork runs this directly — do NOT skip)
 
 **⚠️ Historical note:** publishing used to be handled by a separate launchd job
@@ -439,8 +503,8 @@ permitted`), so it silently failed every morning since ~June 8 and never reached
 `git push`. Cowork's own process already has Documents access (it just wrote
 `index.html` in Step 4), so Cowork now does the publish itself.
 
-**Only proceed past this point if Step 4.5 passed.** After Step 4 (and a
-passing Step 4.5), run:
+**Only proceed past this point if Step 4.5 AND Step 4.6 passed.** After Step 4
+(and passing Steps 4.5 and 4.6), run:
 
 ```bash
 git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard pull --rebase origin main
@@ -488,7 +552,7 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 |---|---|
 | Fathom returns no data for a pathname | Set entry to `{pageviews:0, uniques:0, avg_duration:0, bounce_rate:0}` |
 | Fathom `get-aggregation` response too large / call errors out | `limit:25` (already set in Calls 1-3,6) should keep responses well under the ~21 tracked pathnames. If a call still fails, split it into two calls covering different pathname groups (e.g. checkout pages vs. content/lead-magnet pages) using `filters: [{property:"pathname", operator:"is", value:"..."}]` per group — do NOT drop tracked pathnames or fall back to manual/Python workarounds, and do NOT skip Step 5 because of this. |
-| SureCart Abilities unavailable | Set `SC_DATA = null` — Sales tab shows "pending" |
+| SureCart (or Airtable Daily Product Stats) unavailable mid-run | Do NOT null out or empty `SC_DATA` fields, `PREV_PERIOD`, `SC_PREV_30`, or `byProductPeriod`. Carry forward the ENTIRE previous run's values for these structures unchanged (1-day-stale is fine and far better than nulls — the dashboard has no "pending" state and renders `null`/`[]`/`{}` as broken/empty). Still inject the Fathom-derived fields normally and update `LAST_UPDATED`. Note in the run summary which sections are stale so Sean can re-run later when the source is back up. |
 | Airtable write fails | Log error, report to Sean, do not block dashboard inject |
 | Growth query fails (non-Sunday) | Carry forward previous growth block unchanged |
 | Revenue from SureCart in dollars | Multiply × 100 before storing in SC_DATA |
@@ -506,7 +570,10 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 |---|---|---|
 | Full data refresh + Airtable write + inject | 7:30 AM ET daily | Cowork |
 | New signups growth query | Sundays only | Cowork |
-| Git commit + push → Vercel deploy (Step 5) | Immediately after inject, same run | Cowork |
+| Pre-publish sanity check (Step 4.5) | Immediately after inject, same run | Cowork |
+| Run-to-run anomaly check (Step 4.6) | Immediately after Step 4.5, same run | Cowork |
+| Write LAST_RUN_STATUS.md (OK or DEGRADED) | End of Step 4.6/5, every run | Cowork |
+| Git commit + push → Vercel deploy (Step 5) | Immediately after passing Steps 4.5 and 4.6, same run | Cowork |
 | On demand | "refresh dashboard" | Cowork |
 
 ---
@@ -535,8 +602,9 @@ All tools already connected on Mac Studio. No API keys needed.
 
 ---
 
-*Version: 6.3*
-*Last updated: 2026-06-14 — Added mandatory Step 4.5 pre-publish sanity check: a 2026-06-13 run silently dropped FATHOM_WEEKLY/FATHOM_YTD/MONTHLY/SC_DATA.growth/byProductPeriod/PREV_PERIOD/SPIKE_REFERRERS/SC_PREV_30 and pushed the broken file to production. Cowork must now verify all required `const` declarations are present (and the data block parses) before committing/pushing — if not, revert index.html and report to Sean instead of publishing.*
+*Version: 6.4*
+*Last updated: 2026-06-15 — Unified the two skill copies: `Scheduled/swp-performance-dashboard-refresh/SKILL.md` is now a symlink to this file, so there is only ONE copy to edit going forward (previously, fixes made here didn't reach the actual scheduled run for days — see Jun 14 note below). Added mandatory Step 4.6 run-to-run anomaly check: the 2026-06-15 run nulled out SC_DATA/PREV_PERIOD/SC_PREV_30/byProductPeriod/growth/recentOrders after a transient SureCart outage — it passed Step 4.5 (structure intact) but was full of nulls. Step 4.6 compares new values against the live dashboard and holds the publish (writing LAST_RUN_STATUS.md instead) if real data would be replaced with null/0/empty. Also changed the Error Handling row for "SureCart unavailable" from "set SC_DATA = null" to "carry forward the previous run's values unchanged" — nulling was itself the bug. Clarified that `byProduct` is computed identically to `byProductPeriod.ytd` (both are Airtable cumulative-to-date, not a rolling 30-day window — Airtable's Daily Product Stats table only has data from 2026-06-01 onward).*
+*Last updated: 2026-06-14 — Synced this scheduled copy with the maintained Artifacts copy (this file was 7 days stale, still listing old product names like "4-Day Beginner Course" / "$1 Trial Membership" instead of the current verified names). Added mandatory Step 4.5 pre-publish sanity check: a 2026-06-13 run silently dropped FATHOM_WEEKLY/FATHOM_YTD/MONTHLY/SC_DATA.growth/byProductPeriod/PREV_PERIOD/SPIKE_REFERRERS/SC_PREV_30 and pushed the broken file to production. Cowork must now verify all required `const` declarations are present (and the data block parses) before committing/pushing — if not, revert index.html and report to Sean instead of publishing.*
 *v6.2: Cowork now publishes directly (Step 5): git commit + push every run, no more reliance on the broken `com.seanwilson.swp-dashboard-push` launchd job (disabled — TCC blocked it from `~/Documents`)*
 *v6.1: added Premium/Annual Membership tracking, FUNNEL_CHAINS marker block (preserved across daily runs), and weekly Funnel Chains analysis sync (Step 3B)*
 *Base: SWP Performance Data (`appGGzkWDtvCU3wGk`)*
