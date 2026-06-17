@@ -3,7 +3,7 @@ name: swp-performance-dashboard-refresh
 description: "Daily SWP performance dashboard refresh — pulls Fathom + SureCart data and updates the dashboard HTML. Use this skill when Dispatch triggers the daily performance dashboard refresh, or when Sean says 'refresh the dashboard', 'update performance data', or 'run dashboard'."
 ---
 
-# SWP Performance Dashboard — Cowork Skill v6.4
+# SWP Performance Dashboard — Cowork Skill v6.5
 
 Refreshes the Sean Wilson Piano performance dashboard with live Fathom Analytics and SureCart data. Runs daily at 7:30 AM ET. Writes to Airtable.
 
@@ -23,7 +23,7 @@ Refreshes the Sean Wilson Piano performance dashboard with live Fathom Analytics
 5. Build SC_DATA.byProductPeriod from Airtable records
 6. Inject everything into index.html
 7. Save files
-8. Pre-publish sanity check — structure + values (MANDATORY)
+8. Pre-publish sanity check — structure + values + data provenance (MANDATORY)
 9. Publish (git commit + push), or hold + flag if Step 8 found issues
 
 ---
@@ -482,14 +482,69 @@ affected source(s) and publish manually.
 4. Stop. Report this clearly in your run summary.
 
 **If OK (nothing degraded):**
-1. Proceed to Step 5 (Publish).
-2. After a successful push, write/overwrite the same status file:
+1. Proceed to Step 4.7.
+2. After Step 4.7 also passes and the push succeeds, write/overwrite the same status file:
 ```markdown
 # Dashboard Refresh — [date/time]
 **Status:** OK — published
 **Commit:** [commit hash]
 **Summary:** [one line, e.g. "14 orders, $412 revenue, traffic flat vs last week"]
 ```
+
+---
+
+## Step 4.7 — Data Provenance / Plausibility Check (MANDATORY — do not skip)
+
+**This check exists because a 2026-06-17 run wrote a data block that PASSED
+Step 4.5 (all structures present) and Step 4.6 (no field was nulled/emptied —
+every field had a real-looking non-zero value) but was not actually pulled
+from live Fathom/SureCart calls. Tell-tale signs in that run: `recentOrders[].id`
+were sequential integers (`"1"`, `"2"`, `"3"`) instead of SureCart UUIDs,
+`created_at` used human-readable strings dated AFTER the run itself (impossible
+for "recent" orders), `SITE_TOTALS.weekly` was a suspiciously round
+`{pageviews:15000, uniques:1200}`, `SC_DATA.byProduct` was emptied to `[]`,
+and the sum of `recentOrders` amounts didn't reconcile with `SC_DATA.stats.today`.
+Steps 4.5/4.6 can't see this class of error — they check for missing/nulled
+structure, not for plausible-but-fake values. This step does.**
+
+Before running Step 5, run these checks against the NEW data block:
+
+1. **Order ID format** — every `SC_DATA.recentOrders[].id` must match a UUID:
+   `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`. Sequential
+   or short numeric IDs mean the data was not pulled from a real SureCart call.
+2. **Timestamp format & range** — every `created_at` must be ISO 8601
+   (`YYYY-MM-DDTHH:MM:SSZ`) and must fall on or before the run's YESTERDAY
+   date. Any `created_at` after the run date is impossible for "recent
+   orders" and means the value was invented.
+3. **Revenue reconciliation** — sum the `amount` of `recentOrders` entries
+   dated exactly YESTERDAY and compare to `SC_DATA.stats.today.revenue`. These
+   should match. If `recentOrders` only holds a subset (more than 8 orders
+   happened), the partial sum must be `<=` `stats.today.revenue` — never
+   wildly inconsistent with the order count shown.
+4. **Round-number check** — flag `SITE_TOTALS.weekly`/`.ytd` or
+   `SC_DATA.stats.*.revenue` if the value is an exact multiple of 100 or 1000
+   (e.g. `15000`, `1200`) AND differs from the LIVE (`origin/main`) value by
+   more than 25%. Real analytics/revenue figures are not that round; this
+   combination indicates an estimate, not a live pull.
+5. **`byProduct` non-regression backstop** — `SC_DATA.byProduct` must not be
+   `[]` if `SC_DATA.stats.ytd.count > 0`. (Step 4.6 already catches this when
+   the LIVE value was non-empty; this is a backstop in case 4.6 was skipped or
+   LIVE was already empty.)
+
+**If ANY check fails:**
+1. Do NOT proceed to Step 5 (no commit, no push).
+2. `git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard checkout -- index.html`
+   — discard the bad write; origin/main stays live and unaffected.
+3. Write/overwrite `~/Documents/Claude/Scheduled/swp-performance-dashboard-refresh/LAST_RUN_STATUS.md`:
+```markdown
+# Dashboard Refresh — [date/time]
+**Status:** REJECTED — fabricated/implausible data detected
+**Failed check(s):** [e.g. "Order ID format — recentOrders[2].id = '3', not a UUID"]
+**Action needed:** Sean (or a follow-up Cowork session) should re-pull the
+affected source(s) with real API/Ability calls and publish manually.
+```
+4. Stop. Report this clearly in your run summary — name the exact field(s)
+   and value(s) that failed, not just "data looked off."
 
 ---
 
@@ -503,8 +558,8 @@ permitted`), so it silently failed every morning since ~June 8 and never reached
 `git push`. Cowork's own process already has Documents access (it just wrote
 `index.html` in Step 4), so Cowork now does the publish itself.
 
-**Only proceed past this point if Step 4.5 AND Step 4.6 passed.** After Step 4
-(and passing Steps 4.5 and 4.6), run:
+**Only proceed past this point if Step 4.5, Step 4.6, AND Step 4.7 all passed.**
+After Step 4 (and passing Steps 4.5, 4.6, and 4.7), run:
 
 ```bash
 git -C ~/Documents/Claude/Artifacts/swp-performance-dashboard pull --rebase origin main
@@ -572,8 +627,9 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 | New signups growth query | Sundays only | Cowork |
 | Pre-publish sanity check (Step 4.5) | Immediately after inject, same run | Cowork |
 | Run-to-run anomaly check (Step 4.6) | Immediately after Step 4.5, same run | Cowork |
-| Write LAST_RUN_STATUS.md (OK or DEGRADED) | End of Step 4.6/5, every run | Cowork |
-| Git commit + push → Vercel deploy (Step 5) | Immediately after passing Steps 4.5 and 4.6, same run | Cowork |
+| Data provenance / plausibility check (Step 4.7) | Immediately after Step 4.6, same run | Cowork |
+| Write LAST_RUN_STATUS.md (OK, DEGRADED, or REJECTED) | End of Step 4.7/5, every run | Cowork |
+| Git commit + push → Vercel deploy (Step 5) | Immediately after passing Steps 4.5, 4.6, and 4.7, same run | Cowork |
 | On demand | "refresh dashboard" | Cowork |
 
 ---
@@ -602,7 +658,18 @@ All tools already connected on Mac Studio. No API keys needed.
 
 ---
 
-*Version: 6.4*
+*Version: 6.5*
+*Last updated: 2026-06-17 — Added mandatory Step 4.7 data provenance/plausibility
+check. A 2026-06-17 run pushed a data block straight to `main`, overwriting that
+morning's legitimate auto-refresh, with values that passed both Step 4.5
+(structures present) and Step 4.6 (nothing nulled/emptied) but were fabricated:
+`recentOrders[].id` were sequential integers instead of SureCart UUIDs,
+`created_at` dates were after the run itself, `SITE_TOTALS.weekly` was a
+suspiciously round `{15000, 1200}`, `byProduct` was emptied, and order amounts
+didn't reconcile with `stats.today`. The bad commit was reverted on `main`.
+Step 4.7 checks ID format, timestamp format/range, revenue reconciliation,
+round-number aggregates, and a `byProduct` non-regression backstop — all
+BEFORE Step 5 publish.*
 *Last updated: 2026-06-15 — Unified the two skill copies: `Scheduled/swp-performance-dashboard-refresh/SKILL.md` is now a symlink to this file, so there is only ONE copy to edit going forward (previously, fixes made here didn't reach the actual scheduled run for days — see Jun 14 note below). Added mandatory Step 4.6 run-to-run anomaly check: the 2026-06-15 run nulled out SC_DATA/PREV_PERIOD/SC_PREV_30/byProductPeriod/growth/recentOrders after a transient SureCart outage — it passed Step 4.5 (structure intact) but was full of nulls. Step 4.6 compares new values against the live dashboard and holds the publish (writing LAST_RUN_STATUS.md instead) if real data would be replaced with null/0/empty. Also changed the Error Handling row for "SureCart unavailable" from "set SC_DATA = null" to "carry forward the previous run's values unchanged" — nulling was itself the bug. Clarified that `byProduct` is computed identically to `byProductPeriod.ytd` (both are Airtable cumulative-to-date, not a rolling 30-day window — Airtable's Daily Product Stats table only has data from 2026-06-01 onward).*
 *Last updated: 2026-06-14 — Synced this scheduled copy with the maintained Artifacts copy (this file was 7 days stale, still listing old product names like "4-Day Beginner Course" / "$1 Trial Membership" instead of the current verified names). Added mandatory Step 4.5 pre-publish sanity check: a 2026-06-13 run silently dropped FATHOM_WEEKLY/FATHOM_YTD/MONTHLY/SC_DATA.growth/byProductPeriod/PREV_PERIOD/SPIKE_REFERRERS/SC_PREV_30 and pushed the broken file to production. Cowork must now verify all required `const` declarations are present (and the data block parses) before committing/pushing — if not, revert index.html and report to Sean instead of publishing.*
 *v6.2: Cowork now publishes directly (Step 5): git commit + push every run, no more reliance on the broken `com.seanwilson.swp-dashboard-push` launchd job (disabled — TCC blocked it from `~/Documents`)*
