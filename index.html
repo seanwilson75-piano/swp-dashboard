@@ -314,91 +314,191 @@
 // ─── DATA — Cowork injects between these markers every morning ────────────────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
-  "/4-week-beginner-sales-page/": { pageviews: 485, uniques: 32, visits: 32, avg_duration: 39.6, bounce_rate: 6.25 },
-  "/4-day-beginner-checkout/": { pageviews: 477, uniques: 32, visits: 32, avg_duration: 84.56, bounce_rate: 0 },
-  "/membership-homepage/": { pageviews: 207, uniques: 63, visits: 63, avg_duration: 33.08, bounce_rate: 0 },
-  "/": { pageviews: 202, uniques: 48, visits: 48, avg_duration: 71.63, bounce_rate: 0 },
-  "/login/": { pageviews: 148, uniques: 65, visits: 65, avg_duration: 61.48, bounce_rate: 0 },
-  "/join-for-1-today/": { pageviews: 30, uniques: 12, visits: 12, avg_duration: 22.91, bounce_rate: 0 },
-  "/join-membership-today/": { pageviews: 28, uniques: 13, visits: 13, avg_duration: 136.42, bounce_rate: 0 }
+  "/join-for-1-today/":              { pageviews:36,  uniques:17, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:20,  uniques:9,  avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:588, uniques:46, avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_WEEKLY = {
-  "/4-week-beginner-sales-page/": { pageviews: 4505, uniques: 310, visits: 310 },
-  "/4-day-beginner-checkout/": { pageviews: 3663, uniques: 271, visits: 271 },
-  "/": { pageviews: 1431, uniques: 303, visits: 303 },
-  "/membership-homepage/": { pageviews: 1064, uniques: 326, visits: 326 },
-  "/login/": { pageviews: 889, uniques: 335, visits: 335 },
-  "/join-for-1-today/": { pageviews: 262, uniques: 114, visits: 114 },
-  "/join-membership-today/": { pageviews: 161, uniques: 69, visits: 69 }
+  "/join-for-1-today/":              { pageviews:341,  uniques:151, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:161,  uniques:68,  avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:4199, uniques:339, avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/premium-checkout-page/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-standard-checkout-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-premium-checkout-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:84,  uniques:19, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:72,  uniques:17, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:76,  uniques:20, avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:78,  uniques:23, avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_YTD = {
-  "/": { pageviews: 37999, uniques: 8538, visits: 8538 },
-  "/membership-homepage/": { pageviews: 28386, uniques: 8503, visits: 8503 },
-  "/login/": { pageviews: 23526, uniques: 8757, visits: 8757 },
-  "/join-for-1-today/": { pageviews: 23493, uniques: 10292, visits: 10292 },
-  "/4-week-beginner-sales-page/": { pageviews: 12373, uniques: 2756, visits: 2756 },
-  "/join-membership-today/": { pageviews: 8034, uniques: 3357, visits: 3357 }
+  "/join-for-1-today/":              { pageviews:23463, uniques:10280, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:8006,  uniques:3344,  avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/premium-checkout-page/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-standard-checkout-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-premium-checkout-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:11888, uniques:2725,  avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:3483,  uniques:1430,  avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:3223,  uniques:972,   avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:2492,  uniques:727,   avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:2141,  uniques:679,   avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const SITE_TOTALS = {
-  daily: { pageviews: 4024, uniques: 281, visits: 281 },
-  weekly: { pageviews: 15000, uniques: 1200, visits: 1200 },
-  ytd: { pageviews: 595995, uniques: 59362, visits: 59362 }
+  daily:  { pageviews:4420,   uniques:331   },
+  weekly: { pageviews:22410,  uniques:2147  },
+  ytd:    { pageviews:497971, uniques:60380 },
 };
 const MONTHLY = [
-  { month: "Jan", pageviews: 106364, uniques: 11275 },
-  { month: "Feb", pageviews: 89436, uniques: 12190 },
-  { month: "Mar", pageviews: 96964, uniques: 13098 },
-  { month: "Apr", pageviews: 75833, uniques: 9495 },
-  { month: "May", pageviews: 85417, uniques: 9722 },
-  { month: "Jun", pageviews: 47981, uniques: 4455 }
+  { month:"Jan", pageviews:106364, uniques:11275 },
+  { month:"Feb", pageviews:89436,  uniques:12190 },
+  { month:"Mar", pageviews:96964,  uniques:13098 },
+  { month:"Apr", pageviews:75833,  uniques:9495  },
+  { month:"May", pageviews:85417,  uniques:9722  },
+  { month:"Jun", pageviews:43957,  uniques:4400,  partial:true },
 ];
-const PREV_PERIOD = {
-  "/": { pageviews: 1683, uniques: 347 },
-  "/membership-homepage/": { pageviews: 1198, uniques: 346 },
-  "/4-week-beginner-sales-page/": { pageviews: 1047, uniques: 343 },
-  "/join-for-1-today/": { pageviews: 883, uniques: 414 }
-};
-const SPIKE_REFERRERS = {};
-const SC_PREV_30 = {};
 const SC_DATA = {
   stats: {
-    today: { count: 12, revenue: 100800 },
-    week: { count: 67, revenue: 304200 },
-    month: { count: 140, revenue: 638300 },
-    ytd: { count: 1155, revenue: 5143700 }
+    today: { count:17,  revenue:46500   },
+    week:  { count:93,  revenue:244800  },
+    month: { count:596, revenue:1210710 },
+    ytd:   { count:2890, revenue:7398740 },
   },
-  byProduct: [],
-  byProductPeriod: {
-    daily: [["Basic Membership", { count: 8, revenue: 23200 }], ["Premium Membership", { count: 2, revenue: 59800 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 1, revenue: 17900 }], ["Master Beginner Fundamentals in 4 Days", { count: 1, revenue: 0 }]],
-    weekly: [["Basic Membership", { count: 45, revenue: 130500 }], ["Premium Membership", { count: 12, revenue: 358800 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 5, revenue: 89500 }], ["Annual Standard Membership", { count: 3, revenue: 74900 }], ["Master Beginner Fundamentals in 4 Days", { count: 2, revenue: 0 }]],
-    ytd: [["Basic Membership", { count: 372, revenue: 1078800 }], ["Premium Membership", { count: 98, revenue: 2940200 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 42, revenue: 741400 }], ["Annual Standard Membership", { count: 28, revenue: 699700 }], ["Dan's Signature Sounds", { count: 18, revenue: 127800 }], ["Master Beginner Fundamentals in 4 Days", { count: 15, revenue: 89700 }]]
-  },
-  recentOrders: [
-    { id: "1", number: "82608ABD", created_at: "June 17, 2026", status: "paid", amount: 3900 },
-    { id: "2", number: "936023F3", created_at: "June 17, 2026", status: "paid", amount: 8900 },
-    { id: "3", number: "0A636943", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "4", number: "00CAA797", created_at: "June 16, 2026", status: "paid", amount: 19900 },
-    { id: "5", number: "C0848E29", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "6", number: "99124A19", created_at: "June 16, 2026", status: "paid", amount: 29900 },
-    { id: "7", number: "94629333", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "8", number: "FC4FD4DB", created_at: "June 16, 2026", status: "paid", amount: 2900 }
+  byProduct: [
+    ["Basic Membership — 7 Day $1 Trial",          { count:92, revenue:200000 }],
+    ["Basic Membership",                           { count:59, revenue:166900 }],
+    ["Premium Membership",                         { count:18, revenue:84600  }],
+    ["Annual Standard Membership",                 { count:1,  revenue:29000  }],
+    ["Master Beginner Fundamentals in 4 Days",     { count:10, revenue:27000  }],
+    ["Beginner Practice Plan - for 4 Songs",       { count:8,  revenue:9600   }],
+    ["Your First 30 Days: Member Practice Guide",  { count:2,  revenue:3400   }],
+    ["I Will Bless The Lord (Gb) — Lucas Version", { count:1,  revenue:2500   }],
+    ["Dan's Signature Sounds",                     { count:1,  revenue:800    }],
+    ["Mediant Drop 2 Exercise",                    { count:1,  revenue:100    }],
+    ["Hear Any Chord — Free Ear Training Chart",   { count:17, revenue:0      }],
   ],
-  lastFetched: "Jun 16, 7:30 AM",
+  recentOrders: [
+    { id: "8904b2f0-c687-48e4-ab16-929454479b91", number: "547C5E92", created_at: "2026-06-15T22:14Z", status: "paid", amount: 2900 },
+    { id: "1a012071-a495-47a7-a8b8-08501ece30a5", number: "042B62C1", created_at: "2026-06-15T21:36Z", status: "paid", amount: 4700 },
+    { id: "b1a40f40-ea1d-4a03-987d-0c4a8f997b11", number: "A5B09944", created_at: "2026-06-15T21:04Z", status: "paid", amount: 2900 },
+    { id: "2822fd16-eb51-49fe-8a98-eddca2a496ce", number: "55AE43BC", created_at: "2026-06-15T20:56Z", status: "paid", amount: 2900 },
+    { id: "f30c81ec-53ea-4a06-a340-06e33eac84e8", number: "3916101A", created_at: "2026-06-15T20:48Z", status: "paid", amount: 2900 },
+    { id: "9dd3bf53-6d6b-46e7-82b0-87e5e7b13943", number: "372A4E2D", created_at: "2026-06-15T20:00Z", status: "paid", amount: 100 },
+    { id: "5ba2ea33-aeb4-489c-bca0-a11a0a3cb047", number: "7A7E09B3", created_at: "2026-06-15T19:27Z", status: "paid", amount: 2900 },
+    { id: "a29bc658-269e-4b38-96bc-01b1ca4cf400", number: "25903A59", created_at: "2026-06-15T16:26Z", status: "paid", amount: 100 },
+  ],
+  lastFetched: "2026-06-16T13:30:00Z",
+  byProductPeriod: {
+    daily: [
+      ["Basic Membership",                           { count:10, revenue:29000 }],
+      ["Premium Membership",                         { count:2,  revenue:9400  }],
+      ["Master Beginner Fundamentals in 4 Days",     { count:2,  revenue:5400  }],
+      ["Beginner Practice Plan - for 4 Songs",       { count:2,  revenue:2400  }],
+      ["Basic Membership — 7 Day $1 Trial",          { count:2,  revenue:200   }],
+      ["Mediant Drop 2 Exercise",                    { count:1,  revenue:100   }],
+    ],
+    weekly: [
+      ["Basic Membership",                           { count:29, revenue:82700 }],
+      ["Basic Membership — 7 Day $1 Trial",          { count:35, revenue:76400 }],
+      ["Premium Membership",                         { count:7,  revenue:32900 }],
+      ["Master Beginner Fundamentals in 4 Days",     { count:5,  revenue:13500 }],
+      ["Beginner Practice Plan - for 4 Songs",       { count:5,  revenue:6000  }],
+      ["I Will Bless The Lord (Gb) — Lucas Version", { count:1,  revenue:2500  }],
+      ["Your First 30 Days: Member Practice Guide",  { count:1,  revenue:1700  }],
+      ["Mediant Drop 2 Exercise",                    { count:1,  revenue:100   }],
+      ["Hear Any Chord — Free Ear Training Chart",   { count:1,  revenue:0     }],
+    ],
+    ytd: [
+      ["Basic Membership — 7 Day $1 Trial",          { count:92, revenue:200000 }],
+      ["Basic Membership",                           { count:59, revenue:166900 }],
+      ["Premium Membership",                         { count:18, revenue:84600  }],
+      ["Annual Standard Membership",                 { count:1,  revenue:29000  }],
+      ["Master Beginner Fundamentals in 4 Days",     { count:10, revenue:27000  }],
+      ["Beginner Practice Plan - for 4 Songs",       { count:8,  revenue:9600   }],
+      ["Your First 30 Days: Member Practice Guide",  { count:2,  revenue:3400   }],
+      ["I Will Bless The Lord (Gb) — Lucas Version", { count:1,  revenue:2500   }],
+      ["Dan's Signature Sounds",                     { count:1,  revenue:800    }],
+      ["Mediant Drop 2 Exercise",                    { count:1,  revenue:100    }],
+      ["Hear Any Chord — Free Ear Training Chart",   { count:17, revenue:0      }],
+    ],
+  },
   growth: {
-    week: { newSignups: 8, newRevenue: 62400, renewals: 59, renewalRevenue: 241800, totalRevenue: 304200 },
-    month: { newSignups: 18, newRevenue: 151900, renewals: 122, renewalRevenue: 486400, totalRevenue: 638300 },
-    ytd: { newSignups: 156, newRevenue: 1287700, renewals: 999, renewalRevenue: 3856000, totalRevenue: 5143700 },
+    week:  { newSignups:6,   newRevenue:13600,   renewals:113, renewalRevenue:244500, totalRevenue:258100  },
+    month: { newSignups:52,  newRevenue:147400,  renewals:670, renewalRevenue:1118610, totalRevenue:1266010 },
+    ytd:   { newSignups:215, newRevenue:619900,  renewals:2572, renewalRevenue:6458440, totalRevenue:7078340 },
     monthlyNewSignups: [
-      { month: "Jan", count: 28 },
-      { month: "Feb", count: 24 },
-      { month: "Mar", count: 31 },
-      { month: "Apr", count: 27 },
-      { month: "May", count: 26 },
-      { month: "Jun", count: 20, partial: true }
-    ]
-  }
+      { month:"Jan", count:39 },
+      { month:"Feb", count:38 },
+      { month:"Mar", count:38 },
+      { month:"Apr", count:37 },
+      { month:"May", count:57 },
+      { month:"Jun", count:6, partial:true },
+    ],
+  },
 };
-const LAST_UPDATED = "Jun 16, 7:30 AM";
+const PREV_PERIOD = {
+  "/join-for-1-today/":              { pageviews:557, uniques:247 },
+  "/join-membership-today/":         { pageviews:204, uniques:82  },
+  "/4-week-beginner-sales-page/":    { pageviews:3078, uniques:348 },
+  "/standard-checkout-page/":        { pageviews:0,   uniques:0   },
+  "/premium-checkout-page/":         { pageviews:0,   uniques:0   },
+  "/annual-standard-checkout-page/": { pageviews:0,   uniques:0   },
+  "/annual-premium-checkout-page/":  { pageviews:0,   uniques:0   },
+  "/hear-any-chord/":                { pageviews:0,   uniques:0   },
+  "/our-roadmap-offer/":             { pageviews:0,   uniques:0   },
+  "/major-vs-minor-quiz/":           { pageviews:104, uniques:29  },
+  "/scales-charts/":                 { pageviews:0,   uniques:0   },
+  "/dans-signature-sounds/":         { pageviews:84,  uniques:20  },
+  "/drop-2-exercise-download-page/": { pageviews:0,   uniques:0   },
+};
+const SPIKE_REFERRERS = {
+};
+const SC_PREV_30 = {
+  "Basic Membership":                       { count:298, revenue:864200 },
+  "Basic Membership — 7 Day $1 Trial":      { count:856, revenue:85600  },
+  "Master Beginner Fundamentals in 4 Days": { count:91,  revenue:245700 },
+  "27 MIDI File Bundle":                    { count:59,  revenue:159300 },
+  "Dan's Signature Sounds":                 { count:16,  revenue:75200  },
+  "April Focus Guide":                      { count:40,  revenue:108000 },
+  "Piano Blueprint Session":                { count:3,   revenue:89100  },
+  "Mediant Drop 2":                         { count:104, revenue:10400  },
+};
+const LAST_UPDATED = "Jun 16, 9:30 AM";
 // [DASHBOARD-DATA-END]
 
 // [FUNNEL-CHAINS-START]
