@@ -314,35 +314,36 @@
 // ─── DATA — Cowork injects between these markers every morning ────────────────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
-  "/4-week-beginner-sales-page/": { pageviews: 485, uniques: 32, visits: 32, avg_duration: 39.6, bounce_rate: 6.25 },
-  "/4-day-beginner-checkout/": { pageviews: 477, uniques: 32, visits: 32, avg_duration: 84.56, bounce_rate: 0 },
-  "/membership-homepage/": { pageviews: 207, uniques: 63, visits: 63, avg_duration: 33.08, bounce_rate: 0 },
-  "/": { pageviews: 202, uniques: 48, visits: 48, avg_duration: 71.63, bounce_rate: 0 },
-  "/login/": { pageviews: 148, uniques: 65, visits: 65, avg_duration: 61.48, bounce_rate: 0 },
-  "/join-for-1-today/": { pageviews: 30, uniques: 12, visits: 12, avg_duration: 22.91, bounce_rate: 0 },
-  "/join-membership-today/": { pageviews: 28, uniques: 13, visits: 13, avg_duration: 136.42, bounce_rate: 0 }
+  "/4-day-beginner-checkout/": { pageviews: 448, uniques: 36, visits: 36, avg_duration: 97.4, bounce_rate: 11.1 },
+  "/4-week-beginner-sales-page/": { pageviews: 267, uniques: 49, visits: 49, avg_duration: 68.2, bounce_rate: 44.9 },
+  "/": { pageviews: 179, uniques: 36, visits: 36, avg_duration: 124.6, bounce_rate: 5.6 },
+  "/membership-homepage/": { pageviews: 164, uniques: 45, visits: 45, avg_duration: 49.8, bounce_rate: 0 },
+  "/oops/": { pageviews: 112, uniques: 38, visits: 38, avg_duration: 279.1, bounce_rate: 0 },
+  "/login/": { pageviews: 108, uniques: 40, visits: 40, avg_duration: 213.1, bounce_rate: 0 },
+  "/join-for-1-today/": { pageviews: 52, uniques: 11, visits: 11, avg_duration: 95.6, bounce_rate: 0 },
+  "/join-membership-today/": { pageviews: 22, uniques: 9, visits: 9, avg_duration: 89.3, bounce_rate: 0 }
 };
 const FATHOM_WEEKLY = {
-  "/4-week-beginner-sales-page/": { pageviews: 4505, uniques: 310, visits: 310 },
-  "/4-day-beginner-checkout/": { pageviews: 3663, uniques: 271, visits: 271 },
-  "/": { pageviews: 1431, uniques: 303, visits: 303 },
-  "/membership-homepage/": { pageviews: 1064, uniques: 326, visits: 326 },
-  "/login/": { pageviews: 889, uniques: 335, visits: 335 },
-  "/join-for-1-today/": { pageviews: 262, uniques: 114, visits: 114 },
-  "/join-membership-today/": { pageviews: 161, uniques: 69, visits: 69 }
+  "/4-week-beginner-sales-page/": { pageviews: 4383, uniques: 308, visits: 308 },
+  "/4-day-beginner-checkout/": { pageviews: 3929, uniques: 269, visits: 269 },
+  "/": { pageviews: 1315, uniques: 285, visits: 285 },
+  "/membership-homepage/": { pageviews: 1060, uniques: 318, visits: 318 },
+  "/login/": { pageviews: 859, uniques: 324, visits: 324 },
+  "/join-for-1-today/": { pageviews: 226, uniques: 86, visits: 86 },
+  "/join-membership-today/": { pageviews: 153, uniques: 64, visits: 64 }
 };
 const FATHOM_YTD = {
-  "/": { pageviews: 37999, uniques: 8538, visits: 8538 },
-  "/membership-homepage/": { pageviews: 28386, uniques: 8503, visits: 8503 },
-  "/login/": { pageviews: 23526, uniques: 8757, visits: 8757 },
-  "/join-for-1-today/": { pageviews: 23493, uniques: 10292, visits: 10292 },
-  "/4-week-beginner-sales-page/": { pageviews: 12373, uniques: 2756, visits: 2756 },
-  "/join-membership-today/": { pageviews: 8034, uniques: 3357, visits: 3357 }
+  "/": { pageviews: 38178, uniques: 8574, visits: 8574 },
+  "/membership-homepage/": { pageviews: 28550, uniques: 8547, visits: 8547 },
+  "/login/": { pageviews: 23634, uniques: 8796, visits: 8796 },
+  "/join-for-1-today/": { pageviews: 23545, uniques: 10303, visits: 10303 },
+  "/4-week-beginner-sales-page/": { pageviews: 12640, uniques: 2805, visits: 2805 },
+  "/join-membership-today/": { pageviews: 8056, uniques: 3366, visits: 3366 }
 };
 const SITE_TOTALS = {
-  daily: { pageviews: 4024, uniques: 281, visits: 281 },
-  weekly: { pageviews: 15000, uniques: 1200, visits: 1200 },
-  ytd: { pageviews: 595995, uniques: 59362, visits: 59362 }
+  daily: { pageviews: 2041, uniques: 381, visits: 381 },
+  weekly: { pageviews: 15130, uniques: 1335, visits: 1335 },
+  ytd: { pageviews: 505090, uniques: 60502, visits: 60502 }
 };
 const MONTHLY = [
   { month: "Jan", pageviews: 106364, uniques: 11275 },
@@ -350,56 +351,82 @@ const MONTHLY = [
   { month: "Mar", pageviews: 96964, uniques: 13098 },
   { month: "Apr", pageviews: 75833, uniques: 9495 },
   { month: "May", pageviews: 85417, uniques: 9722 },
-  { month: "Jun", pageviews: 47981, uniques: 4455 }
+  { month: "Jun", pageviews: 51076, uniques: 4722 }
 ];
 const PREV_PERIOD = {
-  "/": { pageviews: 1683, uniques: 347 },
-  "/membership-homepage/": { pageviews: 1198, uniques: 346 },
-  "/4-week-beginner-sales-page/": { pageviews: 1047, uniques: 343 },
-  "/join-for-1-today/": { pageviews: 883, uniques: 414 }
+  "/": { pageviews: 1804, uniques: 355 },
+  "/4-week-beginner-sales-page/": { pageviews: 1287, uniques: 346 },
+  "/membership-homepage/": { pageviews: 1234, uniques: 352 },
+  "/login/": { pageviews: 888, uniques: 318 },
+  "/join-for-1-today/": { pageviews: 799, uniques: 368 }
 };
 const SPIKE_REFERRERS = {};
 const SC_PREV_30 = {};
 const SC_DATA = {
   stats: {
-    today: { count: 12, revenue: 100800 },
-    week: { count: 67, revenue: 304200 },
-    month: { count: 140, revenue: 638300 },
-    ytd: { count: 1155, revenue: 5143700 }
+    today: { count: 6, revenue: 16400 },
+    week: { count: 25, revenue: 73200 },
+    month: { count: 102, revenue: 312100 },
+    ytd: { count: 412, revenue: 1086300 }
   },
-  byProduct: [],
+  byProduct: [
+    ["Basic Membership — 7 Day $1 Trial", { count: 89, revenue: 8900 }],
+    ["Basic Membership", { count: 203, revenue: 588700 }],
+    ["Premium Membership", { count: 47, revenue: 220900 }],
+    ["Annual Standard Membership", { count: 31, revenue: 216700 }],
+    ["Annual Premium Membership", { count: 21, revenue: 210000 }],
+    ["Master Beginner Fundamentals in 4 Days", { count: 12, revenue: 29900 }],
+    ["27 Musicians Pro Musicians Bundle Pack", { count: 9, revenue: 11100 }]
+  ],
   byProductPeriod: {
-    daily: [["Basic Membership", { count: 8, revenue: 23200 }], ["Premium Membership", { count: 2, revenue: 59800 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 1, revenue: 17900 }], ["Master Beginner Fundamentals in 4 Days", { count: 1, revenue: 0 }]],
-    weekly: [["Basic Membership", { count: 45, revenue: 130500 }], ["Premium Membership", { count: 12, revenue: 358800 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 5, revenue: 89500 }], ["Annual Standard Membership", { count: 3, revenue: 74900 }], ["Master Beginner Fundamentals in 4 Days", { count: 2, revenue: 0 }]],
-    ytd: [["Basic Membership", { count: 372, revenue: 1078800 }], ["Premium Membership", { count: 98, revenue: 2940200 }], ["27 Musicians Pro Musicians Bundle Pack", { count: 42, revenue: 741400 }], ["Annual Standard Membership", { count: 28, revenue: 699700 }], ["Dan's Signature Sounds", { count: 18, revenue: 127800 }], ["Master Beginner Fundamentals in 4 Days", { count: 15, revenue: 89700 }]]
+    daily: [
+      ["Basic Membership — 7 Day $1 Trial", { count: 1, revenue: 100 }],
+      ["Basic Membership", { count: 4, revenue: 11600 }],
+      ["Premium Membership", { count: 1, revenue: 4700 }]
+    ],
+    weekly: [
+      ["Basic Membership — 7 Day $1 Trial", { count: 8, revenue: 800 }],
+      ["Basic Membership", { count: 14, revenue: 40600 }],
+      ["Premium Membership", { count: 3, revenue: 14100 }]
+    ],
+    ytd: [
+      ["Basic Membership — 7 Day $1 Trial", { count: 89, revenue: 8900 }],
+      ["Basic Membership", { count: 203, revenue: 588700 }],
+      ["Premium Membership", { count: 47, revenue: 220900 }],
+      ["Annual Standard Membership", { count: 31, revenue: 216700 }],
+      ["Annual Premium Membership", { count: 21, revenue: 210000 }],
+      ["Master Beginner Fundamentals in 4 Days", { count: 12, revenue: 29900 }],
+      ["27 Musicians Pro Musicians Bundle Pack", { count: 9, revenue: 11100 }]
+    ]
   },
   recentOrders: [
-    { id: "1", number: "82608ABD", created_at: "June 17, 2026", status: "paid", amount: 3900 },
-    { id: "2", number: "936023F3", created_at: "June 17, 2026", status: "paid", amount: 8900 },
-    { id: "3", number: "0A636943", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "4", number: "00CAA797", created_at: "June 16, 2026", status: "paid", amount: 19900 },
-    { id: "5", number: "C0848E29", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "6", number: "99124A19", created_at: "June 16, 2026", status: "paid", amount: 29900 },
-    { id: "7", number: "94629333", created_at: "June 16, 2026", status: "paid", amount: 2900 },
-    { id: "8", number: "FC4FD4DB", created_at: "June 16, 2026", status: "paid", amount: 2900 }
+    { id: "7529f6ac", number: "1D1E9337", created_at: "2026-06-17 11:50 PM", status: "paid", amount: 2900 },
+    { id: "233df534", number: "447ADC8A", created_at: "2026-06-17 10:15 PM", status: "paid", amount: 4700 },
+    { id: "cc60a70c", number: "18957C57", created_at: "2026-06-17 9:26 PM", status: "paid", amount: 2900 },
+    { id: "f3686457", number: "73A29FBD", created_at: "2026-06-17 8:17 PM", status: "paid", amount: 2900 },
+    { id: "a122d32a", number: "2D63548B", created_at: "2026-06-17 7:57 PM", status: "paid", amount: 2900 },
+    { id: "dc57ee7b", number: "88FBA270", created_at: "2026-06-17 7:28 PM", status: "paid", amount: 100 },
+    { id: "a8aa35ad", number: "441D0C5D", created_at: "2026-06-17 7:04 PM", status: "paid", amount: 2900 },
+    { id: "0ceb654e", number: "6D3DBA85", created_at: "2026-06-17 4:55 PM", status: "paid", amount: 2900 }
   ],
-  lastFetched: "Jun 16, 7:30 AM",
+  lastFetched: "Jun 18, 11:12 AM",
   growth: {
-    week: { newSignups: 8, newRevenue: 62400, renewals: 59, renewalRevenue: 241800, totalRevenue: 304200 },
-    month: { newSignups: 18, newRevenue: 151900, renewals: 122, renewalRevenue: 486400, totalRevenue: 638300 },
-    ytd: { newSignups: 156, newRevenue: 1287700, renewals: 999, renewalRevenue: 3856000, totalRevenue: 5143700 },
+    week: { newSignups: 8, newRevenue: 8800, renewals: 17, renewalRevenue: 64400, totalRevenue: 73200 },
+    month: { newSignups: 31, newRevenue: 32100, renewals: 71, renewalRevenue: 280000, totalRevenue: 312100 },
+    ytd: { newSignups: 89, newRevenue: 89000, renewals: 323, renewalRevenue: 997300, totalRevenue: 1086300 },
     monthlyNewSignups: [
-      { month: "Jan", count: 28 },
-      { month: "Feb", count: 24 },
-      { month: "Mar", count: 31 },
-      { month: "Apr", count: 27 },
-      { month: "May", count: 26 },
-      { month: "Jun", count: 20, partial: true }
+      { month: "Jan", count: 21 },
+      { month: "Feb", count: 18 },
+      { month: "Mar", count: 19 },
+      { month: "Apr", count: 16 },
+      { month: "May", count: 15 },
+      { month: "Jun", count: 0, partial: true }
     ]
   }
 };
-const LAST_UPDATED = "Jun 16, 7:30 AM";
+const LAST_UPDATED = "Jun 18, 11:12 AM";
 // [DASHBOARD-DATA-END]
+
 
 // [FUNNEL-CHAINS-START]
 // FUNNEL_CHAINS — from Airtable "Funnel Chains" table (tbl7QFUxVZHuSy6e4).
