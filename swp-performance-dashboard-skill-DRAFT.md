@@ -205,6 +205,68 @@ test's second entry page (e.g. /4-day-beginner-checkout/ and
 Days" — not a separate product).
 ```
 
+### 4.2.2 Known Cowork bugs
+
+Found 2026-06-19 by reconciling several weeks of Cowork-pulled SureCart data
+against a full SureCart order export (CSV, all orders, not date-filtered).
+None of these produce nulls, zeros, or structurally-broken output — they all
+look like plausible, well-formed data, which is exactly why they survived
+in `index.html`/Airtable for weeks without tripping Section 6. Treat a full
+CSV export as ground truth when it disagrees with a Cowork natural-language
+pull.
+
+1. **Bumps report can undercount combo checkouts by exactly one order.**
+   2026-06-18: Bumps report said "Your First 30 Days: Member Practice Guide"
+   had 1 accepted offer / $17. Items Purchased and the full CSV export both
+   showed 2 orders / $34 that day. The missing order was a checkout where the
+   bump was bundled with the Trial in a single combo purchase — the Bumps
+   report's offer-acceptance view didn't surface it as a separate accepted
+   offer. A prior run hit this exact discrepancy and *trusted the Bumps
+   report over Items Purchased*, reasoning it would avoid double-counting —
+   that reasoning was wrong here. **When Bumps and Items Purchased disagree
+   on a bump's count, don't default to either one — flag it and, if
+   possible, check the actual orders for that product/date.**
+
+2. **An A/B-test checkout pathname can get logged as a phantom second
+   product.** `/4-day-beginner-checkout/` (one of the two entry points for
+   `Master Beginner Fundamentals in 4 Days`, see reference table) was being
+   written to Airtable under a new, never-defined product name, **"4-Day
+   Beginner Course,"** starting 2026-05-02. This silently fragmented the
+   product's order history under two names for ~7 weeks. Fixed 2026-06-19:
+   renamed all 15 affected rows (not the ~24 first estimated — confirmed by
+   exact-match filter; actual revenue was $612, not the $648 first
+   estimated) to the canonical product name. Two dates (Jun 10, Jun 15)
+   already had a legitimate same-day row under the canonical name, so the
+   rename created two upsert-key collisions; both duplicate rows had
+   0 orders/$0 revenue, so they were deleted outright after confirming nothing
+   else needed to be merged from them (one also had Fathom Checkout Page
+   Views/Uniques worth recovering — see Reference Table A/B-test note for
+   the canonical product name; the surviving row absorbed those numbers
+   before the duplicate was deleted). **Never write a product name to
+   Airtable that isn't in the Reference Table above — if SureCart/Cowork
+   surfaces an unfamiliar name, treat it as a likely duplicate or rename of
+   an existing product (see point 3) and confirm before writing, don't
+   invent a new row.**
+
+3. **SureCart's dashboard can cosmetically rename a product/bump without
+   changing the underlying item.** See the bump footnote in the reference
+   table above (`Your First 30 Days: Member Practice Guide` → "30 Day
+   Guided Practice Plan for Every Level" in SureCart's own UI). If a pull
+   surfaces a name that isn't in the reference table, check whether it
+   matches an existing item's price + parent product before assuming it's
+   new — this is the same root cause as point 2, just cosmetic rather than
+   a tracking bug.
+
+4. **Aggregate "YTD" totals and the per-product breakdown can silently stop
+   agreeing with each other, and nothing in Section 6 catches it.** Before
+   the 2026-06-19 CSV rebuild, `SC_DATA.stats.ytd.count` was 2890 while
+   `SC_DATA.byProduct` (supposedly the same YTD window, per Section 5) summed
+   to only ~210 — a >13x gap, hidden by the fact that both numbers
+   individually looked plausible. The per-product pull was effectively only
+   covering a much shorter window than the revenue-summary pull, mislabeled
+   as YTD. Section 6 now has check **E** for this (below) — run it every
+   time.
+
 ### 4.3 Airtable write (every run)
 
 **Table:** Daily Product Stats (`tblzeTGmTQJ6UOEJl`), upsert key = `Record ID`
@@ -295,6 +357,26 @@ replay the actual 2026-06-17 bad commit's data block through checks C1-C5
 and confirm it would have been rejected (it should fail C1, C2, and C4 at
 minimum). This is part of the promotion checklist in the STATUS section.
 
+**E — Per-product totals reconcile with aggregate totals.** (Added after the
+2026-06-19 reconciliation — see Section 4.2.2 #4. Aggregate and per-product
+numbers can each look individually plausible while silently disagreeing.)
+1. Sum of `SC_DATA.byProductPeriod.ytd[].count` equals `SC_DATA.stats.ytd.count`
+   exactly. Same for `byProductPeriod.daily`/`.weekly`/`.monthly` against
+   `stats.today`/`.week`/`.month`. If they don't match, the per-product pull
+   covered a different window than the aggregate pull — stop and fix the
+   window, don't push a mismatched pair.
+2. `SC_DATA.byProduct` is identical to `SC_DATA.byProductPeriod.ytd` (per
+   Section 5) — same entries, same counts, same revenue.
+3. No product name appears in `byProduct`/`byProductPeriod.*` that isn't in
+   this doc's Reference Table. An unfamiliar name is far more likely a
+   duplicate/rename of an existing product (Section 4.2.2 #2-3) than a real
+   new product — confirm against Sean before writing it as new. As of
+   2026-06-19 the table has several entries marked "unconfirmed"/"new,
+   not independently verified" (footnotes ²,³,⁶) — a name matching one of
+   those is a known gap, not a fresh failure; still flag it to Sean to get
+   confirmed and de-flagged, but it isn't grounds to block a push by itself
+   the way a truly unrecognized name is.
+
 ---
 
 ## 7. Publish
@@ -355,24 +437,72 @@ When ready:
 | `Annual Premium Membership` | Subscription | `/annual-premium-checkout-page/` |
 | `Master Beginner Fundamentals in 4 Days` | Product | `/4-week-beginner-sales-page/` and `/4-day-beginner-checkout/` (A/B test, same product — see note below) |
 | `27 Musicians Pro Musicians Bundle Pack` | Product | `/27musicians/` |
-| `April Focus Guide` | Product | `/april-focus-bundle-2026/` |
-| `Dan's Signature Sounds` | Product | `/dans-signature-sounds/` |
+| `April Focus Guide`² | Product | `/april-focus-bundle-2026/` |
+| `Dan's Signature Sounds`³ | Product | `/dans-signature-sounds/` |
 | `Piano Blueprint Session` | Coaching | `/break` |
-| `Mediant Drop 2 Exercise` | Product | `/drop-2-exercise-download-page/` |
+| `Mediant Drop 2 Exercise`⁴ | Product | `/drop-2-exercise-download-page/` |
 | `Hear Any Chord — Free Ear Training Chart` | Lead Magnet | `/hear-any-chord/` |
 | `Roadmap Lead` | Lead Magnet | `/our-roadmap-offer/` |
 | `Major vs Minor Quiz` | Lead Magnet | `/major-vs-minor-quiz/` |
 | `Scales Charts` | Lead Magnet | `/scales-charts/` |
+| `I Will Bless The Lord (Gb) — Lucas Version`⁵ | Product | not yet mapped |
+| `Bundled / multi-item orders`⁶ | — (not a product) | n/a |
+| `Tutorial for Take 6 Song - Let the Words of My Mouth`⁶ | Lead Magnet (assumed, $0) | not yet mapped |
+| `Jesus Loves Me by Joy Bloom Piano Sheet and Midi File`⁶ | Lead Magnet (assumed, $0) | not yet mapped |
+
+² **Unconfirmed 2026-06-19:** the full SureCart CSV export shows
+`April 2026 Monthly Focus Bundle` instead of this name. This looks like a
+**month-named recurring bundle** — i.e. expect `May 2026 Monthly Focus
+Bundle`, `June 2026 Monthly Focus Bundle`, etc. in future exports, not a
+fixed product name. If so, match this product by the pattern `<Month
+Name> 2026 Monthly Focus Bundle`, not an exact string, and don't treat next
+month's name as a brand-new product (Section 4.2.2 #2-3 pattern). Needs
+Sean's confirmation before relying on this in an automated run.
+
+³ **Unconfirmed 2026-06-19:** the CSV export shows a separate line,
+`Single Course - Dan's Signature Sounds` (21 orders, ~$40.71 avg in the
+2026-06-19 export), at a different price point than this row and than the
+existing bump `Dan's Signature Sounds - Logic Sessions Pack` ($8.32 avg).
+Relationship between these three names is unconfirmed — do not merge or
+rename anything here without Sean's input.
+
+⁴ **Renamed 2026-06-19** in SureCart's UI to **"Get the Drop 2 Practice
+Files and Charts!"** — confirmed via matching $100/unit price in the CSV
+export. Same convention as footnote ¹: keep writing to Airtable under this
+original canonical name for upsert-key continuity.
+
+⁵ **Renamed 2026-06-19** in SureCart's UI to **"Learn Lucas's Chords: I
+Will Bless the Lord [Tutorial + Download]"** — confirmed via matching
+$25/unit price in the CSV export. Same convention as footnote ¹: keep
+writing to Airtable under this original canonical name.
+
+⁶ **New 2026-06-19, added straight from the CSV export, not independently
+verified.** `Bundled / multi-item orders` is SureCart's own catch-all
+bucket for checkouts containing more than one item — it is not a real
+product and should not be written to Airtable as one; if it shows up in a
+future pull, it needs to be unbundled into its real component products
+before writing (not yet solved — flag to Sean if it recurs). The two
+"Tutorial for Take 6 Song" / "Jesus Loves Me" lead-magnet-style rows are
+real but have no Fathom pathname mapped yet here — flag to Sean to confirm
+their checkout/opt-in pages before the next run needs to track their
+traffic.
 
 | Bump Name (exact) | Parent Product | Price |
 |---|---|---|
-| `Your First 30 Days: Member Practice Guide` | `Basic Membership — 7 Day $1 Trial` | $17 |
+| `Your First 30 Days: Member Practice Guide`¹ | `Basic Membership — 7 Day $1 Trial` | $17 |
 | `Beginner Practice Plan - for 4 Songs` | `Master Beginner Fundamentals in 4 Days` | $12 |
 | `Play Like Them: MIDI File Bundle 🎹🔥` | `Basic Membership` | varies |
 | `Travis Sayles Organ Runs – Custom MIDI Transcription` | `27 Musicians Pro Musicians Bundle Pack` | $14 |
 | `27 Musicians Guided Study Session` | `27 Musicians Pro Musicians Bundle Pack` | $9 |
 | `Dan's Signature Sounds - Logic Sessions Pack` | `Dan's Signature Sounds` | varies |
 | `Play Like Them: MIDI File Bundle 🎹🔥` | `Annual Standard Membership` | $22 |
+
+¹ SureCart's UI now displays this bump as **"30 Day Guided Practice Plan for
+Every Level"** (cosmetic rename noticed 2026-06-19; same underlying bump, same
+$17 price, same parent product). Keep writing it to Airtable under the
+original canonical name above for upsert-key continuity with all prior rows
+— do not start a new product name just because SureCart's dashboard label
+changed. See Section 4.2.2 for the general pattern this is an instance of.
 
 Bump data source: SureCart Reports → Bumps page only — do not parse line items.
 
@@ -402,6 +532,29 @@ product's historical revenue/count from 2026-05-02 onward — see Changelog.
   increments matching `Master Beginner Fundamentals in 4 Days`'s exact
   price) that fragmented this product's real history under a second name
   — needs a manual merge/cleanup pass, flagged to Sean, not yet fixed.
+  **Fixed later the same day — see next entry.**
+- **2026-06-19 — Airtable cleanup + CSV reconciliation + Section 4.2.2/E.**
+  Resolved the "4-Day Beginner Course" bug above: exact-match filter found
+  15 affected rows (not ~24), totaling $612 (not $648); renamed all 15 to
+  the canonical `Master Beginner Fundamentals in 4 Days`. Two dates
+  (Jun 10, Jun 15) already had a legitimate row under the canonical name,
+  so the rename produced two upsert-key collisions — both duplicates had
+  0 orders/$0 revenue and were deleted after recovering the Jun 10 row's
+  Fathom Checkout Page Views/Uniques (45/15) into the surviving row, which
+  was also reclassified from a mistaken Product Type=Bump back to Product.
+  Separately corrected the 2026-06-18 bump row for "Your First 30 Days:
+  Member Practice Guide" from 1 order/$17 (SureCart Bumps report) to the
+  verified 2 orders/$34 (confirmed against Items Purchased and a full
+  SureCart order CSV export) — see Section 4.2.2 #1. Rebuilt the live
+  `SC_DATA`/`SC_PREV_30` blocks in `index.html` directly from that same
+  full CSV export rather than a Cowork natural-language pull, after
+  finding `SC_DATA.stats.ytd.count` (2890) and the sum of
+  `SC_DATA.byProduct[].count` (~210) had silently diverged by >13x — see
+  Section 4.2.2 #4. Added Section 4.2.2 ("Known Cowork bugs") documenting
+  all of the above as recurring failure patterns, and Section 6 check E
+  (per-product/aggregate reconciliation) to catch #4 automatically on
+  every future run. Added the SureCart cosmetic-rename footnote to the
+  bump reference table (Section 4.2.2 #3).
 - **2026-06-17 — v7.0 (DRAFT).** Full rewrite replacing
   `swp-performance-dashboard-cowork-skill.md` (deleted) and the stale
   `swp-performance-dashboard.skill` zip bundle (deleted — was out of sync
