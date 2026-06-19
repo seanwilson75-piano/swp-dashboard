@@ -118,6 +118,7 @@ Tracked pathnames:
 /annual-standard-checkout-page/
 /annual-premium-checkout-page/
 /4-week-beginner-sales-page/
+/4-day-beginner-checkout/
 /27musicians/
 /april-focus-bundle-2026/
 /dans-signature-sounds/
@@ -170,6 +171,39 @@ previous run's values for `SC_DATA`, `PREV_PERIOD`, `SC_PREV_30`, and
 renders `null`/`[]`/`{}` as visibly broken. Still update the Fathom-derived
 fields and `LAST_UPDATED`, and say explicitly in the run summary which
 sections are stale.
+
+#### 4.2.1 Quick-pull instructions (hand this to Cowork, or paste into chat)
+
+Only ONE day of SureCart source data is ever needed per run — yesterday.
+Every earlier day is already in Airtable's Daily Product Stats table and is
+not re-pulled or re-derived from SureCart; Claude rolls weekly/30-day/YTD
+totals up from Airtable plus this one new day. Note: Airtable's Daily
+Product Stats table only goes back to **2026-05-02** — it is not a full-year
+history, so true YTD count/revenue still comes from SureCart's own Revenue
+Summary report (a single native running total, not a reconstruction).
+
+```
+Pull SureCart data for [YESTERDAY'S DATE] only:
+
+1. Revenue Summary report (no date filter — it shows running totals).
+   Report: count + revenue for yesterday, trailing 7 days, trailing 30
+   days, and year-to-date.
+2. Items Purchased report, filtered to [YESTERDAY'S DATE] only (single
+   day, not a range). Report: product name, order count, total sales —
+   for every product with ≥1 order that day.
+3. Bumps report, filtered to [YESTERDAY'S DATE] only. Report: bump name,
+   offers shown, offers accepted, acceptance rate, total sales.
+4. Recent Orders — most recent 8 paid orders regardless of date. Report:
+   order number, UUID id, ISO-8601 created_at, status, dollar amount —
+   for each.
+
+Do NOT pull multi-day, 30-day, or YTD breakdowns by product — that history
+already exists, validated, in Airtable. Use the exact product names from
+this doc's reference table; never invent a new product name for an A/B
+test's second entry page (e.g. /4-day-beginner-checkout/ and
+/4-week-beginner-sales-page/ are both "Master Beginner Fundamentals in 4
+Days" — not a separate product).
+```
 
 ### 4.3 Airtable write (every run)
 
@@ -319,7 +353,7 @@ When ready:
 | `Premium Membership` | Subscription | `/premium-checkout-page/` |
 | `Annual Standard Membership` | Subscription | `/annual-standard-checkout-page/` |
 | `Annual Premium Membership` | Subscription | `/annual-premium-checkout-page/` |
-| `Master Beginner Fundamentals in 4 Days` | Product | `/4-week-beginner-sales-page/` |
+| `Master Beginner Fundamentals in 4 Days` | Product | `/4-week-beginner-sales-page/` and `/4-day-beginner-checkout/` (A/B test, same product — see note below) |
 | `27 Musicians Pro Musicians Bundle Pack` | Product | `/27musicians/` |
 | `April Focus Guide` | Product | `/april-focus-bundle-2026/` |
 | `Dan's Signature Sounds` | Product | `/dans-signature-sounds/` |
@@ -342,10 +376,32 @@ When ready:
 
 Bump data source: SureCart Reports → Bumps page only — do not parse line items.
 
+⚠️ **A/B test note (added 2026-06-19):** `/4-week-beginner-sales-page/` and
+`/4-day-beginner-checkout/` are two entry points in an A/B test for the same
+product, `Master Beginner Fundamentals in 4 Days`. Track Fathom pageviews for
+both pathnames separately (that's the point of the test), but every order
+still belongs to the single `Master Beginner Fundamentals in 4 Days` product
+row in Airtable — never create a second product record (e.g. a "4-Day
+Beginner Course" line) for the second entry point. A prior run did exactly
+that, creating a duplicate product line that silently fragmented this
+product's historical revenue/count from 2026-05-02 onward — see Changelog.
+
 ---
 
 ## Changelog
 
+- **2026-06-19 — addendum.** Added `/4-day-beginner-checkout/` as a tracked
+  pathname (A/B test vs. `/4-week-beginner-sales-page/`, same product —
+  see reference table note). Documented that Airtable's Daily Product
+  Stats table starts 2026-05-02 (not a full YTD history), so YTD
+  count/revenue should come from SureCart's native Revenue Summary total,
+  while weekly/30-day rollups can be safely built from Airtable. Added
+  Section 4.2.1 single-day Cowork pull instructions. **Found a live data
+  bug:** a "4-Day Beginner Course" product line exists in Airtable
+  (2026-05-02 through 2026-06-15, ~24 orders / $648, all in $27
+  increments matching `Master Beginner Fundamentals in 4 Days`'s exact
+  price) that fragmented this product's real history under a second name
+  — needs a manual merge/cleanup pass, flagged to Sean, not yet fixed.
 - **2026-06-17 — v7.0 (DRAFT).** Full rewrite replacing
   `swp-performance-dashboard-cowork-skill.md` (deleted) and the stale
   `swp-performance-dashboard.skill` zip bundle (deleted — was out of sync
