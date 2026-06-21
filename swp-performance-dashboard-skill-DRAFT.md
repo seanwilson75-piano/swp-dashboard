@@ -174,35 +174,61 @@ sections are stale.
 
 #### 4.2.1 Quick-pull instructions (hand this to Cowork, or paste into chat)
 
+**Cowork's job here is strictly mechanical: fetch and relay raw,
+order-level rows. Cowork must never compute a count, a sum, a "total
+sales" figure, an acceptance rate, or a product-name match — that work
+belongs to Claude, against the Reference Table, after the raw pull comes
+back. Every SureCart-side fabrication incident to date (Section 4.2.2 #2,
+#5, #6) happened at the exact step where Cowork was asked to aggregate or
+categorize instead of just relay raw rows — that step has been removed
+from Cowork's job entirely below. If Cowork is ever asked to "just handle
+the whole pull" as a one-off exception, this raw-pull-only boundary still
+applies — there is no safe version of letting Cowork aggregate or write to
+Airtable itself (Section 4.2.2 #5).**
+
 Only ONE day of SureCart source data is ever needed per run — yesterday.
 Every earlier day is already in Airtable's Daily Product Stats table and is
-not re-pulled or re-derived from SureCart; Claude rolls weekly/30-day/YTD
+not re-pulled or re-derived from SureCart; Claude rolls weekly/30-day
 totals up from Airtable plus this one new day. Note: Airtable's Daily
-Product Stats table only goes back to **2026-05-02** — it is not a full-year
-history, so true YTD count/revenue still comes from SureCart's own Revenue
-Summary report (a single native running total, not a reconstruction).
+Product Stats table only goes back to **2026-05-02** — it is not a
+full-year history. Because of this, true YTD count/revenue and the
+per-product YTD breakdown can only be refreshed **together**, from a full
+SureCart order export (CSV), during a periodic reconciliation pass — never
+from a quick daily report. On every other day, `SC_DATA.stats.ytd`,
+`byProduct`, and `byProductPeriod.ytd` are carried forward unchanged as one
+frozen unit (Section 4.2.2 #4, Section 6 Check E); do not pull SureCart's
+Revenue Summary YTD figure on its own and write just that on a normal day —
+it desynchronizes from the per-product breakdown and reproduces the exact
+>13x gap bug Check E exists to catch.
 
 ```
-Pull SureCart data for [YESTERDAY'S DATE] only:
+Pull SureCart data for [YESTERDAY'S DATE] only — raw rows, no aggregation:
 
-1. Revenue Summary report (no date filter — it shows running totals).
-   Report: count + revenue for yesterday, trailing 7 days, trailing 30
-   days, and year-to-date.
-2. Items Purchased report, filtered to [YESTERDAY'S DATE] only (single
-   day, not a range). Report: product name, order count, total sales —
-   for every product with ≥1 order that day.
-3. Bumps report, filtered to [YESTERDAY'S DATE] only. Report: bump name,
-   offers shown, offers accepted, acceptance rate, total sales.
-4. Recent Orders — most recent 8 paid orders regardless of date. Report:
-   order number, UUID id, ISO-8601 created_at, status, dollar amount —
-   for each.
+1. All paid orders dated [YESTERDAY'S DATE] (America/New_York), as a raw
+   list of orders, each with: order number, UUID id, ISO-8601 created_at,
+   status, and every line item on that order with its own exact
+   product/bump name AND its own dollar amount (the line's amount, not
+   the order total — so combo/bundle orders aren't misattributed to one
+   item or double-counted).
+2. Do not compute a count, a sum, a "total sales" figure, or an acceptance
+   rate. Do not group, label, or categorize anything. Just relay the raw
+   rows; Claude does all counting/summing against the Reference Table.
+3. Do not infer a dollar amount from a product's name (e.g. do not assume
+   "Basic Membership — 7 Day $1 Trial" charges $1 — use the line item's
+   actual amount field, whatever it is). This exact shortcut produced a
+   >130x undercount on one product on 2026-06-20 — see Section 4.2.2 #5.
 
-Do NOT pull multi-day, 30-day, or YTD breakdowns by product — that history
-already exists, validated, in Airtable. Use the exact product names from
-this doc's reference table; never invent a new product name for an A/B
-test's second entry page (e.g. /4-day-beginner-checkout/ and
-/4-week-beginner-sales-page/ are both "Master Beginner Fundamentals in 4
-Days" — not a separate product).
+Do NOT pull multi-day, 30-day, or YTD breakdowns, by product or otherwise —
+that history already exists, validated, in Airtable, or is refreshed
+separately via full CSV reconciliation (see above). Claude — not Cowork —
+matches each line item's product/bump name against this doc's Reference
+Table; never invent a new product name for an A/B test's second entry page
+(e.g. /4-day-beginner-checkout/ and /4-week-beginner-sales-page/ are both
+"Master Beginner Fundamentals in 4 Days" — not a separate product). This
+instruction has already been violated once after being written here
+verbatim (Section 4.2.2 #2, #6) — treat it as something Claude must verify
+against the Reference Table on every run, not as a rule Cowork can be
+trusted to follow on its own.
 ```
 
 ### 4.2.2 Known Cowork bugs
@@ -265,7 +291,40 @@ pull.
    individually looked plausible. The per-product pull was effectively only
    covering a much shorter window than the revenue-summary pull, mislabeled
    as YTD. Section 6 now has check **E** for this (below) — run it every
-   time.
+   time. Root cause: the daily instructions (Section 4.2.1) said to refresh
+   YTD from SureCart's Revenue Summary every run while the per-product
+   breakdown only got refreshed periodically — those two were never meant
+   to be independently refreshed. Section 4.2.1 now says explicitly that
+   `stats.ytd`/`byProduct`/`byProductPeriod.ytd` move together as one
+   frozen unit between full CSV reconciliations; this is the durable fix,
+   not just the one-time 2026-06-19 rebuild.
+
+5. **Asked to aggregate, Cowork can fabricate a "total sales" figure by
+   reading the product's name instead of the actual line-item price.**
+   2026-06-20: Cowork reported `Basic Membership — 7 Day $1 Trial` as 2
+   orders / $2.00 for the day — literally $1 × 2, the trial price implied
+   by the product's *name* — and a daily total of 13 orders / $312.80. The
+   real numbers, confirmed against the raw order list (UUIDs, timestamps,
+   per-order line-item amounts): 9 orders / $262.00 for that product, 11
+   orders / $348.00 for the day overall. Not a rounding error — a wholesale
+   invented figure that happened to look plausible, because a small dollar
+   amount for a "$1 Trial" product reads as correct on its face. This is
+   why Section 4.2.1 no longer asks Cowork to report any sum, count, or
+   "total sales" at all — Cowork relays raw per-order line items only;
+   every aggregation happens in Claude, against the line item's actual
+   amount field, never the product name.
+
+6. **The documented A/B-test phantom-product bug (#2 above) recurred even
+   with an explicit inline warning already in front of Cowork.** The exact
+   sentence added to Section 4.2.1 after the first occurrence — "never
+   invent a new product name for an A/B test's second entry page... not a
+   separate product" — was already present in the instructions the second
+   time this happened, and Cowork violated it anyway. **An inline reminder
+   in the prompt is not a sufficient safeguard by itself.** The durable fix
+   is structural, not textual: Claude re-validates every product/bump name
+   a pull returns against the Reference Table before writing it anywhere
+   (Airtable or `index.html`), and flags/rejects any name not present
+   there — regardless of what the instructions told the puller to do.
 
 ### 4.3 Airtable write (every run)
 
@@ -520,6 +579,25 @@ product's historical revenue/count from 2026-05-02 onward — see Changelog.
 
 ## Changelog
 
+- **2026-06-21 — Section 4.2.2 #5/#6 + Section 4.2.1 rewrite.** Two new
+  Cowork SureCart-pull failures found 2026-06-20: (#5) Cowork fabricated a
+  product's daily revenue from its name (read "$1 Trial" as a literal $1
+  charge: reported 2 orders/$2.00 vs. real 9 orders/$262.00, and 13/$312.80
+  vs. real 11/$348.00 for the day overall); (#6) the 2026-06-19 A/B-test
+  phantom-product bug (#2) recurred despite an explicit inline warning
+  already present in Section 4.2.1 at the time. Root cause both times:
+  Cowork was asked to aggregate/categorize, not just relay raw data, and an
+  inline warning alone didn't stop it. Fix: rewrote Section 4.2.1 so
+  Cowork's only job is to relay raw, order-level rows (UUID, order number,
+  ISO-8601 timestamp, status, per-line-item name + amount) — never a count,
+  sum, "total sales" figure, or product-name match; all of that now
+  happens in Claude against the Reference Table. Also fixed the underlying
+  contradiction documented in #4: Section 4.2.1 previously said to refresh
+  `stats.ytd` from SureCart's Revenue Summary every run while the
+  per-product YTD breakdown only refreshes periodically — those can never
+  be independently refreshed without breaking Check E. Section 4.2.1 now
+  states explicitly that `stats.ytd`/`byProduct`/`byProductPeriod.ytd` move
+  together as one frozen unit between full CSV reconciliations.
 - **2026-06-19 — addendum.** Added `/4-day-beginner-checkout/` as a tracked
   pathname (A/B test vs. `/4-week-beginner-sales-page/`, same product —
   see reference table note). Documented that Airtable's Daily Product
