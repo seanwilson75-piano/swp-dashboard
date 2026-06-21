@@ -240,11 +240,11 @@
 </div>
 
 <div class="main">
-  <!-- KPI strip -->
-  <div class="kpi-grid" id="kpi-grid"></div>
-
   <!-- Overview panel -->
   <div class="panel active" id="panel-pages">
+    <!-- KPI strip (Overview only — was previously outside the panel system and stayed
+         visible on every tab, stacking with Sales Detail's own KPI grid) -->
+    <div class="kpi-grid" id="kpi-grid"></div>
     <!-- Alerts banner -->
     <div id="alerts-banner"></div>
     <!-- Date range label -->
@@ -256,7 +256,7 @@
       <div class="legend-item"><span class="conv-pill conv-mid"  style="font-size:10px;padding:1px 6px">1–3%</span> Moderate</div>
       <div class="legend-item"><span class="conv-pill conv-low"  style="font-size:10px;padding:1px 6px">&lt;1%</span> Low</div>
       <div class="legend-item"><span class="conv-pill conv-none" style="font-size:10px;padding:1px 6px">—</span> No data / free</div>
-      <span style="font-size:11px;color:var(--dim);margin-left:8px">· Revenue matches selected period · N/A = data not yet in Airtable for that window</span>
+      <span style="font-size:11px;color:var(--dim);margin-left:8px">· Revenue matches selected period · N/A = data not yet in Airtable for that window · Checkout-page Views only count new visits — renewals/recurring charges bill automatically without a pageview, so Revenue can show with low or 0 Views</span>
     </div>
   </div>
 
@@ -416,7 +416,7 @@ const SC_DATA = {
   // All dates bucketed in America/New_York. Test/duplicate admin orders excluded.
   stats: {
     today: { count:11,   revenue:34800   },   // Jun 20 (most recent complete ET day) — verified raw order list
-    week:  { count:103,  revenue:276900  },   // STALE — Jun 12–18, pending Jun 19 backfill + reconciliation
+    week:  { count:106,  revenue:285000  },   // STALE (Jun 12–18 base) + Master Beginner Fundamentals patched in from Airtable (Jun 15/17/20) to match byProductPeriod.weekly — still pending Jun 19 backfill + full reconciliation
     month: { count:546,  revenue:1174910 },   // STALE — May 20–Jun 18, pending Jun 19 backfill + reconciliation
     ytd:   { count:2957, revenue:7707640 },   // STALE — Jan 1–Jun 18, pending next full CSV reconciliation
   },
@@ -460,11 +460,17 @@ const SC_DATA = {
       ["Premium Membership",                                      { count:1,  revenue:4700  }],
     ],
     // weekly/monthly/ytd below: STALE, carried forward — see stats.week/.month/.ytd notes above.
+    // "Master Beginner Fundamentals in 4 Days" was missing entirely from this array
+    // (not zero — absent as a key), which made the dashboard show "0 sales" for a
+    // page with 3.5k weekly views. Patched 2026-06-21 directly from Airtable Daily
+    // Product Stats (Jun 15 + Jun 17 + Jun 20 rows — Jun 19 has no Airtable rows at
+    // all yet, so this is a 6-of-7-day figure, not a true full week).
     weekly: [
       ["Basic Membership",                                        { count:45, revenue:129100 }],
       ["Basic Membership — 7 Day $1 Trial",                       { count:38, revenue:87900  }],
       ["Bundled / multi-item orders",                             { count:11, revenue:36300  }],
       ["Premium Membership",                                      { count:5,  revenue:23500  }],
+      ["Master Beginner Fundamentals in 4 Days",                  { count:3,  revenue:8100   }],
       ["Get the Drop 2 Practice Files and Charts!",                { count:1,  revenue:100    }],
       ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",    { count:2,  revenue:0      }],
       ["Hear Any Chord — Free Ear Training Chart",                { count:1,  revenue:0      }],
@@ -554,7 +560,7 @@ const SC_PREV_30 = {
   "Jesus Loves Me by Joy Bloom Piano Sheet and Midi File": { count:4, revenue:0 },
   "Tutorial for Take 6 Song - Let the Words of My Mouth": { count:2, revenue:0 },
 };
-const LAST_UPDATED = "Jun 20, 10:38 PM";
+const LAST_UPDATED = "Jun 21, 2:56 PM";
 // [DASHBOARD-DATA-END]
 
 // [FUNNEL-CHAINS-START]
@@ -599,11 +605,11 @@ const FUNNEL_CHAINS = [
   { parent:"April Focus Guide", slug:"/april-focus-bundle-2026/",
     bumps:[], upsells:[],
     analysis:"No traffic or sales this week — likely past its promotional window. Consider retiring the page or repurposing for the next monthly focus guide." },
-  { parent:"Dan's Signature Sounds", slug:"/dans-signature-sounds/",
+  { parent:"Single Course - Dan's Signature Sounds", slug:"/dans-signature-sounds/",
     bumps:[ { name:"Dan's Signature Sounds - Logic Sessions Pack", price:null, accepted:0, offers:16 } ],
     upsells:[],
     analysis:"1 sale this week from a high-intent page (avg time on page over 10 minutes) — but that sale was a standalone purchase, not via the bump (0 of 16 bump offers accepted per SureCart this week)." },
-  { parent:"Mediant Drop 2 Exercise", slug:"/drop-2-exercise-download-page/",
+  { parent:"Get the Drop 2 Practice Files and Charts!", slug:"/drop-2-exercise-download-page/",
     bumps:[], upsells:[],
     analysis:"Quiet this week — no views or sales. This $1 exercise has historically had your highest bump conversion rate; worth a traffic push (ManyChat keyword 'mediant') to re-test." },
   { parent:"Piano Blueprint Session", slug:"/break",
@@ -626,9 +632,9 @@ const TRACKED = [
   { name:"Beginner Practice Plan",   slug:null,                              type:"Product",      price:12,  cat:"checkout", sc_product:"Beginner Practice Plan - for 4 Songs"               },
   { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                                 },
   { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                                   },
-  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"                              },
+  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Single Course - Dan's Signature Sounds"              },
   { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"                             },
-  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"                                      },
+  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Get the Drop 2 Practice Files and Charts!"           },
   { name:"Ear Chart Lead Magnet",    slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Scales Charts",            slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Roadmap Lead",             slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"                                             },
@@ -755,8 +761,11 @@ function renderAlerts() {
   }
 
   // Sales spikes vs prior 30 days
-  if (SC_DATA?.byProduct && SC_PREV_30) {
-    SC_DATA.byProduct.forEach(([name, data]) => {
+  // NOTE: must use byProductPeriod.monthly (current-month-to-date per product),
+  // not byProduct (YTD cumulative) — comparing a YTD total against a single
+  // 30-day baseline produced nonsensical "500%+ this month" alerts.
+  if (SC_DATA?.byProductPeriod?.monthly && SC_PREV_30) {
+    SC_DATA.byProductPeriod.monthly.forEach(([name, data]) => {
       const prev = SC_PREV_30[name];
       if (!prev || prev.count < 5) return;
       const ratio = data.count / prev.count;
@@ -773,7 +782,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const failed = SC_DATA.recentOrders.filter(o => o.status==="failed" || o.status==="past_due");
     failed.forEach(o => {
-      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"warning", msg:`⚠️ Failed payment: Order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Check dunning sequence.` });
     });
   }
@@ -782,7 +791,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const highValue = SC_DATA.recentOrders.filter(o => o.status==="paid" && o.amount >= 29700);
     highValue.forEach(o => {
-      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"action", msg:`🔔 High-value order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Confirm session is scheduled with customer.` });
     });
   }
@@ -1094,7 +1103,7 @@ function renderSales() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
         <!-- New Signups -->
         <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px">
-          <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🟢 New Signups</div>
+          <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🟢 New Signups (paid, first charge)</div>
           <div style="font-size:24px;font-weight:800;color:var(--green);letter-spacing:-.02em">${g.newSignups}</div>
           <div style="font-size:13px;font-weight:700;color:var(--green);margin-top:2px">${fmtUSD(g.newRevenue)}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:3px">${newPct}% of revenue</div>
