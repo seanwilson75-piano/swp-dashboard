@@ -314,28 +314,33 @@
 // ─── DATA — Cowork injects between these markers every morning ────────────────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
-  "/join-for-1-today/":              { pageviews:23,  uniques:10, avg_duration:0, bounce_rate:0 },
-  "/join-membership-today/":         { pageviews:26,  uniques:9,  avg_duration:0, bounce_rate:0 },
-  "/4-week-beginner-sales-page/":    { pageviews:447, uniques:35, avg_duration:0, bounce_rate:0 },
-  "/4-day-beginner-checkout/":       { pageviews:339, uniques:22, avg_duration:0, bounce_rate:0 },
-  "/standard-checkout-page/":        { pageviews:24, uniques:12, avg_duration:0, bounce_rate:0 },
+  // Jun 20, 2026 (yesterday relative to this run) — raw per-pathname pull, verified.
+  "/join-for-1-today/":              { pageviews:30,  uniques:13, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:24,  uniques:10, avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:174, uniques:21, avg_duration:0, bounce_rate:0 },
+  "/4-day-beginner-checkout/":       { pageviews:241, uniques:16, avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:18, uniques:8, avg_duration:0, bounce_rate:0 },
   "/27musicians/":                   { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/dans-signature-sounds/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/break":                          { pageviews:8, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/scales-charts/":                 { pageviews:12, uniques:3, avg_duration:0, bounce_rate:0 },
-  "/our-roadmap-offer/":             { pageviews:26, uniques:5, avg_duration:0, bounce_rate:0 },
-  "/major-vs-minor-quiz/":           { pageviews:10, uniques:2, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_WEEKLY = {
-  "/join-for-1-today/":              { pageviews:201,  uniques:78,  avg_duration:0, bounce_rate:0 },
+  // STALE — carried forward unchanged, trailing-7-days window ending Jun 18.
+  // Jun 19 was never pulled (gap in the Jun 19 run); shifting this window to
+  // end Jun 20 without it would silently undercount. Backfill Jun 19, then
+  // refresh this block from a fresh Fathom pull for the new window.
+  "/join-for-1-today/":            { pageviews:201,  uniques:78,  avg_duration:0, bounce_rate:0 },
   "/join-membership-today/":         { pageviews:154,  uniques:62,  avg_duration:0, bounce_rate:0 },
   "/4-week-beginner-sales-page/":    { pageviews:3538, uniques:282, avg_duration:0, bounce_rate:0 },
   "/4-day-beginner-checkout/":       { pageviews:3711, uniques:255, avg_duration:0, bounce_rate:0 },
@@ -359,20 +364,23 @@ const FATHOM_WEEKLY = {
   "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_YTD = {
-  "/join-for-1-today/":              { pageviews:23568, uniques:10313, avg_duration:0, bounce_rate:0 },
-  "/join-membership-today/":         { pageviews:8082,  uniques:3375,  avg_duration:0, bounce_rate:0 },
-  "/standard-checkout-page/":        { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  // Incremented by Jun 20's verified daily pull only. Jun 19 has no
+  // per-pathname pull on file (gap, see FATHOM_WEEKLY note) and is NOT
+  // included here — so this is a slight undercount until Jun 19 is backfilled.
+  "/join-for-1-today/":              { pageviews:23598, uniques:10326, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:8106,  uniques:3385,  avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:18, uniques:8, avg_duration:0, bounce_rate:0 },
   "/premium-checkout-page/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/annual-standard-checkout-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/annual-premium-checkout-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/4-week-beginner-sales-page/":    { pageviews:13087, uniques:2839, avg_duration:0, bounce_rate:0 },
-  "/4-day-beginner-checkout/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:13261, uniques:2860, avg_duration:0, bounce_rate:0 },
+  "/4-day-beginner-checkout/":       { pageviews:241, uniques:16, avg_duration:0, bounce_rate:0 },
   "/27musicians/":                   { pageviews:3487,  uniques:1432, avg_duration:0, bounce_rate:0 },
   "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/dans-signature-sounds/":         { pageviews:3223,  uniques:972,   avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:3232,  uniques:975,   avg_duration:0, bounce_rate:0 },
   "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
   "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
-  "/scales-charts/":                 { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
   "/our-roadmap-offer/":             { pageviews:2534,  uniques:736,   avg_duration:0, bounce_rate:0 },
   "/major-vs-minor-quiz/":           { pageviews:2141,  uniques:679,   avg_duration:0, bounce_rate:0 },
   "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
@@ -383,9 +391,9 @@ const FATHOM_YTD = {
   "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const SITE_TOTALS = {
-  daily:  { pageviews:2815,   uniques:218   },
-  weekly: { pageviews:22147,  uniques:1782  },
-  ytd:    { pageviews:507905, uniques:60714 },
+  daily:  { pageviews:1288,   uniques:267   },   // Jun 20, verified raw Fathom pull
+  weekly: { pageviews:22147,  uniques:1782  },   // STALE — see FATHOM_WEEKLY note, pending Jun 19 backfill
+  ytd:    { pageviews:509193, uniques:60981 },   // prior YTD + Jun 20 only (Jun 19 not yet included)
 };
 const MONTHLY = [
   { month:"Jan", pageviews:106364, uniques:11275 },
@@ -393,17 +401,24 @@ const MONTHLY = [
   { month:"Mar", pageviews:96964,  uniques:13098 },
   { month:"Apr", pageviews:75833,  uniques:9495  },
   { month:"May", pageviews:85417,  uniques:9722  },
-  { month:"Jun", pageviews:53891,  uniques:4934,  partial:true },
+  { month:"Jun", pageviews:55179,  uniques:5201,  partial:true },
 ];
 const SC_DATA = {
-  // Rebuilt 2026-06-19 directly from a full SureCart order export (CSV), not Cowork's
-  // natural-language SureCart pull — see skill doc Section 4.2.2 "Known Cowork bugs."
+  // byProduct/byProductPeriod.ytd/stats.week/stats.month/stats.ytd were rebuilt
+  // 2026-06-19 from a full SureCart order export (CSV) — see skill doc Section
+  // 4.2.2 "Known Cowork bugs." That per-product YTD snapshot is a periodic
+  // full-reconciliation artifact, not a daily rolling figure (see Section 4.2.2
+  // #4 and Section 6 Check E) — it is intentionally carried forward unchanged
+  // here and only refreshed on the next full CSV reconciliation pass.
+  // stats.today / byProductPeriod.daily ARE updated daily, from verified
+  // per-order SureCart data (raw order list, not a Cowork natural-language
+  // aggregate report — see skill doc Section 4.2.3).
   // All dates bucketed in America/New_York. Test/duplicate admin orders excluded.
   stats: {
-    today: { count:17,   revenue:41400   },   // Jun 18 (most recent complete ET day)
-    week:  { count:103,  revenue:276900  },   // Jun 12–18
-    month: { count:546,  revenue:1174910 },   // May 20–Jun 18
-    ytd:   { count:2957, revenue:7707640 },   // Jan 1–Jun 18
+    today: { count:11,   revenue:34800   },   // Jun 20 (most recent complete ET day) — verified raw order list
+    week:  { count:103,  revenue:276900  },   // STALE — Jun 12–18, pending Jun 19 backfill + reconciliation
+    month: { count:546,  revenue:1174910 },   // STALE — May 20–Jun 18, pending Jun 19 backfill + reconciliation
+    ytd:   { count:2957, revenue:7707640 },   // STALE — Jan 1–Jun 18, pending next full CSV reconciliation
   },
   byProduct: [
     ["Basic Membership",                                          { count:1029, revenue:2925500 }],
@@ -425,23 +440,26 @@ const SC_DATA = {
     ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",     { count:6,    revenue:0       }],
   ],
   recentOrders: [
-    { id: "0e5e42d4-8d2d-420e-913a-403abba4daed", number: "6362AD1C", created_at: "2026-06-19T18:18Z", status: "paid", amount: 2900 },
-    { id: "e11e2d0b-8ee6-45ba-aaf1-53ceb9bdc158", number: "6941EDDB", created_at: "2026-06-19T18:10Z", status: "paid", amount: 3900 },
-    { id: "07c7ad58-3021-47d1-b2fa-b2acca71ce94", number: "FA03E086", created_at: "2026-06-19T17:13Z", status: "paid", amount: 100  },
-    { id: "a6acef4a-b027-4122-b6fe-dce174857dbd", number: "22F26A08", created_at: "2026-06-19T13:43Z", status: "paid", amount: 100  },
-    { id: "a1305b13-3e66-4f85-a872-fe79d95ed9cb", number: "7FD5066A", created_at: "2026-06-19T06:18Z", status: "paid", amount: 0    },
-    { id: "3655862e-8c7a-4c56-ad34-09c5a24f293b", number: "A1312511", created_at: "2026-06-19T03:07Z", status: "paid", amount: 2900 },
-    { id: "a721cc55-f0b6-4e0c-9ac3-c63843d30c53", number: "A07480B2", created_at: "2026-06-19T01:54Z", status: "paid", amount: 2900 },
-    { id: "73ef29f0-f261-4313-9533-556160ecd9ae", number: "9C50280A", created_at: "2026-06-19T01:41Z", status: "paid", amount: 100  },
+    { id: "87e1d28f-1b10-41b5-a0d2-c448837bb586", number: "901E767F", created_at: "2026-06-21T01:13Z", status: "paid", amount: 2900 },
+    { id: "ce092bde-95db-4359-99e8-4b5d9d786b8c", number: "7471C7FF", created_at: "2026-06-21T00:05Z", status: "paid", amount: 2900 },
+    { id: "528fe306-e0ee-4e69-8ca1-0696aa5d62a5", number: "3D444FE1", created_at: "2026-06-20T22:50Z", status: "paid", amount: 3900 },
+    { id: "8a42529a-4867-450e-8504-5599edb7da93", number: "D9072458", created_at: "2026-06-20T21:47Z", status: "paid", amount: 2900 },
+    { id: "3ea59eea-c9ce-41bd-81f9-330c23b2997a", number: "430C6100", created_at: "2026-06-20T14:08Z", status: "paid", amount: 3000 },
+    { id: "c4e8559b-e38b-4fe4-be41-ad125148c300", number: "939EAA49", created_at: "2026-06-20T14:07Z", status: "paid", amount: 2900 },
+    { id: "724f1540-f6c4-4b39-ba31-aaff8f3e6580", number: "048EA509", created_at: "2026-06-20T09:17Z", status: "paid", amount: 2900 },
+    { id: "06166313-8d24-46c2-9c8d-267296d9fb2b", number: "05206213", created_at: "2026-06-20T06:49Z", status: "paid", amount: 4700 },
   ],
-  lastFetched: "2026-06-19T21:19:03Z",
+  lastFetched: "2026-06-21T02:38:01Z",
   byProductPeriod: {
     daily: [
-      ["Basic Membership",                                        { count:11, revenue:31900 }],
-      ["Basic Membership — 7 Day $1 Trial",                       { count:3,  revenue:5900  }],
-      ["Bundled / multi-item orders",                             { count:2,  revenue:3600  }],
-      ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",    { count:1,  revenue:0     }],
+      // Jun 20 — verified against the raw 11-order list (UUID/timestamp/amount per order),
+      // not a Cowork aggregate pull. Combo order 3D444FE1 (base + bump) bucketed as
+      // "Bundled / multi-item orders" per the convention used elsewhere in this block.
+      ["Basic Membership — 7 Day $1 Trial",                       { count:9,  revenue:26200 }],
+      ["Bundled / multi-item orders",                             { count:1,  revenue:3900  }],
+      ["Premium Membership",                                      { count:1,  revenue:4700  }],
     ],
+    // weekly/monthly/ytd below: STALE, carried forward — see stats.week/.month/.ytd notes above.
     weekly: [
       ["Basic Membership",                                        { count:45, revenue:129100 }],
       ["Basic Membership — 7 Day $1 Trial",                       { count:38, revenue:87900  }],
@@ -536,7 +554,7 @@ const SC_PREV_30 = {
   "Jesus Loves Me by Joy Bloom Piano Sheet and Midi File": { count:4, revenue:0 },
   "Tutorial for Take 6 Song - Let the Words of My Mouth": { count:2, revenue:0 },
 };
-const LAST_UPDATED = "Jun 19, 5:19 PM";
+const LAST_UPDATED = "Jun 20, 10:38 PM";
 // [DASHBOARD-DATA-END]
 
 // [FUNNEL-CHAINS-START]
