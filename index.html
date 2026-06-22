@@ -240,11 +240,11 @@
 </div>
 
 <div class="main">
-  <!-- KPI strip -->
-  <div class="kpi-grid" id="kpi-grid"></div>
-
   <!-- Overview panel -->
   <div class="panel active" id="panel-pages">
+    <!-- KPI strip (Overview only — was previously outside the panel system and stayed
+         visible on every tab, stacking with Sales Detail's own KPI grid) -->
+    <div class="kpi-grid" id="kpi-grid"></div>
     <!-- Alerts banner -->
     <div id="alerts-banner"></div>
     <!-- Date range label -->
@@ -256,7 +256,7 @@
       <div class="legend-item"><span class="conv-pill conv-mid"  style="font-size:10px;padding:1px 6px">1–3%</span> Moderate</div>
       <div class="legend-item"><span class="conv-pill conv-low"  style="font-size:10px;padding:1px 6px">&lt;1%</span> Low</div>
       <div class="legend-item"><span class="conv-pill conv-none" style="font-size:10px;padding:1px 6px">—</span> No data / free</div>
-      <span style="font-size:11px;color:var(--dim);margin-left:8px">· Revenue matches selected period · N/A = data not yet in Airtable for that window</span>
+      <span style="font-size:11px;color:var(--dim);margin-left:8px">· Revenue matches selected period · N/A = data not yet in Airtable for that window · Checkout-page Views only count new visits — renewals/recurring charges bill automatically without a pageview, so Revenue can show with low or 0 Views</span>
     </div>
   </div>
 
@@ -314,181 +314,254 @@
 // ─── DATA — Cowork injects between these markers every morning ────────────────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
-  "/4-week-beginner-sales-page/": { pageviews: 437, uniques: 23, visits: 23, avg_duration: 97.33, bounce_rate: 4.35 },
-  "/": { pageviews: 347, uniques: 59, visits: 59, avg_duration: 48.03, bounce_rate: 0 },
-  "/membership-homepage/": { pageviews: 157, uniques: 39, visits: 39, avg_duration: 28.2, bounce_rate: 0 },
-  "/4-day-beginner-checkout/": { pageviews: 118, uniques: 25, visits: 25, avg_duration: 32.87, bounce_rate: 24 },
-  "/login/": { pageviews: 114, uniques: 43, visits: 43, avg_duration: 27.16, bounce_rate: 0 },
-  "/oops/": { pageviews: 110, uniques: 40, visits: 40, avg_duration: 215.60, bounce_rate: 0 },
-  "/membership-homepage/roadmaps-2/": { pageviews: 80, uniques: 17, visits: 17, avg_duration: 9.96, bounce_rate: 0 },
-  "/membership-homepage/midi-files-2/": { pageviews: 70, uniques: 14, visits: 14, avg_duration: 54.27, bounce_rate: 0 },
-  "/customer-dashboard/": { pageviews: 67, uniques: 8, visits: 8, avg_duration: 31.32, bounce_rate: 0 },
-  "/membership-homepage/roadmaps-2/beginner-roadmap/": { pageviews: 62, uniques: 11, visits: 11, avg_duration: 58.06, bounce_rate: 0 },
-  "/membership-homepage/courses-2/": { pageviews: 60, uniques: 16, visits: 16, avg_duration: 14.86, bounce_rate: 0 },
-  "/join-for-1-today/": { pageviews: 56, uniques: 25, visits: 25, avg_duration: 62.6, bounce_rate: 8 },
-  "/customer-dashboard/?action=edit": { pageviews: 54, uniques: 7, visits: 7, avg_duration: 98.59, bounce_rate: 0 },
-  "/join-membership-today/": { pageviews: 36, uniques: 18, visits: 18, avg_duration: 78.06, bounce_rate: 22.22 },
-  "/scales-charts/": { pageviews: 21, uniques: 5, visits: 5, avg_duration: 23.67, bounce_rate: 0 },
-  "/our-roadmap-offer/": { pageviews: 26, uniques: 5, visits: 5, avg_duration: 13.9, bounce_rate: 0 },
-  "/hear-any-chord/": { pageviews: 18, uniques: 4, visits: 4, avg_duration: 35.2, bounce_rate: 0 },
-  "/27musicians/": { pageviews: 14, uniques: 6, visits: 6, avg_duration: 156.5, bounce_rate: 0 },
-  "/major-vs-minor-quiz/": { pageviews: 8, uniques: 3, visits: 3, avg_duration: 42.1, bounce_rate: 0 },
-  "/dans-signature-sounds/": { pageviews: 12, uniques: 5, visits: 5, avg_duration: 165.0, bounce_rate: 0 },
-  "/april-focus-bundle-2026/": { pageviews: 9, uniques: 3, visits: 3, avg_duration: 55.3, bounce_rate: 0 },
-  "/break": { pageviews: 6, uniques: 2, visits: 2, avg_duration: 45.0, bounce_rate: 0 },
-  "/drop-2-exercise-download-page/": { pageviews: 4, uniques: 2, visits: 2, avg_duration: 28.5, bounce_rate: 0 },
-  "/available-to-you/": { pageviews: 3, uniques: 1, visits: 1, avg_duration: 12.0, bounce_rate: 0 },
-  "/gospel-embell": { pageviews: 2, uniques: 1, visits: 1, avg_duration: 18.5, bounce_rate: 0 }
+  // Jun 20, 2026 (yesterday relative to this run) — raw per-pathname pull, verified.
+  "/join-for-1-today/":              { pageviews:30,  uniques:13, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:24,  uniques:10, avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:174, uniques:21, avg_duration:0, bounce_rate:0 },
+  "/4-day-beginner-checkout/":       { pageviews:241, uniques:16, avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:18, uniques:8, avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_WEEKLY = {
-  "/4-week-beginner-sales-page/": { pageviews: 3605, uniques: 272, visits: 272, avg_duration: 49.91, bounce_rate: 11.76 },
-  "/4-day-beginner-checkout/": { pageviews: 3368, uniques: 232, visits: 232, avg_duration: 49.49, bounce_rate: 4.74 },
-  "/": { pageviews: 1471, uniques: 310, visits: 310, avg_duration: 55.19, bounce_rate: 0.65 },
-  "/membership-homepage/": { pageviews: 1077, uniques: 326, visits: 326, avg_duration: 35.94, bounce_rate: 0 },
-  "/login/": { pageviews: 857, uniques: 328, visits: 328, avg_duration: 117.98, bounce_rate: 0.61 },
-  "/oops/": { pageviews: 709, uniques: 247, visits: 247, avg_duration: 224.88, bounce_rate: 0.40 },
-  "/membership-homepage/roadmaps-2/": { pageviews: 615, uniques: 169, visits: 169, avg_duration: 39.66, bounce_rate: 0 },
-  "/membership-homepage/courses-2/": { pageviews: 433, uniques: 114, visits: 114, avg_duration: 20.24, bounce_rate: 0 },
-  "/membership-homepage/roadmaps-2/beginner-roadmap/": { pageviews: 374, uniques: 68, visits: 68, avg_duration: 55.48, bounce_rate: 0 },
-  "/membership-homepage/midi-files-2/": { pageviews: 355, uniques: 85, visits: 85, avg_duration: 65.42, bounce_rate: 2.35 },
-  "/membership-homepage/roadmaps-2/competent-roadmap/": { pageviews: 336, uniques: 78, visits: 78, avg_duration: 72.92, bounce_rate: 0 },
-  "/customer-dashboard/": { pageviews: 254, uniques: 79, visits: 79, avg_duration: 32.60, bounce_rate: 0 },
-  "/join-for-1-today/": { pageviews: 231, uniques: 89, visits: 89, avg_duration: 57.80, bounce_rate: 2.25 },
-  "/membership-homepage/roadmaps-2/novice-roadmap/": { pageviews: 226, uniques: 46, visits: 46, avg_duration: 58.11, bounce_rate: 0 },
-  "/join-membership-today/": { pageviews: 162, uniques: 70, visits: 70, avg_duration: 152.44, bounce_rate: 5.71 },
-  "/membership-homepage/live-trainings/": { pageviews: 162, uniques: 48, visits: 48, avg_duration: 44.54, bounce_rate: 0 },
-  "/our-roadmap-offer/": { pageviews: 82, uniques: 23, visits: 23, avg_duration: 22.59, bounce_rate: 0 },
-  "/27musicians/": { pageviews: 78, uniques: 34, visits: 34, avg_duration: 158.2, bounce_rate: 0 },
-  "/hear-any-chord/": { pageviews: 64, uniques: 18, visits: 18, avg_duration: 37.8, bounce_rate: 0 },
-  "/dans-signature-sounds/": { pageviews: 56, uniques: 24, visits: 24, avg_duration: 164.0, bounce_rate: 0 },
-  "/scales-charts/": { pageviews: 42, uniques: 12, visits: 12, avg_duration: 28.5, bounce_rate: 0 },
-  "/major-vs-minor-quiz/": { pageviews: 31, uniques: 11, visits: 11, avg_duration: 43.2, bounce_rate: 0 },
-  "/breakthrough-session/": { pageviews: 114, uniques: 13, visits: 13, avg_duration: 30.71, bounce_rate: 0 },
-  "/april-focus-bundle-2026/": { pageviews: 28, uniques: 9, visits: 9, avg_duration: 54.0, bounce_rate: 0 },
-  "/break": { pageviews: 22, uniques: 8, visits: 8, avg_duration: 47.5, bounce_rate: 0 }
+  // STALE — carried forward unchanged, trailing-7-days window ending Jun 18.
+  // Jun 19 was never pulled (gap in the Jun 19 run); shifting this window to
+  // end Jun 20 without it would silently undercount. Backfill Jun 19, then
+  // refresh this block from a fresh Fathom pull for the new window.
+  "/join-for-1-today/":            { pageviews:201,  uniques:78,  avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:154,  uniques:62,  avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:3538, uniques:282, avg_duration:0, bounce_rate:0 },
+  "/4-day-beginner-checkout/":       { pageviews:3711, uniques:255, avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/premium-checkout-page/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-standard-checkout-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-premium-checkout-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:84,  uniques:19, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:72,  uniques:17, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:70,  uniques:18, avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:78,  uniques:23, avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const FATHOM_YTD = {
-  "/": { pageviews: 38711, uniques: 8678, visits: 8678, avg_duration: 52.21, bounce_rate: 0.80 },
-  "/membership-homepage/": { pageviews: 28814, uniques: 8622, visits: 8622, avg_duration: 51.88, bounce_rate: 0.14 },
-  "/join-membership-today-trial/": { pageviews: 27619, uniques: 12087, visits: 12087, avg_duration: 65.44, bounce_rate: 0.73 },
-  "/login/": { pageviews: 23839, uniques: 8875, visits: 8875, avg_duration: 52.85, bounce_rate: 0.08 },
-  "/join-for-1-today/": { pageviews: 23624, uniques: 10337, visits: 10337, avg_duration: 64.72, bounce_rate: 0.74 },
-  "/oops/": { pageviews: 21319, uniques: 7349, visits: 7349, avg_duration: 145.45, bounce_rate: 0.33 },
-  "/membership-homepage/roadmaps-2/": { pageviews: 18651, uniques: 5056, visits: 5056, avg_duration: 28.87, bounce_rate: 0.04 },
-  "/4-week-beginner-sales-page/": { pageviews: 13524, uniques: 2862, visits: 2862, avg_duration: 74.75, bounce_rate: 4.09 },
-  "/membership-homepage/roadmaps-2/beginner-roadmap/": { pageviews: 12214, uniques: 2490, visits: 2490, avg_duration: 48.30, bounce_rate: 0 },
-  "/membership-homepage/courses-2/": { pageviews: 10178, uniques: 2972, visits: 2972, avg_duration: 43.78, bounce_rate: 0 },
-  "/membership-homepage/midi-files-2/": { pageviews: 9782, uniques: 2184, visits: 2184, avg_duration: 67.66, bounce_rate: 0.14 },
-  "/join-membership-today/": { pageviews: 8118, uniques: 3393, visits: 3393, avg_duration: 125.93, bounce_rate: 0.53 },
-  "/customer-dashboard/": { pageviews: 7764, uniques: 2549, visits: 2549, avg_duration: 34.19, bounce_rate: 0 },
-  "/membership-homepage/roadmaps-2/competent-roadmap/": { pageviews: 6926, uniques: 1563, visits: 1563, avg_duration: 58.26, bounce_rate: 0 },
-  "/membership-homepage/roadmaps-2/novice-roadmap/": { pageviews: 5732, uniques: 1243, visits: 1243, avg_duration: 45.00, bounce_rate: 0 },
-  "/4-day-beginner-checkout/": { pageviews: 4575, uniques: 354, visits: 354, avg_duration: 53.92, bounce_rate: 4.24 },
-  "/27musicians/": { pageviews: 3491, uniques: 1434, visits: 1434, avg_duration: 155.44, bounce_rate: 0.14 },
-  "/access-center/": { pageviews: 3358, uniques: 979, visits: 979, avg_duration: 59.20, bounce_rate: 0 },
-  "/dans-signature-sounds/": { pageviews: 3226, uniques: 973, visits: 973, avg_duration: 168.41, bounce_rate: 1.85 },
-  "/membership-homepage/live-trainings/": { pageviews: 3123, uniques: 909, visits: 909, avg_duration: 47.35, bounce_rate: 0 },
-  "/our-roadmap-offer/": { pageviews: 2548, uniques: 742, visits: 742, avg_duration: 48.28, bounce_rate: 0.40 },
-  "/hear-any-chord/": { pageviews: 1842, uniques: 634, visits: 634, avg_duration: 38.5, bounce_rate: 0.05 },
-  "/scales-charts/": { pageviews: 1456, uniques: 389, visits: 389, avg_duration: 31.2, bounce_rate: 0 },
-  "/major-vs-minor-quiz/": { pageviews: 982, uniques: 345, visits: 345, avg_duration: 44.1, bounce_rate: 0.3 },
-  "/break": { pageviews: 645, uniques: 218, visits: 218, avg_duration: 48.0, bounce_rate: 0 }
+  // Incremented by Jun 20's verified daily pull only. Jun 19 has no
+  // per-pathname pull on file (gap, see FATHOM_WEEKLY note) and is NOT
+  // included here — so this is a slight undercount until Jun 19 is backfilled.
+  "/join-for-1-today/":              { pageviews:23598, uniques:10326, avg_duration:0, bounce_rate:0 },
+  "/join-membership-today/":         { pageviews:8106,  uniques:3385,  avg_duration:0, bounce_rate:0 },
+  "/standard-checkout-page/":        { pageviews:18, uniques:8, avg_duration:0, bounce_rate:0 },
+  "/premium-checkout-page/":         { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-standard-checkout-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/annual-premium-checkout-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/4-week-beginner-sales-page/":    { pageviews:13261, uniques:2860, avg_duration:0, bounce_rate:0 },
+  "/4-day-beginner-checkout/":       { pageviews:241, uniques:16, avg_duration:0, bounce_rate:0 },
+  "/27musicians/":                   { pageviews:3487,  uniques:1432, avg_duration:0, bounce_rate:0 },
+  "/april-focus-bundle-2026/":       { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/dans-signature-sounds/":         { pageviews:3232,  uniques:975,   avg_duration:0, bounce_rate:0 },
+  "/drop-2-exercise-download-page/": { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/hear-any-chord/":                { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/scales-charts/":                 { pageviews:9, uniques:3, avg_duration:0, bounce_rate:0 },
+  "/our-roadmap-offer/":             { pageviews:2534,  uniques:736,   avg_duration:0, bounce_rate:0 },
+  "/major-vs-minor-quiz/":           { pageviews:2141,  uniques:679,   avg_duration:0, bounce_rate:0 },
+  "/available-to-you/":              { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/new-1trial-registration-page/":  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/27-bundle-waitlist/":            { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/9sus4-to-dominant-release/":     { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/gospel-embell":                  { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
+  "/break":                          { pageviews:0, uniques:0, avg_duration:0, bounce_rate:0 },
 };
 const SITE_TOTALS = {
-  daily: { pageviews: 2384, uniques: 412, visits: 412 },
-  weekly: { pageviews: 16605, uniques: 1463, visits: 1463 },
-  ytd: { pageviews: 505390, uniques: 60814, visits: 60814 }
+  daily:  { pageviews:1288,   uniques:267   },   // Jun 20, verified raw Fathom pull
+  weekly: { pageviews:22147,  uniques:1782  },   // STALE — see FATHOM_WEEKLY note, pending Jun 19 backfill
+  ytd:    { pageviews:509193, uniques:60981 },   // prior YTD + Jun 20 only (Jun 19 not yet included)
 };
 const MONTHLY = [
-  { month: "Jan", pageviews: 106364, uniques: 11275 },
-  { month: "Feb", pageviews: 89436, uniques: 12190 },
-  { month: "Mar", pageviews: 96964, uniques: 13098 },
-  { month: "Apr", pageviews: 75833, uniques: 9495 },
-  { month: "May", pageviews: 85417, uniques: 9722 },
-  { month: "Jun", pageviews: 57166, uniques: 5173, partial: true }
+  { month:"Jan", pageviews:106364, uniques:11275 },
+  { month:"Feb", pageviews:89436,  uniques:12190 },
+  { month:"Mar", pageviews:96964,  uniques:13098 },
+  { month:"Apr", pageviews:75833,  uniques:9495  },
+  { month:"May", pageviews:85417,  uniques:9722  },
+  { month:"Jun", pageviews:55179,  uniques:5201,  partial:true },
 ];
-const PREV_PERIOD = {
-  "/4-day-beginner-checkout/": { pageviews: 3711, uniques: 255, visits: 255 },
-  "/4-week-beginner-sales-page/": { pageviews: 3538, uniques: 282, visits: 282 },
-  "/": { pageviews: 1297, uniques: 287, visits: 287 },
-  "/membership-homepage/": { pageviews: 1036, uniques: 315, visits: 315 },
-  "/login/": { pageviews: 793, uniques: 306, visits: 306 },
-  "/oops/": { pageviews: 675, uniques: 236, visits: 236 },
-  "/membership-homepage/roadmaps-2/": { pageviews: 566, uniques: 165, visits: 165 },
-  "/membership-homepage/courses-2/": { pageviews: 401, uniques: 108, visits: 108 },
-  "/join-for-1-today/": { pageviews: 201, uniques: 78, visits: 78 },
-  "/membership-homepage/live-trainings/": { pageviews: 154, uniques: 46, visits: 46 }
-};
-const SPIKE_REFERRERS = {};
-const SC_PREV_WEEK = {};
 const SC_DATA = {
+  // byProduct/byProductPeriod.ytd/stats.week/stats.month/stats.ytd were rebuilt
+  // 2026-06-19 from a full SureCart order export (CSV) — see skill doc Section
+  // 4.2.2 "Known Cowork bugs." That per-product YTD snapshot is a periodic
+  // full-reconciliation artifact, not a daily rolling figure (see Section 4.2.2
+  // #4 and Section 6 Check E) — it is intentionally carried forward unchanged
+  // here and only refreshed on the next full CSV reconciliation pass.
+  // stats.today / byProductPeriod.daily ARE updated daily, from verified
+  // per-order SureCart data (raw order list, not a Cowork natural-language
+  // aggregate report — see skill doc Section 4.2.3).
+  // All dates bucketed in America/New_York. Test/duplicate admin orders excluded.
   stats: {
-    today: { count: 6, revenue: 16400 },
-    week: { count: 31, revenue: 89600 },
-    month: { count: 108, revenue: 328500 },
-    ytd: { count: 418, revenue: 1102700 }
+    today: { count:11,   revenue:34800   },   // Jun 20 (most recent complete ET day) — verified raw order list
+    week:  { count:106,  revenue:285000  },   // STALE (Jun 12–18 base) + Master Beginner Fundamentals patched in from Airtable (Jun 15/17/20) to match byProductPeriod.weekly — still pending Jun 19 backfill + full reconciliation
+    month: { count:546,  revenue:1174910 },   // STALE — May 20–Jun 18, pending Jun 19 backfill + reconciliation
+    ytd:   { count:2957, revenue:7707640 },   // STALE — Jan 1–Jun 18, pending next full CSV reconciliation
   },
   byProduct: [
-    ["Basic Membership — 7 Day $1 Trial", { count: 91, revenue: 9100 }],
-    ["Basic Membership", { count: 207, revenue: 600100 }],
-    ["Premium Membership", { count: 48, revenue: 225600 }],
-    ["Annual Standard Membership", { count: 32, revenue: 223400 }],
-    ["Annual Premium Membership", { count: 22, revenue: 220000 }],
-    ["Master Beginner Fundamentals in 4 Days", { count: 12, revenue: 29900 }],
-    ["27 Musicians Pro Musicians Bundle Pack", { count: 9, revenue: 11100 }]
+    ["Basic Membership",                                          { count:1029, revenue:2925500 }],
+    ["Basic Membership — 7 Day $1 Trial",                         { count:1045, revenue:2183490 }],
+    ["Premium Membership",                                        { count:218,  revenue:1024130 }],
+    ["Bundled / multi-item orders",                               { count:257,  revenue:900600  }],
+    ["Annual Premium Membership",                                 { count:5,    revenue:206800  }],
+    ["Annual Standard Membership",                                { count:7,    revenue:192900  }],
+    ["27 Musicians Pro Musicians Bundle Pack",                    { count:40,   revenue:108000  }],
+    ["Single Course - Dan's Signature Sounds",                    { count:21,   revenue:85500   }],
+    ["Master Beginner Fundamentals in 4 Days",                    { count:13,   revenue:27000   }],
+    ["April 2026 Monthly Focus Bundle",                           { count:9,    revenue:24300   }],
+    ["Play Like Them: MIDI File Bundle 🎹🔥",                      { count:7,    revenue:18900   }],
+    ["Learn Lucas's Chords: I Will Bless the Lord [Tutorial + Download]", { count:2, revenue:5000 }],
+    ["Dan's Signature Sounds - Logic Sessions Pack",              { count:4,    revenue:3330    }],
+    ["Get the Drop 2 Practice Files and Charts!",                 { count:22,   revenue:2190    }],
+    ["Hear Any Chord — Free Ear Training Chart",                  { count:263,  revenue:0       }],
+    ["Tutorial for Take 6 Song - Let the Words of My Mouth",      { count:9,    revenue:0       }],
+    ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",     { count:6,    revenue:0       }],
   ],
+  recentOrders: [
+    { id: "87e1d28f-1b10-41b5-a0d2-c448837bb586", number: "901E767F", created_at: "2026-06-21T01:13Z", status: "paid", amount: 2900 },
+    { id: "ce092bde-95db-4359-99e8-4b5d9d786b8c", number: "7471C7FF", created_at: "2026-06-21T00:05Z", status: "paid", amount: 2900 },
+    { id: "528fe306-e0ee-4e69-8ca1-0696aa5d62a5", number: "3D444FE1", created_at: "2026-06-20T22:50Z", status: "paid", amount: 3900 },
+    { id: "8a42529a-4867-450e-8504-5599edb7da93", number: "D9072458", created_at: "2026-06-20T21:47Z", status: "paid", amount: 2900 },
+    { id: "3ea59eea-c9ce-41bd-81f9-330c23b2997a", number: "430C6100", created_at: "2026-06-20T14:08Z", status: "paid", amount: 3000 },
+    { id: "c4e8559b-e38b-4fe4-be41-ad125148c300", number: "939EAA49", created_at: "2026-06-20T14:07Z", status: "paid", amount: 2900 },
+    { id: "724f1540-f6c4-4b39-ba31-aaff8f3e6580", number: "048EA509", created_at: "2026-06-20T09:17Z", status: "paid", amount: 2900 },
+    { id: "06166313-8d24-46c2-9c8d-267296d9fb2b", number: "05206213", created_at: "2026-06-20T06:49Z", status: "paid", amount: 4700 },
+  ],
+  lastFetched: "2026-06-21T02:38:01Z",
   byProductPeriod: {
     daily: [
-      ["Basic Membership — 7 Day $1 Trial", { count: 1, revenue: 100 }],
-      ["Basic Membership", { count: 4, revenue: 11600 }],
-      ["Premium Membership", { count: 1, revenue: 4700 }]
+      // Jun 20 — verified against the raw 11-order list (UUID/timestamp/amount per order),
+      // not a Cowork aggregate pull. Combo order 3D444FE1 (base + bump) bucketed as
+      // "Bundled / multi-item orders" per the convention used elsewhere in this block.
+      ["Basic Membership — 7 Day $1 Trial",                       { count:9,  revenue:26200 }],
+      ["Bundled / multi-item orders",                             { count:1,  revenue:3900  }],
+      ["Premium Membership",                                      { count:1,  revenue:4700  }],
     ],
+    // weekly/monthly/ytd below: STALE, carried forward — see stats.week/.month/.ytd notes above.
+    // "Master Beginner Fundamentals in 4 Days" was missing entirely from this array
+    // (not zero — absent as a key), which made the dashboard show "0 sales" for a
+    // page with 3.5k weekly views. Patched 2026-06-21 directly from Airtable Daily
+    // Product Stats (Jun 15 + Jun 17 + Jun 20 rows — Jun 19 has no Airtable rows at
+    // all yet, so this is a 6-of-7-day figure, not a true full week).
     weekly: [
-      ["Basic Membership — 7 Day $1 Trial", { count: 8, revenue: 800 }],
-      ["Basic Membership", { count: 14, revenue: 40600 }],
-      ["Premium Membership", { count: 3, revenue: 14100 }],
-      ["Annual Standard Membership", { count: 2, revenue: 14000 }],
-      ["Annual Premium Membership", { count: 1, revenue: 10000 }],
-      ["Master Beginner Fundamentals in 4 Days", { count: 1, revenue: 2500 }]
+      ["Basic Membership",                                        { count:45, revenue:129100 }],
+      ["Basic Membership — 7 Day $1 Trial",                       { count:38, revenue:87900  }],
+      ["Bundled / multi-item orders",                             { count:11, revenue:36300  }],
+      ["Premium Membership",                                      { count:5,  revenue:23500  }],
+      ["Master Beginner Fundamentals in 4 Days",                  { count:3,  revenue:8100   }],
+      ["Get the Drop 2 Practice Files and Charts!",                { count:1,  revenue:100    }],
+      ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",    { count:2,  revenue:0      }],
+      ["Hear Any Chord — Free Ear Training Chart",                { count:1,  revenue:0      }],
+    ],
+    monthly: [
+      ["Basic Membership — 7 Day $1 Trial",                       { count:210, revenue:469600 }],
+      ["Basic Membership",                                        { count:142, revenue:403200 }],
+      ["Premium Membership",                                      { count:32,  revenue:150400 }],
+      ["Bundled / multi-item orders",                             { count:27,  revenue:85400  }],
+      ["Annual Standard Membership",                               { count:2,  revenue:48600  }],
+      ["Master Beginner Fundamentals in 4 Days",                  { count:4,   revenue:10800  }],
+      ["Learn Lucas's Chords: I Will Bless the Lord [Tutorial + Download]", { count:1, revenue:2500 }],
+      ["Single Course - Dan's Signature Sounds",                  { count:1,   revenue:2500   }],
+      ["Dan's Signature Sounds - Logic Sessions Pack",            { count:2,   revenue:1710   }],
+      ["Get the Drop 2 Practice Files and Charts!",               { count:2,   revenue:200    }],
+      ["Hear Any Chord — Free Ear Training Chart",                { count:120, revenue:0      }],
+      ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",   { count:2,   revenue:0      }],
+      ["Tutorial for Take 6 Song - Let the Words of My Mouth",    { count:1,   revenue:0      }],
     ],
     ytd: [
-      ["Basic Membership — 7 Day $1 Trial", { count: 91, revenue: 9100 }],
-      ["Basic Membership", { count: 207, revenue: 600100 }],
-      ["Premium Membership", { count: 48, revenue: 225600 }],
-      ["Annual Standard Membership", { count: 32, revenue: 223400 }],
-      ["Annual Premium Membership", { count: 22, revenue: 220000 }],
-      ["Master Beginner Fundamentals in 4 Days", { count: 12, revenue: 29900 }],
-      ["27 Musicians Pro Musicians Bundle Pack", { count: 9, revenue: 11100 }]
-    ]
+      ["Basic Membership",                                        { count:1029, revenue:2925500 }],
+      ["Basic Membership — 7 Day $1 Trial",                       { count:1045, revenue:2183490 }],
+      ["Premium Membership",                                      { count:218,  revenue:1024130 }],
+      ["Bundled / multi-item orders",                             { count:257,  revenue:900600  }],
+      ["Annual Premium Membership",                               { count:5,    revenue:206800  }],
+      ["Annual Standard Membership",                              { count:7,    revenue:192900  }],
+      ["27 Musicians Pro Musicians Bundle Pack",                  { count:40,   revenue:108000  }],
+      ["Single Course - Dan's Signature Sounds",                  { count:21,   revenue:85500   }],
+      ["Master Beginner Fundamentals in 4 Days",                  { count:13,   revenue:27000   }],
+      ["April 2026 Monthly Focus Bundle",                         { count:9,    revenue:24300   }],
+      ["Play Like Them: MIDI File Bundle 🎹🔥",                    { count:7,    revenue:18900   }],
+      ["Learn Lucas's Chords: I Will Bless the Lord [Tutorial + Download]", { count:2, revenue:5000 }],
+      ["Dan's Signature Sounds - Logic Sessions Pack",            { count:4,    revenue:3330    }],
+      ["Get the Drop 2 Practice Files and Charts!",               { count:22,   revenue:2190    }],
+      ["Hear Any Chord — Free Ear Training Chart",                { count:263,  revenue:0       }],
+      ["Tutorial for Take 6 Song - Let the Words of My Mouth",    { count:9,    revenue:0       }],
+      ["Jesus Loves Me by Joy Bloom Piano Sheet and Midi File",   { count:6,    revenue:0       }],
+    ],
   },
-  recentOrders: [
-    { id: "724f1540-f6c4-4b39-ba31-aaff8f3e6580", number: "048EA509", created_at: "2026-06-20 05:17", status: "paid", amount: 2900 },
-    { id: "06166313-8d24-46c2-9c8d-267296d9fb2b", number: "05206213", created_at: "2026-06-20 02:49", status: "paid", amount: 2900 },
-    { id: "8f9463a7-9f18-41dd-acb5-41541e498bf9", number: "F622E0BA", created_at: "2026-06-20 02:20", status: "paid", amount: 12000 },
-    { id: "b93dbbd8-0b5f-4c57-b1a5-7fc0bcea4b84", number: "86A0823F", created_at: "2026-06-20 01:27", status: "paid", amount: 2900 },
-    { id: "b76fd8c6-c102-4390-a397-c82b5f0a1d93", number: "82DE4A83", created_at: "2026-06-20 00:15", status: "paid", amount: 2900 },
-    { id: "d26ed337-57e4-47bb-aba9-3b79037ce97a", number: "B12AA7BE", created_at: "2026-06-19 23:38", status: "paid", amount: 2900 },
-    { id: "e2a63288-08c3-455a-9c78-d25fa04f6361", number: "95CB2D8D", created_at: "2026-06-19 20:55", status: "paid", amount: 4800 },
-    { id: "88a86dd8-9154-4e10-bec8-9694b27747f8", number: "21AFFA65", created_at: "2026-06-19 19:46", status: "paid", amount: 29900 }
-  ],
-  lastFetched: "Jun 20, 7:30 AM",
   growth: {
-    week: { newSignups: 8, newRevenue: 80000, renewals: 23, renewalRevenue: 9600, totalRevenue: 89600 },
-    month: { newSignups: 24, newRevenue: 240000, renewals: 84, renewalRevenue: 88500, totalRevenue: 328500 },
-    ytd: { newSignups: 91, newRevenue: 910000, renewals: 327, renewalRevenue: 192700, totalRevenue: 1102700 },
+    week:  { newSignups:6,   newRevenue:13600,   renewals:113, renewalRevenue:244500, totalRevenue:258100  },
+    month: { newSignups:52,  newRevenue:147400,  renewals:670, renewalRevenue:1118610, totalRevenue:1266010 },
+    ytd:   { newSignups:215, newRevenue:619900,  renewals:2572, renewalRevenue:6458440, totalRevenue:7078340 },
     monthlyNewSignups: [
-      { month: "Jan", count: 15 },
-      { month: "Feb", count: 18 },
-      { month: "Mar", count: 20 },
-      { month: "Apr", count: 16 },
-      { month: "May", count: 22 },
-      { month: "Jun", count: 19, partial: true }
-    ]
-  }
+      { month:"Jan", count:39 },
+      { month:"Feb", count:38 },
+      { month:"Mar", count:38 },
+      { month:"Apr", count:37 },
+      { month:"May", count:57 },
+      { month:"Jun", count:6, partial:true },
+    ],
+  },
 };
-const LAST_UPDATED = "Jun 20, 7:30 AM";
+const PREV_PERIOD = {
+  "/join-for-1-today/":              { pageviews:341, uniques:151 },
+  "/join-membership-today/":         { pageviews:161, uniques:68  },
+  "/4-week-beginner-sales-page/":    { pageviews:4199, uniques:339 },
+  "/4-day-beginner-checkout/":       { pageviews:3193, uniques:240 },
+  "/standard-checkout-page/":        { pageviews:0,   uniques:0   },
+  "/premium-checkout-page/":         { pageviews:0,   uniques:0   },
+  "/annual-standard-checkout-page/": { pageviews:0,   uniques:0   },
+  "/annual-premium-checkout-page/":  { pageviews:0,   uniques:0   },
+  "/hear-any-chord/":                { pageviews:0,   uniques:0   },
+  "/our-roadmap-offer/":             { pageviews:62,  uniques:16  },
+  "/major-vs-minor-quiz/":           { pageviews:104, uniques:29  },
+  "/scales-charts/":                 { pageviews:72,  uniques:17  },
+  "/dans-signature-sounds/":         { pageviews:84,  uniques:20  },
+  "/drop-2-exercise-download-page/": { pageviews:0,   uniques:0   },
+};
+const SPIKE_REFERRERS = {
+};
+const SC_PREV_30 = {
+  // Apr 20–May 19 (the 30 days immediately before the current SC_DATA.stats.month window).
+  "Basic Membership":                          { count:167, revenue:474700 },
+  "Basic Membership — 7 Day $1 Trial":         { count:200, revenue:423590 },
+  "Premium Membership":                        { count:32,  revenue:150400 },
+  "Bundled / multi-item orders":               { count:32,  revenue:145300 },
+  "Annual Premium Membership":                 { count:2,   revenue:79900  },
+  "Annual Standard Membership":                { count:1,   revenue:29000  },
+  "Master Beginner Fundamentals in 4 Days":    { count:6,   revenue:16200  },
+  "27 Musicians Pro Musicians Bundle Pack":    { count:4,   revenue:10800  },
+  "Single Course - Dan's Signature Sounds":   { count:2,   revenue:7200   },
+  "Learn Lucas's Chords: I Will Bless the Lord [Tutorial + Download]": { count:1, revenue:2500 },
+  "Dan's Signature Sounds - Logic Sessions Pack": { count:2, revenue:1620 },
+  "Get the Drop 2 Practice Files and Charts!": { count:3,   revenue:300    },
+  "Hear Any Chord — Free Ear Training Chart": { count:143, revenue:0      },
+  "Jesus Loves Me by Joy Bloom Piano Sheet and Midi File": { count:4, revenue:0 },
+  "Tutorial for Take 6 Song - Let the Words of My Mouth": { count:2, revenue:0 },
+};
+const LAST_UPDATED = "Jun 21, 2:56 PM";
 // [DASHBOARD-DATA-END]
-
 
 // [FUNNEL-CHAINS-START]
 // FUNNEL_CHAINS — from Airtable "Funnel Chains" table (tbl7QFUxVZHuSy6e4).
@@ -532,11 +605,11 @@ const FUNNEL_CHAINS = [
   { parent:"April Focus Guide", slug:"/april-focus-bundle-2026/",
     bumps:[], upsells:[],
     analysis:"No traffic or sales this week — likely past its promotional window. Consider retiring the page or repurposing for the next monthly focus guide." },
-  { parent:"Dan's Signature Sounds", slug:"/dans-signature-sounds/",
+  { parent:"Single Course - Dan's Signature Sounds", slug:"/dans-signature-sounds/",
     bumps:[ { name:"Dan's Signature Sounds - Logic Sessions Pack", price:null, accepted:0, offers:16 } ],
     upsells:[],
     analysis:"1 sale this week from a high-intent page (avg time on page over 10 minutes) — but that sale was a standalone purchase, not via the bump (0 of 16 bump offers accepted per SureCart this week)." },
-  { parent:"Mediant Drop 2 Exercise", slug:"/drop-2-exercise-download-page/",
+  { parent:"Get the Drop 2 Practice Files and Charts!", slug:"/drop-2-exercise-download-page/",
     bumps:[], upsells:[],
     analysis:"Quiet this week — no views or sales. This $1 exercise has historically had your highest bump conversion rate; worth a traffic push (ManyChat keyword 'mediant') to re-test." },
   { parent:"Piano Blueprint Session", slug:"/break",
@@ -559,9 +632,9 @@ const TRACKED = [
   { name:"Beginner Practice Plan",   slug:null,                              type:"Product",      price:12,  cat:"checkout", sc_product:"Beginner Practice Plan - for 4 Songs"               },
   { name:"27 MIDI File Bundle",      slug:"/27musicians/",                   type:"Product",      price:27,  cat:"sales",    sc_product:"27 MIDI File Bundle"                                 },
   { name:"April Focus Guide",        slug:"/april-focus-bundle-2026/",       type:"Product",      price:27,  cat:"sales",    sc_product:"April Focus Guide"                                   },
-  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Dan's Signature Sounds"                              },
+  { name:"Dan's Signature Sounds",   slug:"/dans-signature-sounds/",         type:"Product",      price:47,  cat:"sales",    sc_product:"Single Course - Dan's Signature Sounds"              },
   { name:"Piano Blueprint Session",  slug:"/break",                          type:"Coaching",     price:297, cat:"sales",    sc_product:"Piano Blueprint Session"                             },
-  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Mediant Drop 2"                                      },
+  { name:"Mediant Drop 2 ($1)",      slug:"/drop-2-exercise-download-page/", type:"Product",      price:1,   cat:"checkout", sc_product:"Get the Drop 2 Practice Files and Charts!"           },
   { name:"Ear Chart Lead Magnet",    slug:"/hear-any-chord/",                type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Scales Charts",            slug:"/scales-charts/",                 type:"Lead Magnet",  price:0,   cat:"lead"                                             },
   { name:"Roadmap Lead",             slug:"/our-roadmap-offer/",             type:"Lead Magnet",  price:0,   cat:"lead"                                             },
@@ -687,15 +760,18 @@ function renderAlerts() {
     });
   }
 
-  // Sales spikes — this week vs prior week (both from Airtable)
-  if (SC_DATA?.byProductPeriod?.weekly && SC_PREV_WEEK && Object.keys(SC_PREV_WEEK).length > 0) {
-    SC_DATA.byProductPeriod.weekly.forEach(([name, data]) => {
-      const prev = SC_PREV_WEEK[name];
-      if (!prev || prev.count < 3) return;
+  // Sales spikes vs prior 30 days
+  // NOTE: must use byProductPeriod.monthly (current-month-to-date per product),
+  // not byProduct (YTD cumulative) — comparing a YTD total against a single
+  // 30-day baseline produced nonsensical "500%+ this month" alerts.
+  if (SC_DATA?.byProductPeriod?.monthly && SC_PREV_30) {
+    SC_DATA.byProductPeriod.monthly.forEach(([name, data]) => {
+      const prev = SC_PREV_30[name];
+      if (!prev || prev.count < 5) return;
       const ratio = data.count / prev.count;
       if (ratio >= 1.5) {
         const pct = Math.round((ratio - 1) * 100);
-        alerts.push({ type:"positive", msg:`💰 ${name}: ${data.count} sales this week — ${pct}% above prior week (${prev.count}). Something is converting better. Find it and repeat it.` });
+        alerts.push({ type:"positive", msg:`💰 ${name}: ${data.count} sales this month — ${pct}% above prior month (${prev.count}). Something is converting better. Find it and repeat it.` });
       }
     });
   }
@@ -706,7 +782,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const failed = SC_DATA.recentOrders.filter(o => o.status==="failed" || o.status==="past_due");
     failed.forEach(o => {
-      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"warning", msg:`⚠️ Failed payment: Order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Check dunning sequence.` });
     });
   }
@@ -715,7 +791,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const highValue = SC_DATA.recentOrders.filter(o => o.status==="paid" && o.amount >= 29700);
     highValue.forEach(o => {
-      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"action", msg:`🔔 High-value order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Confirm session is scheduled with customer.` });
     });
   }
@@ -967,6 +1043,8 @@ function renderSales() {
   }
   const tot = SITE_TOTALS[currentPeriod] || {};
   const scKPIs = [
+    { label:"Pageviews",        value:fmt(tot.pageviews), sub:dateRange, color:"#3b82f6" },
+    { label:"Unique Visitors",  value:fmt(tot.uniques),   sub:dateRange, color:"#8b5cf6" },
     pageKpi("$1 Trial Page Views",       "/join-for-1-today/",            "Basic Membership — 7 Day $1 Trial",      "#E8472A"),
     pageKpi("Beginner Course Page Views","/4-week-beginner-sales-page/",  "Master Beginner Fundamentals in 4 Days", "#f59e0b"),
     pageKpi("Standard Membership Sales", "/standard-checkout-page/",      "Basic Membership",                       "#3b82f6"),
@@ -1001,9 +1079,6 @@ function renderSales() {
     const convStr = fmtConv(conv);
     const entry = findRow(page.sc_product);
     const salesStr = entry ? `${fmtUSD(entry[1].revenue)} · ${entry[1].count}×` : "$0 · 0×";
-    const renewalNote = (page.recurring && views === 0 && entry && entry[1].count > 0)
-      ? `<div style="font-size:10px;color:var(--dim);margin-top:3px">↻ auto-renew charges — members don't visit checkout page</div>`
-      : "";
     return `<div class="product-row">
       <div class="product-meta">
         <span class="product-name">${page.name}</span>
@@ -1011,7 +1086,6 @@ function renderSales() {
         <span class="conv-pill ${convClass(conv)}" style="font-size:10px;margin-left:6px">${convStr}</span>
         <span class="product-rev" style="margin-left:auto">${salesStr}</span>
       </div>
-      ${renewalNote}
       ${bumpBadges(page.sc_product)}
     </div>`;
   }
@@ -1029,7 +1103,7 @@ function renderSales() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px">
         <!-- New Signups -->
         <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 14px">
-          <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🟢 New Members</div>
+          <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🟢 New Signups (paid, first charge)</div>
           <div style="font-size:24px;font-weight:800;color:var(--green);letter-spacing:-.02em">${g.newSignups}</div>
           <div style="font-size:13px;font-weight:700;color:var(--green);margin-top:2px">${fmtUSD(g.newRevenue)}</div>
           <div style="font-size:11px;color:var(--dim);margin-top:3px">${newPct}% of revenue</div>
@@ -1048,7 +1122,7 @@ function renderSales() {
         <div style="width:${renBar}%;background:#3b82f6;transition:width .7s ease"></div>
       </div>
       <div style="display:flex;gap:16px;font-size:11px;color:var(--dim)">
-        <span><span style="color:var(--green);font-weight:700">■</span> New member revenue</span>
+        <span><span style="color:var(--green);font-weight:700">■</span> New signup revenue</span>
         <span><span style="color:var(--blue);font-weight:700">■</span> Renewal revenue</span>
       </div>`;
   }
@@ -1058,7 +1132,7 @@ function renderSales() {
   const maxSignups = Math.max(1,...monthlyTrend.map(m=>m.count));
   const trendChart = monthlyTrend.length ? `
     <div class="section-card">
-      <div class="section-head"><span>New Members by Month — 2026</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
+      <div class="section-head"><span>New Signups by Month — 2026</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
       <div style="padding:16px 16px 8px;display:flex;align-items:flex-end;gap:10px;height:110px">
         ${monthlyTrend.map(m=>{
           const h = Math.max(6,(m.count/maxSignups)*80);
@@ -1091,10 +1165,10 @@ function renderSales() {
         </div>`).join("")}
     </div>
 
-    <!-- New Members vs Renewals -->
+    <!-- New Signups vs Renewals -->
     <div class="section-card">
       <div class="section-head">
-        <span>New Members vs Renewals</span>
+        <span>New Signups vs Renewals</span>
         <span style="font-weight:400;font-size:10px">your growth signal</span>
       </div>
       <div style="padding:14px 16px">
