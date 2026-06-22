@@ -277,15 +277,16 @@ Prior Week fields: copy from previous week's rollup record for same product.
 
 ---
 
-## Step 2 — Build SC_DATA.byProductPeriod and SC_PREV_WEEK from Airtable
+## Step 2 — Build SC_DATA.byProductPeriod and SC_PREV_30 from Airtable
 
-After writing to Airtable, query Daily Product Stats to build period-matched revenue and the prior-week comparison baseline.
+After writing to Airtable, query Daily Product Stats to build period-matched revenue and the prior-month comparison baseline. All comparison data comes from Airtable — never use SureCart for SC_PREV_30.
 
-### 2A — byProductPeriod (3 queries)
+### 2A — byProductPeriod (4 queries)
 
 Query for each window using yesterday as the end date:
 - **daily:** Date = yesterday
 - **weekly:** Date >= 7 days ago AND <= yesterday
+- **monthly:** Date >= first day of current calendar month AND <= yesterday
 - **ytd:** Date >= 2026-01-01 AND <= yesterday
 
 Sum Orders and Revenue per Product Name for each window.
@@ -298,6 +299,7 @@ SC_DATA.byProductPeriod = {
     ...
   ],
   weekly: [ ... ],
+  monthly: [ ... ],   // current calendar month to yesterday
   ytd: [ ... ],
 };
 ```
@@ -308,22 +310,14 @@ If a product has no Airtable records for a period → omit it. Dashboard shows "
 
 **Product names to include when present:** alongside the existing products, also check for and include `Premium Membership`, `Annual Standard Membership`, and `Annual Premium Membership` in `byProductPeriod` — these are now tracked on the dashboard (Recurring Subscriptions section + Funnel tab) and will show "N/A" if missing for periods where they had no orders.
 
-### 2B — SC_PREV_WEEK (1 query, Airtable-only)
+### 2B — SC_PREV_30 (prior-month baseline, Airtable-only)
 
-Query Daily Product Stats for the **prior 7-day window** (8 days ago to 14 days ago inclusive). Sum Orders per Product Name.
+The dashboard alert engine compares `byProductPeriod.monthly` against `SC_PREV_30` to detect sales spikes. Populate from Airtable only — never SureCart.
 
-Build:
-```js
-const SC_PREV_WEEK = {
-  "Basic Membership — 7 Day $1 Trial": { count: N, revenue: N },  // revenue in CENTS
-  "Basic Membership": { count: N, revenue: N },
-  // ... one key per product that had orders in that prior window
-};
-```
+- Query Daily Product Stats for the **prior full calendar month** (e.g., for June, query May 1–May 31). Sum Orders and Revenue per Product Name.
+- Build: `SC_PREV_30 = { "Product Name": { count: N, revenue: N }, ... }` (revenue in CENTS)
 
-This is used by the dashboard alert engine to detect week-over-week sales spikes — it compares `byProductPeriod.weekly` (current week) against `SC_PREV_WEEK` (prior week). Both windows come from Airtable, so the comparison is apples-to-apples.
-
-**If the prior-week window returns no records** (e.g., Airtable data starts later than 14 days ago), write `SC_PREV_WEEK = {}`. The alert engine checks `Object.keys(SC_PREV_WEEK).length > 0` before firing any sales alerts — an empty object silently suppresses them, which is correct.
+**If Airtable has no data for the prior month** (Airtable tracking started June 1, so May has no rows), write `SC_PREV_30 = {}`. The alert engine's `if (!prev || prev.count < 5) return` guard exits early on undefined keys — an empty object silently suppresses sales alerts. This is correct. Do NOT fall back to SureCart for this field; SureCart-sourced SC_PREV_30 was the root cause of the false 1029/1045 spike alerts.
 
 ---
 
@@ -349,7 +343,7 @@ const PREV_PERIOD    = { /* prior 7-day per pathname for spike detection */ };
 const SPIKE_REFERRERS = { /* from Step 1A Call 7 — only for pages that spiked this week */
   // "/dans-signature-sounds/": [{ source:"youtube: video-title-utm", views:45 }],
 };
-const SC_PREV_WEEK   = { /* prior 7-day per product from Airtable (Step 2B) — for week-over-week spike detection */ };
+const SC_PREV_30     = { /* prior full calendar month per product from Airtable (Step 2B) — for month-over-month spike detection. {} when prior month has no Airtable data yet. */ };
 const SC_DATA = {
   stats: {
     today:  { count: N, revenue: N },   // revenue in CENTS
@@ -359,9 +353,10 @@ const SC_DATA = {
   },
   byProduct: [ ["Product Name", {count:N, revenue:N}], ... ],  // same as byProductPeriod.ytd below (Airtable cumulative-to-date), CENTS
   byProductPeriod: {
-    daily:  [ ["Product Name", {count:N, revenue:N}], ... ],   // CENTS
-    weekly: [ ... ],
-    ytd:    [ ... ],
+    daily:   [ ["Product Name", {count:N, revenue:N}], ... ],  // CENTS
+    weekly:  [ ... ],
+    monthly: [ ... ],  // current calendar month to yesterday
+    ytd:     [ ... ],
   },
   recentOrders: [ {id, number, created_at, status, amount}, ... ],  // amount CENTS
   lastFetched: "Jun 8, 7:32 AM",
@@ -424,7 +419,7 @@ let this happen again.**
 Before running Step 5, run:
 
 ```bash
-grep -c -E "^const (FATHOM_DAILY|FATHOM_WEEKLY|FATHOM_YTD|SITE_TOTALS|MONTHLY|PREV_PERIOD|SPIKE_REFERRERS|SC_PREV_WEEK|SC_DATA|LAST_UPDATED)\b" ~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html
+grep -c -E "^const (FATHOM_DAILY|FATHOM_WEEKLY|FATHOM_YTD|SITE_TOTALS|MONTHLY|PREV_PERIOD|SPIKE_REFERRERS|SC_PREV_30|SC_DATA|LAST_UPDATED)\b" ~/Documents/Claude/Artifacts/swp-performance-dashboard/index.html
 ```
 
 This should report **10** (one per required `const`). Also confirm each of
@@ -455,7 +450,7 @@ If this errors, treat it the same as a missing-structure failure above.
 **This check exists because the 2026-06-15 run hit a transient SureCart outage
 and wrote a data block that PASSED Step 4.5 (all required `const`s present,
 file parses) but had `SC_DATA.stats`, `byProduct`, `byProductPeriod`,
-`recentOrders` amounts, `growth`, `PREV_PERIOD`, and `SC_PREV_WEEK` all nulled
+`recentOrders` amounts, `growth`, `PREV_PERIOD`, and `SC_PREV_30` all nulled
 out or emptied. Step 4.5 catches missing structures; this step catches
 degraded *values* inside structures that are present.**
 
@@ -476,7 +471,7 @@ value you just wrote:
 - `SC_DATA.recentOrders` — count of entries with non-null `amount`
 - `SC_DATA.growth.{week,month,ytd}.*`
 - `PREV_PERIOD` — count of pathnames with non-zero `pageviews`
-- `SC_PREV_WEEK` (object key count — may be `{}` early in the dataset when <14 days of Airtable data exist; only flag if it was previously non-empty and is now empty)
+- `SC_PREV_30` (object key count — may legitimately be `{}` when Airtable has no prior-month data yet; only flag DEGRADED if it was previously non-empty and is now empty)
 
 **Flag as DEGRADED** if the LIVE value was real (non-null, non-zero,
 non-empty) and the NEW value is `null`, `0`, `[]`, or `{}` for the SAME field.
@@ -571,7 +566,7 @@ Inject into morning briefing HTML (slot: `dashboard-summary`):
 |---|---|
 | Fathom returns no data for a pathname | Set entry to `{pageviews:0, uniques:0, avg_duration:0, bounce_rate:0}` |
 | Fathom `get-aggregation` response too large / call errors out | `limit:25` (already set in Calls 1-3,6) should keep responses well under the ~21 tracked pathnames. If a call still fails, split it into two calls covering different pathname groups (e.g. checkout pages vs. content/lead-magnet pages) using `filters: [{property:"pathname", operator:"is", value:"..."}]` per group — do NOT drop tracked pathnames or fall back to manual/Python workarounds, and do NOT skip Step 5 because of this. |
-| SureCart (or Airtable Daily Product Stats) unavailable mid-run | Do NOT null out or empty `SC_DATA` fields, `PREV_PERIOD`, `SC_PREV_WEEK`, or `byProductPeriod`. Carry forward the ENTIRE previous run's values for these structures unchanged (1-day-stale is fine and far better than nulls — the dashboard has no "pending" state and renders `null`/`[]`/`{}` as broken/empty). Still inject the Fathom-derived fields normally and update `LAST_UPDATED`. Note in the run summary which sections are stale so Sean can re-run later when the source is back up. |
+| SureCart (or Airtable Daily Product Stats) unavailable mid-run | Do NOT null out or empty `SC_DATA` fields, `PREV_PERIOD`, `SC_PREV_30`, or `byProductPeriod`. Carry forward the ENTIRE previous run's values for these structures unchanged (1-day-stale is fine and far better than nulls — the dashboard has no "pending" state and renders `null`/`[]`/`{}` as broken/empty). Still inject the Fathom-derived fields normally and update `LAST_UPDATED`. Note in the run summary which sections are stale so Sean can re-run later when the source is back up. |
 | Airtable write fails | Log error, report to Sean, do not block dashboard inject |
 | Growth query fails (non-Sunday) | Carry forward previous growth block unchanged |
 | Revenue from SureCart in dollars | Multiply × 100 before storing in SC_DATA |
