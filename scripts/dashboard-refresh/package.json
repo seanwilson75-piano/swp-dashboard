@@ -1,0 +1,13 @@
+{
+  "name": "swp-dashboard-refresh",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Deterministic daily refresh for the SWP performance dashboard. Replaces the agent-driven Cowork skill — see /Users/jameswilson/.claude/plans/concurrent-twirling-snail.md for why.",
+  "scripts": {
+    "refresh": "node index.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
