@@ -1,0 +1,54 @@
+name: Dashboard Refresh
+
+# Phase 1 of rollout: workflow_dispatch ONLY. Do not add a `schedule:` trigger
+# until at least two clean manual runs have been confirmed end-to-end (secrets,
+# permissions, commit/push all working in the Actions sandbox) — see the build
+# plan at /Users/jameswilson/.claude/plans/concurrent-twirling-snail.md.
+#
+# Once confirmed, add:
+# on:
+#   schedule:
+#     - cron: "30 11 * * *"   # ~7:30am ET (drifts to 6:30am ET / EDT-EST around DST)
+#   workflow_dispatch:
+#     inputs:
+#       date:
+#         description: "Override the 'yesterday' date to refresh (YYYY-MM-DD). Leave blank for actual yesterday."
+#         required: false
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Override the 'yesterday' date to refresh (YYYY-MM-DD). Leave blank for actual yesterday."
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run dashboard refresh
+        working-directory: scripts/dashboard-refresh
+        env:
+          FATHOM_API_TOKEN: ${{ secrets.FATHOM_API_TOKEN }}
+          SURECART_API_KEY: ${{ secrets.SURECART_API_KEY }}
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          GIT_AUTHOR_NAME: "SWP Dashboard Bot"
+          GIT_AUTHOR_EMAIL: "actions@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "SWP Dashboard Bot"
+          GIT_COMMITTER_EMAIL: "actions@users.noreply.github.com"
+        run: |
+          DATE_ARG=""
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            DATE_ARG="--date=${{ github.event.inputs.date }}"
+          fi
+          node index.mjs $DATE_ARG
