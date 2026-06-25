@@ -1,20 +1,13 @@
 name: Dashboard Refresh
 
-# Phase 1 of rollout: workflow_dispatch ONLY. Do not add a `schedule:` trigger
-# until at least two clean manual runs have been confirmed end-to-end (secrets,
-# permissions, commit/push all working in the Actions sandbox) — see the build
-# plan at /Users/jameswilson/.claude/plans/concurrent-twirling-snail.md.
-#
-# Once confirmed, add:
-# on:
-#   schedule:
-#     - cron: "30 11 * * *"   # ~7:30am ET (drifts to 6:30am ET / EDT-EST around DST)
-#   workflow_dispatch:
-#     inputs:
-#       date:
-#         description: "Override the 'yesterday' date to refresh (YYYY-MM-DD). Leave blank for actual yesterday."
-#         required: false
+# Phase 2 of rollout: schedule enabled 2026-06-24/25 after two clean
+# workflow_dispatch runs in the cloud confirmed secrets, permissions, and
+# commit/push all worked (runs 28170702686, 28170768025). See build plan at
+# /Users/jameswilson/.claude/plans/concurrent-twirling-snail.md.
+
 on:
+  schedule:
+    - cron: "30 11 * * *"   # ~7:30am ET (drifts to 6:30am ET / EDT-EST around DST)
   workflow_dispatch:
     inputs:
       date:
