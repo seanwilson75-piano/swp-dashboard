@@ -23,6 +23,7 @@ export const TRACKED_PATHNAMES = [
   "/scales-charts/",
   "/our-roadmap-offer/",
   "/major-vs-minor-quiz/",
+  "/half-dim-locrian-arpeggio-download-page/",
   "/available-to-you/",
   "/new-1trial-registration-page/",
   "/27-bundle-waitlist/",
@@ -42,6 +43,7 @@ export const PRODUCTS = {
   "Dan's Signature Sounds": { type: "Product", slug: "/dans-signature-sounds/" },
   "Piano Blueprint Session": { type: "Coaching", slug: "/break" },
   "Mediant Drop 2 Exercise": { type: "Product", slug: "/drop-2-exercise-download-page/" },
+  "Get the Half-Diminished Exercises": { type: "Product", slug: "/half-dim-locrian-arpeggio-download-page/" },
   "Hear Any Chord — Free Ear Training Chart": { type: "Lead Magnet", slug: "/hear-any-chord/" },
   "Roadmap Lead": { type: "Lead Magnet", slug: "/our-roadmap-offer/" },
   "Major vs Minor Quiz": { type: "Lead Magnet", slug: "/major-vs-minor-quiz/" },
@@ -60,6 +62,7 @@ export const BUMPS = {
   "Travis Sayles Organ Runs – Custom MIDI Transcription": "27 Musicians Pro Musicians Bundle Pack",
   "27 Musicians Guided Study Session": "27 Musicians Pro Musicians Bundle Pack",
   "Dan's Signature Sounds - Logic Sessions Pack": "Dan's Signature Sounds",
+  "Half-Diminished Arpeggio Companion Video(s)": "Get the Half-Diminished Exercises",
 };
 
 // SureCart bump line items are matched against this set by name. Per the

@@ -22,7 +22,7 @@ import { fetchFathomData } from "./fathom.mjs";
 import { fetchSureCartDailyBreakdown, fetchRecentPaidOrders } from "./surecart.mjs";
 import { upsertDailyProductStats, buildPeriodRollups } from "./airtable.mjs";
 import { injectDashboardData, runAnomalyCheck } from "./inject.mjs";
-import { PRODUCTS } from "./config.mjs";
+import { PRODUCTS, BUMPS } from "./config.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_DIR = path.resolve(__dirname, "..", "..");
@@ -129,6 +129,7 @@ async function main() {
       orders: sc.count,
       revenue: sc.revenue,
       parentOrders: sc.count,
+      ...(BUMPS[name] ? { parentProduct: BUMPS[name] } : {}),
     }));
   if (dryRun) {
     console.log("[refresh] DRY RUN — would upsert these Daily Product Stats rows (not written):");
