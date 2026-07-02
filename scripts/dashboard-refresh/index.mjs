@@ -180,6 +180,8 @@ async function main() {
     MONTHLY: fathom.MONTHLY,
     PREV_PERIOD: fathom.PREV_PERIOD,
     SPIKE_REFERRERS: fathom.SPIKE_REFERRERS,
+    DAILY_SOURCES: fathom.DAILY_SOURCES,
+    WEEKLY_SOURCES: fathom.WEEKLY_SOURCES,
     SC_PREV_30,
     SC_DATA,
     LAST_UPDATED: formatLastUpdated(new Date()),

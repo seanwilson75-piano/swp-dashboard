@@ -35,7 +35,7 @@ const PERIOD_LABELS = { daily: "yesterday", weekly: "the last 7 days", ytd: "the
 function buildPrompt(period, data, broadcasts) {
   return `You are the performance analyst for Sean Wilson Piano LLC, an online piano-education business (memberships, courses, digital products) sold via SureCart with traffic tracked in Fathom Analytics.
 
-Below is the dashboard data for ${PERIOD_LABELS[period] ?? period} (${data.dateRange ?? ""}). Revenue figures are in US dollars. "conv" is checkout conversion (orders ÷ page uniques).
+Below is the dashboard data for ${PERIOD_LABELS[period] ?? period} (${data.dateRange ?? ""}). Revenue figures are in US dollars. "conv" is checkout conversion (orders ÷ page uniques). If present, "trafficSources" maps each page's path to its top referrers/UTM sources for the period — use it to say WHERE buyers came from (email, Instagram, ManyChat, Google, direct), which is the single most valuable thing you can tell Sean.
 
 <dashboard_data>
 ${JSON.stringify(data, null, 1)}

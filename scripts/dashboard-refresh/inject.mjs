@@ -21,6 +21,8 @@ const REQUIRED_CONSTS = [
   "MONTHLY",
   "PREV_PERIOD",
   "SPIKE_REFERRERS",
+  "DAILY_SOURCES",
+  "WEEKLY_SOURCES",
   "SC_PREV_30",
   "SC_DATA",
   "LAST_UPDATED",
@@ -36,6 +38,8 @@ const SITE_TOTALS = ${j(data.SITE_TOTALS)};
 const MONTHLY = ${j(data.MONTHLY)};
 const PREV_PERIOD = ${j(data.PREV_PERIOD)};
 const SPIKE_REFERRERS = ${j(data.SPIKE_REFERRERS)};
+const DAILY_SOURCES = ${j(data.DAILY_SOURCES ?? {})};
+const WEEKLY_SOURCES = ${j(data.WEEKLY_SOURCES ?? {})};
 const SC_PREV_30 = ${j(data.SC_PREV_30)};
 const SC_DATA = ${j(data.SC_DATA)};
 const LAST_UPDATED = ${j(data.LAST_UPDATED)};

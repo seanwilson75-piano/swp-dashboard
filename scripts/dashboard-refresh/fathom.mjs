@@ -129,5 +129,37 @@ export async function fetchFathomData({ token, yesterday, sevenDaysAgo, fourteen
     });
   }
 
-  return { FATHOM_DAILY, FATHOM_WEEKLY, FATHOM_YTD, MONTHLY, SITE_TOTALS, PREV_PERIOD, SPIKE_REFERRERS };
+  // Traffic-source attribution: top referrers/UTMs per tracked page, for
+  // yesterday and for the 7-day window. This is what lets the on-page Claude
+  // summary answer "I got 12 trial sales — what drove them?" with actual
+  // source data instead of guesses.
+  const fetchSources = async (dateFrom, dateTo) => {
+    const rows = await callFathom(token, {
+      entity: "pageview",
+      entity_id: FATHOM_SITE_ID,
+      aggregates: "pageviews",
+      date_from: dateFrom,
+      date_to: dateTo,
+      field_grouping: "pathname,referrer_hostname,utm_source,utm_campaign",
+      sort_by: "pageviews:desc",
+      limit: 100,
+      timezone,
+    });
+    const map = {};
+    for (const row of rows) {
+      if (!TRACKED_PATHNAMES.includes(row.pathname)) continue;
+      let source;
+      if (row.utm_source && row.utm_campaign) source = `${row.utm_source}: ${row.utm_campaign}`;
+      else if (row.utm_source) source = row.utm_source;
+      else if (row.referrer_hostname) source = row.referrer_hostname;
+      else source = "direct/unknown";
+      (map[row.pathname] ??= []).push({ source, views: Number(row.pageviews ?? 0) });
+    }
+    for (const key of Object.keys(map)) map[key] = map[key].slice(0, 5);
+    return map;
+  };
+  const DAILY_SOURCES = await fetchSources(yesterday, yesterday);
+  const WEEKLY_SOURCES = await fetchSources(sevenDaysAgo, yesterday);
+
+  return { FATHOM_DAILY, FATHOM_WEEKLY, FATHOM_YTD, MONTHLY, SITE_TOTALS, PREV_PERIOD, SPIKE_REFERRERS, DAILY_SOURCES, WEEKLY_SOURCES };
 }
