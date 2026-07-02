@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/summary.mjs": { "maxDuration": 60 },
+    "api/refresh.mjs": { "maxDuration": 30 }
+  }
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -206,8 +206,43 @@
   .footer-left .f-sub { font-size: 11px; color: var(--faint); margin-top: 1px; }
   .footer-right { font-size: 10px; color: var(--dim); text-align: right; }
 
-  .tr-right { text-align: right; }
-  .tr-center { text-align: center; }
+  /* REFRESH BUTTON + TOAST */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .theme-btn.spinning { animation: spin 1.2s linear infinite; pointer-events: none; opacity: .7; }
+  .toast { position: fixed; bottom: 20px; right: 20px; max-width: 340px; z-index: 200;
+    background: var(--surface); border: 1px solid var(--border2); border-left: 3px solid var(--accent);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 14px;
+    font-size: 12px; line-height: 1.5; color: var(--text); display: none; }
+  .toast.error { border-left-color: var(--red); }
+  .toast.show { display: block; }
+
+  /* CLAUDE SUMMARY MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 100;
+    display: none; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.35); width: 100%; max-width: 640px; }
+  .modal-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px;
+    border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 14px; font-weight: 800; flex: 1; }
+  .modal-close { border: none; background: transparent; color: var(--dim); font-size: 20px;
+    cursor: pointer; line-height: 1; padding: 2px 6px; }
+  .modal-body { padding: 16px 20px; font-size: 13px; line-height: 1.65; max-height: 65vh; overflow-y: auto; }
+  .modal-body h2 { font-size: 13px; font-weight: 800; color: var(--accent); text-transform: uppercase;
+    letter-spacing: .05em; margin: 16px 0 6px; }
+  .modal-body h2:first-child { margin-top: 0; }
+  .modal-body ul { padding-left: 18px; margin: 4px 0 8px; }
+  .modal-body li { margin-bottom: 4px; }
+  .modal-body p { margin-bottom: 8px; }
+  .modal-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding: 10px 18px; border-top: 1px solid var(--border); font-size: 10px; color: var(--dim); }
+  .summary-period-btn { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--dim); font-size: 11px; cursor: pointer; font-weight: 700; }
+  .summary-period-btn.active { border-color: var(--accent); background: rgba(232,71,42,.1); color: var(--accent); }
+  .summary-loading { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; padding: 12px 0; }
+  .summary-loading::before { content: "✨"; animation: pulse 1.2s infinite; font-size: 16px; }
+  .copy-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--pill);
+    color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -224,11 +259,13 @@
     </div>
     <div class="header-controls">
       <div class="period-switcher">
-        <button class="period-btn" data-period="daily"  onclick="setPeriod('daily')">Today</button>
+        <button class="period-btn" data-period="daily"  onclick="setPeriod('daily')">Yesterday</button>
         <button class="period-btn active" data-period="weekly" onclick="setPeriod('weekly')">7 Days</button>
-        <button class="period-btn" data-period="ytd"    onclick="setPeriod('ytd')">YTD 2026</button>
+        <button class="period-btn" data-period="ytd"    onclick="setPeriod('ytd')">YTD</button>
       </div>
-      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">🌙</button>
+      <button class="theme-btn" id="summary-btn" onclick="openSummary()" title="Claude summary of these stats">✨</button>
+      <button class="theme-btn" id="refresh-btn" onclick="triggerRefresh()" title="Pull fresh data now">🔄</button>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark">☀️</button>
     </div>
   </div>
   <div class="tabs">
@@ -282,7 +319,7 @@
   <div class="panel" id="panel-monthly">
     <div class="gap-col">
       <div class="chart-wrap">
-        <div class="chart-title">Monthly Pageviews — 2026</div>
+        <div class="chart-title" id="monthly-chart-title">Monthly Pageviews</div>
         <div class="chart-bars" id="chart-bars"></div>
       </div>
       <div class="monthly-table">
@@ -300,8 +337,8 @@
 
   <div class="footer">
     <div class="footer-left">
-      <div class="f-label">🤖 Cowork Auto-Refresh</div>
-      <div class="f-sub">Daily 8:00 AM ET · Fathom MCP (BCWEGICN) + SureCart MCP → GitHub → Vercel</div>
+      <div class="f-label">🤖 Automated Daily Refresh</div>
+      <div class="f-sub">Daily ~7:30 AM ET · GitHub Actions · Fathom (BCWEGICN) + SureCart + Airtable → Vercel · 🔄 for on-demand</div>
     </div>
     <div class="footer-right">
       <div>seanwilsonpiano.com</div>
@@ -310,8 +347,29 @@
   </div>
 </div>
 
+<!-- Toast for live-refresh status -->
+<div class="toast" id="toast"></div>
+
+<!-- Claude summary modal -->
+<div class="modal-overlay" id="summary-modal" onclick="if(event.target===this)closeSummary()">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">✨ Claude Summary</span>
+      <button class="summary-period-btn" data-speriod="daily"  onclick="generateSummary('daily')">Yesterday</button>
+      <button class="summary-period-btn" data-speriod="weekly" onclick="generateSummary('weekly')">7 Days</button>
+      <button class="summary-period-btn" data-speriod="ytd"    onclick="generateSummary('ytd')">YTD</button>
+      <button class="modal-close" onclick="closeSummary()" title="Close">×</button>
+    </div>
+    <div class="modal-body" id="summary-body"></div>
+    <div class="modal-foot">
+      <span id="summary-foot-note">Written by Claude from the numbers on this dashboard.</span>
+      <button class="copy-btn" id="summary-copy" onclick="copySummary()" style="display:none">Copy</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ─── DATA — Cowork injects between these markers every morning ────────────────
+// ─── DATA — scripts/dashboard-refresh injects between these markers daily ─────
 // [DASHBOARD-DATA-START]
 const FATHOM_DAILY = {
   "/join-for-1-today/": {
@@ -1825,10 +1883,23 @@ function signalColor(views, cat) {
   return views>=t[1]?"#10b981":views>=t[0]?"#f59e0b":"#ef4444";
 }
 
+// MONTHLY as injected by older refresh runs is not guaranteed to be in
+// calendar order, and its `partial` flag can sit on the wrong entry.
+// Sort by calendar month and re-flag the last one (YTD always ends at the
+// current, partial month).
+const MONTH_IDX = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function monthlySorted() {
+  const arr = MONTHLY.map(m => ({...m, partial:false}))
+    .sort((a,b) => (MONTH_IDX[a.month]??0) - (MONTH_IDX[b.month]??0));
+  if (arr.length) arr[arr.length-1].partial = true;
+  return arr;
+}
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let currentPeriod = "weekly";
 let currentTab    = "pages";
-let isDark        = true;
+// Light is the default; "dark" only if explicitly chosen before (persisted).
+let isDark        = localStorage.getItem("swp-theme") === "dark";
 let funnelPeriod  = "weekly";
 
 // ─── RENDER ──────────────────────────────────────────────────────────────────
@@ -1884,7 +1955,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const failed = SC_DATA.recentOrders.filter(o => o.status==="failed" || o.status==="past_due");
     failed.forEach(o => {
-      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"warning", msg:`⚠️ Failed payment: Order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Check dunning sequence.` });
     });
   }
@@ -1893,7 +1964,7 @@ function renderAlerts() {
   if (SC_DATA?.recentOrders) {
     const highValue = SC_DATA.recentOrders.filter(o => o.status==="paid" && o.amount >= 29700);
     highValue.forEach(o => {
-      const date = new Date(o.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      const date = new Date(o.created_at*1000).toLocaleDateString("en-US",{month:"short",day:"numeric"});
       alerts.push({ type:"action", msg:`🔔 High-value order #${o.number||o.id?.slice(0,8)} on ${date} — ${fmtUSD(o.amount)}. Confirm session is scheduled with customer.` });
     });
   }
@@ -1957,19 +2028,22 @@ function renderAll() {
   renderMonthly();
 }
 
+// All periods are anchored to the data's end date: the refresh pulls through
+// YESTERDAY (ET), so "daily" = yesterday and "weekly" = the 7 days ending
+// yesterday. (Anchoring to today overstated every range by one day.)
 function getDateRange(period) {
-  const today = new Date();
-  const pad = n => String(n).padStart(2,'0');
+  const end = new Date(); end.setDate(end.getDate()-1);
   const fmt = d => `${d.toLocaleString('en-US',{month:'short'})} ${d.getDate()}, ${d.getFullYear()}`;
   if (period === "daily") {
-    return `Today — ${fmt(today)}`;
+    return `Yesterday — ${fmt(end)}`;
   } else if (period === "weekly") {
-    const start = new Date(today); start.setDate(today.getDate()-6);
-    return `${fmt(start)} – ${fmt(today)}`;
+    const start = new Date(end); start.setDate(end.getDate()-6);
+    return `${fmt(start)} – ${fmt(end)}`;
   } else {
-    return `Jan 1, 2026 – ${fmt(today)}`;
+    return `Jan 1, ${end.getFullYear()} – ${fmt(end)}`;
   }
 }
+const DATA_YEAR = (() => { const d = new Date(); d.setDate(d.getDate()-1); return d.getFullYear(); })();
 
 function renderKPI() {
   const tot = SITE_TOTALS[currentPeriod]||{};
@@ -1999,8 +2073,11 @@ function renderKPI() {
     { label:periodRevLabel,
       value: periodRevTotal>0 ? fmtUSD(periodRevTotal) : (periodRows.length?"$0":"—"),
       sub:`${periodOrdTotal} orders · ${dateRange}`,                                      color:"#10b981" },
+    // 7-day revenue for context — except on the weekly view, where it would
+    // duplicate the period card above.
+    ...(currentPeriod==="weekly" ? [] : [
     { label:"Revenue 7-Day",    value:scStats ? fmtUSD(scStats.week.revenue) : "—",
-      sub:`${scStats?.week.count??'—'} orders · ${getDateRange('weekly')}`,              color:"#10b981" },
+      sub:`${scStats?.week.count??'—'} orders · ${getDateRange('weekly')}`,              color:"#10b981" }]),
   ];
   document.getElementById("kpi-grid").innerHTML = cards.map(c=>`
     <div class="kpi-card" style="--card-color:${c.color}">
@@ -2120,7 +2197,7 @@ function renderPages() {
 function renderSales() {
   const el = document.getElementById("sales-content");
   if (!SC_DATA) {
-    el.innerHTML = `<div class="sc-pending"><div class="sc-pending-icon">🛒</div><div class="sc-pending-title">SureCart data pending</div><div class="sc-pending-sub">Cowork will inject live data on next 8 AM refresh.</div></div>`;
+    el.innerHTML = `<div class="sc-pending"><div class="sc-pending-icon">🛒</div><div class="sc-pending-title">SureCart data pending</div><div class="sc-pending-sub">Live data lands on the next refresh (daily ~7:30 AM ET, or tap 🔄 above).</div></div>`;
     return;
   }
   const { growth } = SC_DATA;
@@ -2234,7 +2311,7 @@ function renderSales() {
   const maxSignups = Math.max(1,...monthlyTrend.map(m=>m.count));
   const trendChart = monthlyTrend.length ? `
     <div class="section-card">
-      <div class="section-head"><span>New Signups by Month — 2026</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
+      <div class="section-head"><span>New Signups by Month — ${DATA_YEAR}</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
       <div style="padding:16px 16px 8px;display:flex;align-items:flex-end;gap:10px;height:110px">
         ${monthlyTrend.map(m=>{
           const h = Math.max(6,(m.count/maxSignups)*80);
@@ -2253,7 +2330,7 @@ function renderSales() {
   const windows = [
     { key:"week",  label:"7 Days",   g:growth?.week  },
     { key:"month", label:"30 Days",  g:growth?.month },
-    { key:"ytd",   label:"YTD 2026", g:growth?.ytd   },
+    { key:"ytd",   label:`YTD ${DATA_YEAR}`, g:growth?.ytd   },
   ];
 
   el.innerHTML = `
@@ -2324,7 +2401,7 @@ function setFunnelPeriod(p) {
 function renderFunnel() {
   const periodRows = SC_DATA?.byProductPeriod?.[funnelPeriod] || [];
   const findRow = name => periodRows.find(([n]) => n === name);
-  const periodLabel = funnelPeriod==="weekly" ? `Last 7 Days · ${getDateRange("weekly")}` : `Year to Date 2026`;
+  const periodLabel = funnelPeriod==="weekly" ? `Last 7 Days · ${getDateRange("weekly")}` : `Year to Date ${DATA_YEAR}`;
 
   const lbl = document.getElementById("funnel-period-label");
   if (lbl) lbl.textContent = periodLabel;
@@ -2372,8 +2449,10 @@ function renderFunnel() {
 }
 
 function renderMonthly() {
-  const maxPv=Math.max(1,...MONTHLY.map(m=>m.pageviews));
-  document.getElementById("chart-bars").innerHTML = MONTHLY.map(m=>{
+  document.getElementById("monthly-chart-title").textContent = `Monthly Pageviews — ${DATA_YEAR}`;
+  const MONTHS = monthlySorted();
+  const maxPv=Math.max(1,...MONTHS.map(m=>m.pageviews));
+  document.getElementById("chart-bars").innerHTML = MONTHS.map(m=>{
     const h=Math.max(8,(m.pageviews/maxPv)*130);
     return `<div class="chart-col">
       <div class="chart-val">${fmt(m.pageviews)}</div>
@@ -2383,12 +2462,12 @@ function renderMonthly() {
       <div class="chart-month">${m.month}</div>
     </div>`;
   }).join("");
-  const ytdTot=MONTHLY.reduce((s,m)=>({pageviews:s.pageviews+m.pageviews,uniques:s.uniques+m.uniques}),{pageviews:0,uniques:0});
-  document.getElementById("monthly-table-body").innerHTML = MONTHLY.map((m,i,arr)=>{
+  const ytdTot=MONTHS.reduce((s,m)=>({pageviews:s.pageviews+m.pageviews,uniques:s.uniques+m.uniques}),{pageviews:0,uniques:0});
+  document.getElementById("monthly-table-body").innerHTML = MONTHS.map((m,i,arr)=>{
     const prev=arr[i-1];
     const delta=prev?(m.pageviews-prev.pageviews)/prev.pageviews*100:null;
     return `<div class="monthly-row">
-      <div style="font-size:14px;font-weight:700">${m.month} 2026${m.partial?' <span style="font-size:10px;color:var(--accent)">●</span>':""}</div>
+      <div style="font-size:14px;font-weight:700">${m.month} ${DATA_YEAR}${m.partial?' <span style="font-size:10px;color:var(--accent)">●</span>':""}</div>
       <div class="tr-right" style="font-size:14px;font-weight:800;color:var(--blue)">${fmt(m.pageviews)}</div>
       <div class="tr-right" style="font-size:13px;color:var(--muted)">${fmt(m.uniques)}</div>
       <div class="tr-right" style="font-size:13px;font-weight:700;color:${delta===null?"var(--dim)":delta>=0?"var(--green)":"var(--red)"}">
@@ -2396,11 +2475,12 @@ function renderMonthly() {
       </div>
     </div>`;
   }).join("");
+  const lastMonth = MONTHS[MONTHS.length-1];
   document.getElementById("monthly-total").innerHTML = `
     <div style="font-size:13px;font-weight:800">YTD TOTAL</div>
     <div class="tr-right" style="font-weight:800;color:var(--accent)">${fmt(ytdTot.pageviews)}</div>
     <div class="tr-right" style="font-weight:700;color:var(--purple)">${fmt(ytdTot.uniques)}</div>
-    <div class="tr-right" style="font-size:11px;color:var(--dim)">Jan–Jun 6</div>`;
+    <div class="tr-right" style="font-size:11px;color:var(--dim)">Jan–${lastMonth?lastMonth.month:""}${lastMonth?.partial?" (partial)":""}</div>`;
 }
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
@@ -2417,12 +2497,190 @@ function setTab(t) {
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
   document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+t));
 }
-function toggleTheme() {
-  isDark=!isDark;
+function applyTheme() {
   document.documentElement.setAttribute("data-theme",isDark?"":"light");
   document.getElementById("theme-btn").textContent=isDark?"🌙":"☀️";
 }
+function toggleTheme() {
+  isDark=!isDark;
+  localStorage.setItem("swp-theme",isDark?"dark":"light");
+  applyTheme();
+}
 
+// ─── LIVE REFRESH (🔄) ───────────────────────────────────────────────────────
+// Triggers the GitHub Actions refresh workflow via /api/refresh, then polls
+// the deployed page until LAST_UPDATED changes and reloads. End-to-end this
+// takes ~2–4 min (workflow run + Vercel redeploy).
+let refreshPollTimer = null;
+
+function toast(msg, isError) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast show" + (isError ? " error" : "");
+  clearTimeout(toast._hide);
+  if (isError) toast._hide = setTimeout(() => { el.className = "toast"; }, 12000);
+}
+function hideToast() { document.getElementById("toast").className = "toast"; }
+
+async function triggerRefresh() {
+  const btn = document.getElementById("refresh-btn");
+  if (btn.classList.contains("spinning")) return;
+  btn.classList.add("spinning");
+  try {
+    const res  = await fetch("/api/refresh", { method: "POST" });
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 409) {
+      toast("A refresh is already running — this page will reload when the new data is live.");
+      startRefreshPolling(btn);
+      return;
+    }
+    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+    toast("Refresh started — pulling Fathom + SureCart now. Takes ~2–4 min; this page reloads itself when the new data is live.");
+    startRefreshPolling(btn);
+  } catch (err) {
+    btn.classList.remove("spinning");
+    toast(`Couldn't start refresh: ${err.message}`, true);
+  }
+}
+
+function startRefreshPolling(btn) {
+  if (refreshPollTimer) return;
+  const deadline = Date.now() + 12 * 60 * 1000;
+  refreshPollTimer = setInterval(async () => {
+    if (Date.now() > deadline) {
+      clearInterval(refreshPollTimer); refreshPollTimer = null;
+      btn.classList.remove("spinning");
+      toast("Refresh is taking longer than expected — check the GitHub Actions run, or just reload in a few minutes.", true);
+      return;
+    }
+    try {
+      const html = await (await fetch(`/?nocache=${Date.now()}`, { cache: "no-store" })).text();
+      const m = html.match(/const LAST_UPDATED = "([^"]+)"/);
+      if (m && m[1] !== LAST_UPDATED) {
+        clearInterval(refreshPollTimer); refreshPollTimer = null;
+        toast("New data is live — reloading…");
+        setTimeout(() => location.reload(), 800);
+      }
+    } catch { /* transient network error — keep polling */ }
+  }, 20000);
+}
+
+// ─── CLAUDE SUMMARY (✨) ─────────────────────────────────────────────────────
+// Sends the data already embedded in this page to /api/summary, which asks
+// Claude for a period recap (top performers, likely causes, next actions).
+let summaryRawText = "";
+
+function buildSummaryPayload(period) {
+  const fathomMap = period === "daily" ? FATHOM_DAILY : period === "weekly" ? FATHOM_WEEKLY : FATHOM_YTD;
+  const dollars = cents => Math.round((cents || 0)) / 100;
+  const pages = TRACKED.map(p => {
+    const d = p.slug ? (fathomMap[p.slug] || null) : null;
+    const conv = getConvRate(p, period);
+    return {
+      name: p.name, type: p.type, price: p.price,
+      views: d?.pageviews || 0, uniques: d?.uniques || 0,
+      ...(conv !== null ? { conv: +conv.toFixed(1) } : {}),
+    };
+  }).filter(p => p.views > 0 || p.price > 0);
+
+  const sales = (SC_DATA?.byProductPeriod?.[period] || []).map(([name, v]) =>
+    ({ product: name, orders: v.count, revenue: dollars(v.revenue) }));
+
+  const payload = {
+    period, dateRange: getDateRange(period), lastUpdated: LAST_UPDATED,
+    siteTotals: SITE_TOTALS[period],
+    pages, sales,
+    recentOrders: (SC_DATA?.recentOrders || []).map(o =>
+      ({ number: o.number, status: o.status, amount: dollars(o.amount), date: new Date(o.created_at * 1000).toISOString().slice(0, 10) })),
+  };
+  if (period === "weekly") {
+    payload.priorWeekTraffic = Object.fromEntries(Object.entries(PREV_PERIOD || {})
+      .filter(([, v]) => v.pageviews > 0)
+      .map(([slug, v]) => [slug, { views: v.pageviews, uniques: v.uniques }]));
+    payload.growthLast7Days = SC_DATA?.growth?.week || null;
+    payload.bumpsAndUpsells = FUNNEL_CHAINS
+      .filter(f => f.bumps.length || f.upsells.length)
+      .map(f => ({ product: f.parent,
+        offers: [...f.bumps, ...f.upsells].map(b => ({ name: b.name, price: b.price, accepted: b.accepted, shown: b.offers })) }));
+  }
+  if (period === "ytd") {
+    payload.monthlyTraffic = monthlySorted();
+    payload.growthYTD = SC_DATA?.growth?.ytd || null;
+    payload.monthlyNewSignups = SC_DATA?.growth?.monthlyNewSignups || [];
+  }
+  if (period === "daily" || period === "weekly") payload.priorFullMonthSales = SC_PREV_30;
+  return payload;
+}
+
+// Minimal markdown → HTML for the summary (headings, bold, bullets). All model
+// output is HTML-escaped first, so nothing in it can inject markup.
+function mdToHtml(md) {
+  const esc = md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const lines = esc.split("\n");
+  let html = "", inList = false;
+  for (const line of lines) {
+    const bolded = line.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+    if (/^#{1,3} /.test(line)) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h2>${bolded.replace(/^#{1,3} /, "")}</h2>`;
+    } else if (/^[-*] /.test(line)) {
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${bolded.replace(/^[-*] /, "")}</li>`;
+    } else if (line.trim() === "") {
+      if (inList) { html += "</ul>"; inList = false; }
+    } else {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<p>${bolded}</p>`;
+    }
+  }
+  if (inList) html += "</ul>";
+  return html;
+}
+
+function openSummary() {
+  document.getElementById("summary-modal").classList.add("open");
+  generateSummary(currentPeriod === "daily" ? "daily" : currentPeriod === "ytd" ? "ytd" : "weekly");
+}
+function closeSummary() {
+  document.getElementById("summary-modal").classList.remove("open");
+}
+async function generateSummary(period) {
+  document.querySelectorAll(".summary-period-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.speriod === period));
+  const body = document.getElementById("summary-body");
+  const copyBtn = document.getElementById("summary-copy");
+  copyBtn.style.display = "none";
+  body.innerHTML = `<div class="summary-loading">Claude is reading the numbers…</div>`;
+  try {
+    const res = await fetch("/api/summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ period, data: buildSummaryPayload(period) }),
+    });
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(result.error || `HTTP ${res.status}`);
+    summaryRawText = result.summary;
+    body.innerHTML = mdToHtml(result.summary);
+    copyBtn.style.display = "";
+    document.getElementById("summary-foot-note").textContent =
+      result.usedBroadcasts
+        ? "Written by Claude from this dashboard's numbers + recent Kit broadcasts."
+        : "Written by Claude from the numbers on this dashboard.";
+  } catch (err) {
+    body.innerHTML = `<p style="color:var(--red);font-weight:600">Couldn't generate the summary: ${err.message}</p>
+      <p style="color:var(--muted);font-size:12px">This needs the dashboard to be running on Vercel with the ANTHROPIC_API_KEY environment variable set.</p>`;
+  }
+}
+function copySummary() {
+  navigator.clipboard.writeText(summaryRawText).then(() => {
+    const btn = document.getElementById("summary-copy");
+    btn.textContent = "Copied ✓";
+    setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+  });
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSummary(); });
+
+applyTheme();
 renderAll();
 </script>
 </body>

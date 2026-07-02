@@ -79,11 +79,18 @@ export async function fetchFathomData({ token, yesterday, sevenDaysAgo, fourteen
   const FATHOM_YTD = toPerPathnameMap(ytdRows);
   const PREV_PERIOD = toPerPathnameMap(priorWeekRows);
 
-  const MONTHLY = monthlyRows.map((row) => ({
-    month: new Date(row.date ?? row.month ?? `${row.year}-${row.month_number}-01`).toLocaleString("en-US", { month: "short" }),
-    pageviews: Number(row.pageviews ?? 0),
-    uniques: Number(row.uniques ?? 0),
-  }));
+  // Fathom does NOT return month-grouped rows in calendar order — sort before
+  // mapping, or the dashboard's monthly chart/deltas and the "partial" flag
+  // (which must land on the current month) come out scrambled.
+  const monthKey = (row) => String(row.date ?? row.month ?? `${row.year}-${String(row.month_number).padStart(2, "0")}-01`);
+  const MONTHLY = monthlyRows
+    .slice()
+    .sort((a, b) => monthKey(a).localeCompare(monthKey(b)))
+    .map((row) => ({
+      month: new Date(monthKey(row)).toLocaleString("en-US", { month: "short" }),
+      pageviews: Number(row.pageviews ?? 0),
+      uniques: Number(row.uniques ?? 0),
+    }));
   if (MONTHLY.length) MONTHLY[MONTHLY.length - 1].partial = true;
 
   const SITE_TOTALS = {

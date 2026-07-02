@@ -1,3 +1,13 @@
 .env
 .env.local
 scripts/dashboard-refresh/.env
+
+# Local working artifacts (never commit)
+.claude/
+index.html.backup
+index.html.updated
+index.html.dryrun-preview.html
+swp-dashboard-snapshot-*.html
+fathom-surecart-raw-data-*.csv
+DASHBOARD_REFRESH_STATUS.md
+LAST_RUN_STATUS.md
