@@ -28,6 +28,14 @@ export const TRACKED_PATHNAMES = [
   "/new-1trial-registration-page/",
   "/27-bundle-waitlist/",
   "/9sus4-to-dominant-release/",
+  "/half-dim-locrian-arpeggio-download-page/",
+  // Bump accept/not-accept thank-you pages for the Half-Diminished Exercises
+  // checkout — not a "product" page, but tracking both lets pageviews on
+  // each serve as a proxy for bump offers-shown/acceptance-rate, which
+  // SureCart's API doesn't expose anywhere (see surecart.mjs header comment).
+  // Not wired into Airtable/byProductPeriod yet — Fathom traffic only for now.
+  "/half-diminished-locrian-arpeggio-thank-you-page/", // bump NOT accepted
+  "/half-diminished-locrian-bump-accept-thank-you-page/", // bump accepted
 ];
 
 // Main products: Product Name (exact, must match SureCart) -> { type, slug }
@@ -48,6 +56,7 @@ export const PRODUCTS = {
   "Roadmap Lead": { type: "Lead Magnet", slug: "/our-roadmap-offer/" },
   "Major vs Minor Quiz": { type: "Lead Magnet", slug: "/major-vs-minor-quiz/" },
   "Scales Charts": { type: "Lead Magnet", slug: "/scales-charts/" },
+  "Get the Half-Diminished Exercises": { type: "Product", slug: "/half-dim-locrian-arpeggio-download-page/" }, // added 2026-06-25, $1
 };
 
 // Bumps: Bump Name (exact) -> parent product name.
@@ -62,6 +71,9 @@ export const BUMPS = {
   "Travis Sayles Organ Runs – Custom MIDI Transcription": "27 Musicians Pro Musicians Bundle Pack",
   "27 Musicians Guided Study Session": "27 Musicians Pro Musicians Bundle Pack",
   "Dan's Signature Sounds - Logic Sessions Pack": "Dan's Signature Sounds",
+  // Added 2026-06-25. Parent inferred from the bump-accept/not-accepted
+  // thank-you-page pair being attached to the Half-Diminished Exercises
+  // checkout flow — confirm with Sean if this is ever wrong.
   "Half-Diminished Arpeggio Companion Video(s)": "Get the Half-Diminished Exercises",
 };
 
