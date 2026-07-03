@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-07-03T19:23:18.543Z",
+  "date": "2026-07-02",
+  "yesterday": {
+    "orders": 15,
+    "revenueCents": 29500,
+    "topProducts": [
+      {
+        "name": "Basic Membership — 7 Day $1 Trial",
+        "orders": 14,
+        "revenueCents": 26600
+      },
+      {
+        "name": "Basic Membership",
+        "orders": 1,
+        "revenueCents": 2900
+      }
+    ]
+  },
+  "week": {
+    "orders": 165,
+    "revenueCents": 365300
+  },
+  "month": {
+    "orders": 36,
+    "revenueCents": 80200
+  },
+  "ytd": {
+    "orders": 1266,
+    "revenueCents": 2498390
+  }
+}

@@ -16,6 +16,7 @@
 // bulk of the daily refresh cost this script exists to eliminate.
 
 import { execSync } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchFathomData } from "./fathom.mjs";
@@ -192,6 +193,24 @@ async function main() {
   console.log("[refresh] Step 4.6 — Anomaly check against origin/main...");
   runAnomalyCheck(REPO_DIR, newHtml); // throws on DEGRADED
 
+  // Step 4.7 — compact summary consumed by the morning briefing dashboard
+  // (fetched cross-origin via raw.githubusercontent.com). Revenue is cents.
+  const topProducts = [...byProductPeriod.daily]
+    .sort((a, b) => b[1].revenue - a[1].revenue)
+    .slice(0, 3)
+    .map(([name, v]) => ({ name, orders: v.count, revenueCents: v.revenue }));
+  const briefingSummary = {
+    generatedAt: new Date().toISOString(),
+    date: yesterday,
+    yesterday: { orders: todayTotals.count, revenueCents: todayTotals.revenue, topProducts },
+    week: { orders: weekTotals.count, revenueCents: weekTotals.revenue },
+    month: { orders: monthTotals.count, revenueCents: monthTotals.revenue },
+    ytd: { orders: ytdTotals.count, revenueCents: ytdTotals.revenue },
+  };
+  if (!dryRun) {
+    fs.writeFileSync(path.join(REPO_DIR, "data.json"), JSON.stringify(briefingSummary, null, 2) + "\n");
+  }
+
   if (dryRun) {
     console.log(`[refresh] DRY RUN — wrote preview to ${previewPath}. Real index.html untouched, nothing committed/pushed, nothing written to Airtable.`);
   } else {
@@ -215,7 +234,7 @@ function formatLastUpdated(date) {
 function publish(yesterday) {
   const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 16);
   execSync(`mkdir -p versions && cp index.html "versions/${stamp}.html"`, { cwd: REPO_DIR });
-  execSync("git add index.html versions/", { cwd: REPO_DIR });
+  execSync("git add index.html versions/ data.json", { cwd: REPO_DIR });
   const hasChanges = execSync("git diff --cached --quiet; echo $?", { cwd: REPO_DIR, encoding: "utf8" }).trim() !== "0";
   if (hasChanges) {
     execSync(`git commit -m "Dashboard refresh ${yesterday} (automated)"`, { cwd: REPO_DIR });
