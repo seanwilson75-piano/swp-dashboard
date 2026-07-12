@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-07-11T12:11:12.819Z",
-  "date": "2026-07-10",
+  "generatedAt": "2026-07-12T12:10:26.005Z",
+  "date": "2026-07-11",
   "yesterday": {
-    "orders": 11,
-    "revenueCents": 21800,
+    "orders": 21,
+    "revenueCents": 27800,
     "topProducts": [
       {
-        "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 6,
-        "revenueCents": 11800
-      },
-      {
         "name": "Basic Membership",
-        "orders": 3,
-        "revenueCents": 8700
+        "orders": 4,
+        "revenueCents": 11600
       },
       {
-        "name": "Half-Diminished Arpeggio Companion Video(s)",
+        "name": "Basic Membership — 7 Day $1 Trial",
+        "orders": 14,
+        "revenueCents": 9800
+      },
+      {
+        "name": "Premium Membership",
         "orders": 1,
-        "revenueCents": 1200
+        "revenueCents": 4700
       }
     ]
   },
   "week": {
-    "orders": 91,
-    "revenueCents": 271900
+    "orders": 101,
+    "revenueCents": 275300
   },
   "month": {
-    "orders": 142,
-    "revenueCents": 408475
+    "orders": 163,
+    "revenueCents": 436275
   },
   "ytd": {
-    "orders": 1372,
-    "revenueCents": 2826665
+    "orders": 1393,
+    "revenueCents": 2854465
   }
 }
