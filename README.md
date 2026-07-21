@@ -29,7 +29,7 @@ Set these in Vercel → Project → Settings → Environment Variables (Producti
 | `DASHBOARD_GITHUB_TOKEN` | 🔄 Refresh | GitHub → Settings → Developer settings → Fine-grained personal access tokens. Repository access: only `swp-dashboard`. Permissions: **Actions: Read and write**. |
 | `ANTHROPIC_API_KEY` | ✨ Summary | console.anthropic.com → API Keys |
 | `KIT_API_KEY` (optional) | ✨ Summary email correlation | Kit → Settings → Developer → V4 API Key |
-| `SUMMARY_MODEL` (optional) | ✨ Summary | Defaults to `claude-sonnet-4-6` |
+| `SUMMARY_MODEL` (optional) | ✨ Summary | Defaults to `claude-sonnet-5` |
 
 After adding variables, redeploy once (Vercel → Deployments → ⋯ → Redeploy)
 so the functions pick them up. Until they're set, the buttons show a clear

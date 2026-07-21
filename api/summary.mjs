@@ -6,12 +6,12 @@
 // Required Vercel env var:
 //   ANTHROPIC_API_KEY — Claude API key (console.anthropic.com).
 // Optional:
-//   SUMMARY_MODEL — override the Claude model (default claude-sonnet-4-6).
+//   SUMMARY_MODEL — override the Claude model (default claude-sonnet-5).
 //   KIT_API_KEY   — Kit (ConvertKit) v4 API key. If set, recent email
 //     broadcasts are included so the summary can correlate sends with
 //     traffic/sales spikes ("what did I do that worked").
 
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+const DEFAULT_MODEL = "claude-sonnet-5";
 const MAX_PAYLOAD_BYTES = 200_000;
 
 async function fetchKitBroadcasts(apiKey) {
