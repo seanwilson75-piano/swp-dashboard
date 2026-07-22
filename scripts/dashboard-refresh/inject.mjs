@@ -25,6 +25,7 @@ const REQUIRED_CONSTS = [
   "WEEKLY_SOURCES",
   "SC_PREV_30",
   "SC_DATA",
+  "RETENTION_DATA",
   "LAST_UPDATED",
 ];
 
@@ -42,6 +43,7 @@ const DAILY_SOURCES = ${j(data.DAILY_SOURCES ?? {})};
 const WEEKLY_SOURCES = ${j(data.WEEKLY_SOURCES ?? {})};
 const SC_PREV_30 = ${j(data.SC_PREV_30)};
 const SC_DATA = ${j(data.SC_DATA)};
+const RETENTION_DATA = ${j(data.RETENTION_DATA)};
 const LAST_UPDATED = ${j(data.LAST_UPDATED)};
 ${END_MARKER}`;
 }
@@ -132,6 +134,8 @@ export function runAnomalyCheck(repoDir, newHtmlString) {
     ["SC_DATA.recentOrders", live.SC_DATA?.recentOrders, fresh.SC_DATA?.recentOrders],
     ["SC_DATA.growth", live.SC_DATA?.growth, fresh.SC_DATA?.growth],
     ["PREV_PERIOD", live.PREV_PERIOD, fresh.PREV_PERIOD],
+    ["RETENTION_DATA.snapshot", live.RETENTION_DATA?.snapshot, fresh.RETENTION_DATA?.snapshot],
+    ["RETENTION_DATA.cohortRetention", live.RETENTION_DATA?.cohortRetention, fresh.RETENTION_DATA?.cohortRetention],
   ];
 
   const degraded = checks.filter(([, liveVal, freshVal]) => !isEmpty(liveVal) && isEmpty(freshVal));

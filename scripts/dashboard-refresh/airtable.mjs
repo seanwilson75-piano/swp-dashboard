@@ -4,7 +4,13 @@
 // agent-driven skill already did, so any future second dashboard can read this
 // table directly without depending on this script at all.
 
-import { AIRTABLE_BASE_ID, AIRTABLE_DAILY_PRODUCT_STATS_TABLE, DAILY_PRODUCT_STATS_FIELDS as F } from "./config.mjs";
+import {
+  AIRTABLE_BASE_ID,
+  AIRTABLE_DAILY_PRODUCT_STATS_TABLE,
+  AIRTABLE_SUBSCRIPTION_SNAPSHOTS_TABLE,
+  DAILY_PRODUCT_STATS_FIELDS as F,
+  SUBSCRIPTION_SNAPSHOT_FIELDS as SF,
+} from "./config.mjs";
 
 const API_BASE = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
 
@@ -76,6 +82,38 @@ export async function upsertDailyProductStats(token, date, productRows) {
       },
     });
   }
+}
+
+// Writes one daily snapshot row (active/churn/MRR) for `date` (YYYY-MM-DD).
+// Upserts on the Snapshot Date field, so re-running for the same date updates
+// the row in place rather than creating a duplicate — same pattern as
+// upsertDailyProductStats. `snapshot` is subscriptions.mjs's `snapshot` object
+// plus the two trailing-6 averages.
+export async function upsertSubscriptionSnapshot(token, date, snapshot, trailing6) {
+  await airtableFetch(token, `/${AIRTABLE_SUBSCRIPTION_SNAPSHOTS_TABLE}`, {
+    method: "PATCH",
+    body: {
+      performUpsert: { fieldsToMergeOn: [SF.snapshotDate] },
+      records: [
+        {
+          fields: {
+            [SF.snapshotDate]: date,
+            [SF.date]: date,
+            [SF.active]: snapshot.active,
+            [SF.pastDue]: snapshot.pastDue,
+            [SF.trialing]: snapshot.trialing,
+            [SF.canceled]: snapshot.canceled,
+            [SF.total]: snapshot.total,
+            [SF.activeMrr]: Math.round(snapshot.activeMrrCents / 100),
+            [SF.medianTenureDays]: snapshot.medianTenureDays,
+            [SF.avgNewSignupsT6]: trailing6.avgNewSignups,
+            [SF.avgChurnPctT6]: trailing6.avgChurnPct,
+          },
+        },
+      ],
+      typecast: true,
+    },
+  });
 }
 
 function sumByProduct(records) {

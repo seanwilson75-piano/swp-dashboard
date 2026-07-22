@@ -21,7 +21,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchFathomData } from "./fathom.mjs";
 import { fetchSureCartDailyBreakdown, fetchRecentPaidOrders } from "./surecart.mjs";
-import { upsertDailyProductStats, buildPeriodRollups } from "./airtable.mjs";
+import { fetchSubscriptionLifecycleData } from "./subscriptions.mjs";
+import { upsertDailyProductStats, buildPeriodRollups, upsertSubscriptionSnapshot } from "./airtable.mjs";
 import { injectDashboardData, runAnomalyCheck } from "./inject.mjs";
 import { PRODUCTS, BUMPS } from "./config.mjs";
 
@@ -108,6 +109,20 @@ async function main() {
   const recentOrders = await fetchRecentPaidOrders({ apiKey: SURECART_API_KEY, limit: 8 });
   console.log(`[refresh] SureCart: ${orderCount} paid orders on ${yesterday}`);
 
+  console.log("[refresh] Step 1E — SureCart subscription lifecycle (retention/churn/MRR)...");
+  // Full subscription re-pull each run: subscription STATUS is mutable, so
+  // capturing churn of older cohorts requires re-reading the whole list — a
+  // deliberate exception to the single-day-pull convention that applies to
+  // immutable orders. See subscriptions.mjs header.
+  const RETENTION_DATA = await fetchSubscriptionLifecycleData({ apiKey: SURECART_API_KEY });
+  console.log(`[refresh] Subscriptions: ${RETENTION_DATA.snapshot.active} active, MRR $${Math.round(RETENTION_DATA.snapshot.activeMrrCents / 100)}, ${RETENTION_DATA.trailing6.avgChurnPct}% avg monthly churn`);
+  if (dryRun) {
+    console.log("[refresh] DRY RUN — would upsert this subscription snapshot (not written):");
+    console.log(JSON.stringify(RETENTION_DATA.snapshot, null, 2));
+  } else {
+    await upsertSubscriptionSnapshot(AIRTABLE_API_KEY, yesterday, RETENTION_DATA.snapshot, RETENTION_DATA.trailing6);
+  }
+
   console.log("[refresh] Step 1D — Airtable upsert...");
   const productRows = Object.entries(PRODUCTS).map(([name, meta]) => {
     const sc = breakdown[name] ?? { count: 0, revenue: 0 };
@@ -185,6 +200,7 @@ async function main() {
     WEEKLY_SOURCES: fathom.WEEKLY_SOURCES,
     SC_PREV_30,
     SC_DATA,
+    RETENTION_DATA,
     LAST_UPDATED: formatLastUpdated(new Date()),
   };
   const previewPath = path.join(REPO_DIR, "index.html.dryrun-preview.html");

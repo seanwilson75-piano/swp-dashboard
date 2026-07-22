@@ -86,6 +86,21 @@ export const BUMPS = {
 export const AIRTABLE_BASE_ID = "appGGzkWDtvCU3wGk";
 export const AIRTABLE_DAILY_PRODUCT_STATS_TABLE = "tblzeTGmTQJ6UOEJl";
 
+// Subscription lifecycle snapshots — one row per day (active/churn/MRR),
+// written by subscriptions.mjs. Enables trending active members + MRR over time.
+export const AIRTABLE_SUBSCRIPTION_SNAPSHOTS_TABLE = "tblfjchLKKlwUTsXU";
+
+// TWO MEMBERSHIP-REVENUE LENSES — do not "reconcile" them into one number:
+//   1. Daily Product Stats membership revenue (~$10.7K/mo) = BOOKED order
+//      revenue: what SureCart charged for membership products in a period.
+//   2. subscriptions.mjs Active MRR (~$10.8K/mo, verified live 2026-07-22) =
+//      the forward RUN-RATE of currently-active subscriptions (annual ÷12).
+//   These agree to within ~1% — the ~$17.6K figure that once circulated was an
+//   ad-hoc over-count (past_due/trialing at full value, or gross trial amounts)
+//   and is NOT authoritative. Active MRR from subscriptions.mjs is the number
+//   to trust for run-rate; Daily Product Stats stays the source for booked
+//   period revenue. Different questions, both correct.
+
 export const DAILY_PRODUCT_STATS_FIELDS = {
   recordId: "fldq5e23DGa8BpJFU",
   date: "fldpXLQ7f7YArQ2WS",
@@ -103,6 +118,20 @@ export const DAILY_PRODUCT_STATS_FIELDS = {
   manyChatKeyword: "fldlx2D6TU9wiJMFu",
   trafficSource: "fldcP97eyH8Pam5NH",
   notes: "fldYmd2ow7dzhxTB7",
+};
+
+export const SUBSCRIPTION_SNAPSHOT_FIELDS = {
+  snapshotDate: "fldaDQ9p1P7lyHEN0",
+  date: "fldoFa5zcREWFwwA6",
+  active: "fldwvnKrLzgXwXadb",
+  pastDue: "fldCBAZcJZWaeSD00",
+  trialing: "fldwFZFS93V3hKQoc",
+  canceled: "fldfRl88KbCoNFq9o",
+  total: "fldxtPlzCoxVoT72R",
+  activeMrr: "fldOPwoJYuJ83KZvQ",
+  medianTenureDays: "fldEjHZibuLVB1hjT",
+  avgNewSignupsT6: "fldHyzI5bdq1Y44o6",
+  avgChurnPctT6: "fldrvSRVw57tUh4Eo",
 };
 
 // Subscription product types — used to compute Renewals = Orders - NewSignups

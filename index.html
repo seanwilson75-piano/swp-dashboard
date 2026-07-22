@@ -200,6 +200,18 @@
   .monthly-row:nth-child(even) { background: var(--row-alt); }
   .monthly-total { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 11px 16px; border-top: 2px solid var(--border); background: var(--surface2); }
 
+  /* RETENTION */
+  .ret-head, .ret-row { display: grid; align-items: center; padding: 10px 16px; gap: 0; }
+  .ret-head { background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+  .ret-row { border-bottom: 1px solid var(--border); font-size: 13px; }
+  .ret-row:last-child { border-bottom: none; }
+  .ret-row:nth-child(even) { background: var(--row-alt); }
+  .ret-cohort { grid-template-columns: 118px 78px 1fr 1fr 1fr; }
+  .ret-flow   { grid-template-columns: 130px 1fr 1fr 1fr; }
+  .ret-month  { font-size: 13px; font-weight: 700; color: var(--text); }
+  .ret-note   { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: none; letter-spacing: 0; }
+  .ret-cohort .tr-center, .ret-cohort .tr-right { padding: 0 4px; }
+
   /* FOOTER */
   .footer { margin-top: 20px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   .footer-left .f-label { font-size: 11px; font-weight: 700; color: var(--dim); }
@@ -273,6 +285,7 @@
     <button class="tab-btn"        data-tab="sales"   onclick="setTab('sales')">🛒 Sales Detail</button>
     <button class="tab-btn"        data-tab="funnel"  onclick="setTab('funnel')">🔀 Funnel</button>
     <button class="tab-btn"        data-tab="monthly" onclick="setTab('monthly')">📅 Monthly</button>
+    <button class="tab-btn"        data-tab="retention" onclick="setTab('retention')">🔁 Retention</button>
   </div>
 </div>
 
@@ -333,6 +346,11 @@
         <div class="monthly-total" id="monthly-total"></div>
       </div>
     </div>
+  </div>
+
+  <!-- Retention panel -->
+  <div class="panel" id="panel-retention">
+    <div class="gap-col" id="retention-content"></div>
   </div>
 
   <div class="footer">
@@ -2274,6 +2292,177 @@ function renderAll() {
   renderSales();
   renderFunnel();
   renderMonthly();
+  renderRetention();
+}
+
+// Frozen historical reference (MemberPress, pre-SureCart). Static — never
+// refreshed by the pipeline. Source: MemberPress subscription export, live
+// gateway rows, subscriptions created before April 2025 (Airtable table
+// "MemberPress Legacy History"). Shows the long arc: tenure at cancellation
+// fell from 17.6 payments (2017) to 2.7 (2025).
+const MEMBERPRESS_LEGACY = [
+  { year: 2017, signups: 221,  churn: 76.5, tenure: 17.6 },
+  { year: 2018, signups: 251,  churn: 85.3, tenure: 7.8 },
+  { year: 2019, signups: 560,  churn: 93.0, tenure: 6.7 },
+  { year: 2020, signups: 973,  churn: 89.2, tenure: 7.6 },
+  { year: 2021, signups: 1366, churn: 93.4, tenure: 6.4 },
+  { year: 2022, signups: 1810, churn: 95.6, tenure: 5.0 },
+  { year: 2023, signups: 2173, churn: 94.4, tenure: 4.8 },
+  { year: 2024, signups: 1691, churn: 91.2, tenure: 3.6 },
+  { year: 2025, signups: 442,  churn: 93.0, tenure: 2.7 },
+];
+
+// Retention % → colored pill. Higher is better, so green≥55, amber 35–55,
+// red<35. As you read a cohort row left→right (M1→M3) the pills shift toward
+// red, making the month-1-to-3 drop-off visible at a glance.
+function retPill(pct) {
+  if (pct === null || pct === undefined) return '<span class="conv-pill conv-none">—</span>';
+  const cls = pct >= 55 ? "conv-high" : pct >= 35 ? "conv-mid" : "conv-low";
+  return `<span class="conv-pill ${cls}">${pct}%</span>`;
+}
+function retMonthLabel(ym) {
+  const [y, m] = ym.split("-");
+  // timeZone:"UTC" is required — the date is built at UTC midnight, and
+  // formatting in local time would shift it back a day and cross the month
+  // boundary (e.g. "2026-07" rendering as "Jun").
+  return new Date(Date.UTC(+y, +m - 1, 1)).toLocaleString("en-US", { month: "short", timeZone: "UTC" }) + " '" + y.slice(2);
+}
+
+function renderRetention() {
+  const el = document.getElementById("retention-content");
+  const R = (typeof RETENTION_DATA !== "undefined") ? RETENTION_DATA : null;
+  if (!R || !R.snapshot) {
+    el.innerHTML = `<div class="sc-pending"><div class="sc-pending-icon">🔁</div><div class="sc-pending-title">Retention data not yet available</div><div class="sc-pending-sub">The next daily refresh will populate this tab.</div></div>`;
+    return;
+  }
+  const s = R.snapshot;
+  const t6 = R.trailing6 || { avgNewSignups: 0, avgChurnPct: 0 };
+  const mrr = "$" + Math.round(s.activeMrrCents / 100).toLocaleString();
+
+  // ── KPI tiles ──
+  const kpis = `
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--card-color:var(--green)">
+        <div class="kpi-label">Active Members</div>
+        <div class="kpi-value">${fmt(s.active)}</div>
+        <div class="kpi-sub">${fmt(s.pastDue)} past due · ${fmt(s.trialing)} trialing</div>
+      </div>
+      <div class="kpi-card" style="--card-color:var(--green)">
+        <div class="kpi-label">Active MRR</div>
+        <div class="kpi-value">${mrr}</div>
+        <div class="kpi-sub">recurring run-rate</div>
+      </div>
+      <div class="kpi-card" style="--card-color:var(--red)">
+        <div class="kpi-label">Avg Monthly Churn</div>
+        <div class="kpi-value">${t6.avgChurnPct}%</div>
+        <div class="kpi-sub">trailing 6 months</div>
+      </div>
+      <div class="kpi-card" style="--card-color:var(--blue)">
+        <div class="kpi-label">New / Month</div>
+        <div class="kpi-value">${fmt(t6.avgNewSignups)}</div>
+        <div class="kpi-sub">trailing 6-mo avg</div>
+      </div>
+      <div class="kpi-card" style="--card-color:var(--yellow)">
+        <div class="kpi-label">Median Tenure</div>
+        <div class="kpi-value">${s.medianTenureDays}<span style="font-size:14px;font-weight:700"> days</span></div>
+        <div class="kpi-sub">at cancellation</div>
+      </div>
+    </div>`;
+
+  // ── Cohort retention (hero) — newest cohort first ──
+  const cohorts = [...(R.cohortRetention || [])].reverse();
+  const cohortRows = cohorts.map((c) => `
+    <div class="ret-row ret-cohort">
+      <div class="ret-month">${retMonthLabel(c.cohortMonth)}</div>
+      <div class="tr-right" style="color:var(--muted);font-weight:700">${fmt(c.size)}</div>
+      <div class="tr-center">${retPill(c.m1Pct)}</div>
+      <div class="tr-center">${retPill(c.m2Pct)}</div>
+      <div class="tr-center">${retPill(c.m3Pct)}</div>
+    </div>`).join("");
+  const cohortTable = `
+    <div class="section-card">
+      <div class="section-head">
+        <span>🎯 Cohort Retention — % still active</span>
+        <span class="ret-note">Month 1–3 is the target window</span>
+      </div>
+      <div class="ret-head ret-cohort">
+        <div>Signup Month</div>
+        <div class="tr-right">Cohort</div>
+        <div class="tr-center">Month 1</div>
+        <div class="tr-center">Month 2</div>
+        <div class="tr-center">Month 3</div>
+      </div>
+      ${cohortRows}
+    </div>`;
+
+  // ── Survival curve (CSS bars) ──
+  const curve = R.retentionCurve || [];
+  const curveBars = curve.map((p) => {
+    const h = Math.max(8, ((p.pctActive ?? 0) / 100) * 130);
+    return `<div class="chart-col">
+      <div class="chart-val">${p.pctActive === null ? "—" : p.pctActive + "%"}</div>
+      <div class="chart-bar solid" style="height:${h}px"></div>
+      <div class="chart-month">D${p.dayMark}</div>
+    </div>`;
+  }).join("");
+  const curveCard = `
+    <div class="chart-wrap">
+      <div class="chart-title">Survival curve — % of all subscriptions still active by days since signup</div>
+      <div class="chart-bars">${curveBars}</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:12px">The steepest drop is usually the trial-to-paid conversion around day 7–14; the slow bleed after is ongoing month-1–3 churn.</div>
+    </div>`;
+
+  // ── Net member movement — newest first ──
+  const flow = [...(R.monthlyFlow || [])].reverse();
+  const flowRows = flow.map((m) => {
+    const netColor = m.net > 0 ? "var(--green)" : m.net < 0 ? "var(--red)" : "var(--dim)";
+    const netArrow = m.net > 0 ? "▲ " : m.net < 0 ? "▼ " : "";
+    return `<div class="ret-row ret-flow">
+      <div class="ret-month">${retMonthLabel(m.month)}</div>
+      <div class="tr-right" style="color:var(--blue);font-weight:800">${fmt(m.newSignups)}</div>
+      <div class="tr-right" style="color:var(--muted);font-weight:700">${fmt(m.cancellations)}</div>
+      <div class="tr-right" style="color:${netColor};font-weight:800">${netArrow}${m.net > 0 ? "+" : ""}${fmt(m.net)}</div>
+    </div>`;
+  }).join("");
+  const flowTable = `
+    <div class="section-card">
+      <div class="section-head">
+        <span>📈 Net Member Movement</span>
+        <span class="ret-note">New signups minus cancellations</span>
+      </div>
+      <div class="ret-head ret-flow">
+        <div>Month</div>
+        <div class="tr-right">New</div>
+        <div class="tr-right">Cancelled</div>
+        <div class="tr-right">Net</div>
+      </div>
+      ${flowRows}
+    </div>`;
+
+  // ── Historical reference (MemberPress) ──
+  const legacyRows = MEMBERPRESS_LEGACY.map((r) => `
+    <div class="ret-row ret-flow">
+      <div class="ret-month">${r.year}</div>
+      <div class="tr-right" style="color:var(--muted);font-weight:700">${fmt(r.signups)}</div>
+      <div class="tr-right" style="color:var(--red);font-weight:700">${r.churn}%</div>
+      <div class="tr-right" style="color:var(--muted);font-weight:700">${r.tenure} pmts</div>
+    </div>`).join("");
+  const legacyTable = `
+    <div class="section-card">
+      <div class="section-head">
+        <span>🗄️ Historical Churn — MemberPress (pre-2025)</span>
+        <span class="ret-note">Tenure at cancellation fell 17.6 → 2.7 payments</span>
+      </div>
+      <div class="ret-head ret-flow">
+        <div>Cohort Year</div>
+        <div class="tr-right">Signups</div>
+        <div class="tr-right">Churn %</div>
+        <div class="tr-right">Avg Tenure</div>
+      </div>
+      ${legacyRows}
+    </div>`;
+
+  el.innerHTML = kpis + cohortTable + curveCard + flowTable + legacyTable;
 }
 
 // All periods are anchored to the data's end date: the refresh pulls through
@@ -2876,6 +3065,18 @@ function buildSummaryPayload(period) {
     payload.monthlyNewSignups = SC_DATA?.growth?.monthlyNewSignups || [];
   }
   if (period === "daily" || period === "weekly") payload.priorFullMonthSales = SC_PREV_30;
+  // Subscription retention — always current (not period-scoped). Sean's #1
+  // focus is new member gains + reducing month-1-to-3 churn, so this rides on
+  // every summary regardless of the selected period.
+  if (typeof RETENTION_DATA !== "undefined" && RETENTION_DATA?.snapshot) {
+    payload.retention = {
+      snapshot: RETENTION_DATA.snapshot,
+      trailing6: RETENTION_DATA.trailing6,
+      cohortRetention: RETENTION_DATA.cohortRetention,
+      retentionCurve: RETENTION_DATA.retentionCurve,
+      monthlyFlow: RETENTION_DATA.monthlyFlow,
+    };
+  }
   return payload;
 }
 
