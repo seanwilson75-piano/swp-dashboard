@@ -8,10 +8,8 @@
       "subscriptionIds": [
         "571e4577-dd08-4bd7-a8be-c9d2a9df7739",
         "94f2d6f1-ec66-4436-b534-7c35eb2ee98c",
-        "21449eff-8196-443d-9ca7-1bd4aabfb397",
         "b0716bac-7dc4-428c-bb42-db886f5aceda",
         "c3b18985-4390-46ab-bbc2-99b65cd010a7",
-        "6894bf11-6572-430a-9b61-b80076f9be53",
         "a043dd70-b85d-4c46-87d8-2f2be29553fb",
         "04010d98-ad13-4661-a604-a29e97262cd2",
         "6e367a35-cfd5-4bf7-a5af-7e46837dad1b",
@@ -34,17 +32,35 @@
         "013eac40-5593-4fe7-b4cf-052e42f5f043",
         "d99add96-f6bc-4745-9da7-8bca1fe16c51",
         "8ede9b72-0626-4adf-bd0b-8ce81eee8f5d",
-        "e66c8926-43de-4b52-add3-e75439b2c03c",
-        "303a1ca9-8843-4182-8e07-71346ef002f4",
-        "7e3909be-843c-488c-8fa2-d4d0690cae4e"
+        "e66c8926-43de-4b52-add3-e75439b2c03c"
       ],
-      "pendingManualReview": [
-        "21449eff-8196-443d-9ca7-1bd4aabfb397",
-        "6894bf11-6572-430a-9b61-b80076f9be53",
-        "303a1ca9-8843-4182-8e07-71346ef002f4",
-        "7e3909be-843c-488c-8fa2-d4d0690cae4e"
+      "confirmedLegitimate": [
+        {
+          "subscriptionId": "21449eff-8196-443d-9ca7-1bd4aabfb397",
+          "name": "Tameka Dotson",
+          "email": "tleavell76@gmail.com",
+          "reason": "US-based, card country US, single clean charge"
+        },
+        {
+          "subscriptionId": "6894bf11-6572-430a-9b61-b80076f9be53",
+          "name": "Felicia McKnight",
+          "email": "feliciamcknight78@yahoo.com",
+          "reason": "US-based, bundled trial + practice guide upsell — real multi-item purchase"
+        },
+        {
+          "subscriptionId": "303a1ca9-8843-4182-8e07-71346ef002f4",
+          "name": "Jermaine Carroll",
+          "email": "jmcarroll8705@gmail.com",
+          "reason": "IP 70.160.128.3, no overlap with any fraud IP"
+        },
+        {
+          "subscriptionId": "7e3909be-843c-488c-8fa2-d4d0690cae4e",
+          "name": "Ted J George",
+          "email": "tgeorgesre@gmail.com",
+          "reason": "IP 173.76.76.127, no overlap with any fraud IP"
+        }
       ],
-      "pendingManualReviewNote": "These 4 are still marked NOT_CANCELLED_NEEDS_REVIEW in the source export as of 2026-07-22 — excluded from dashboard metrics as fraud, but still need someone to actually cancel/refund them in SureCart."
+      "confirmedLegitimateNote": "Originally flagged NOT_CANCELLED_NEEDS_REVIEW in the source export and provisionally excluded pending manual review. Cesar checked all 4 directly in SureCart on 2026-07-22 and confirmed they are real customers (Slack: 'I checked these 4 $1 in SC - they seem legit.', Sean: 'perfect'). Removed from subscriptionIds — they now count normally toward signups/conversion. Kept here for audit trail only; do not re-add without new evidence."
     }
   ]
 }
