@@ -102,12 +102,7 @@ export default async function handler(req, res) {
     }
     const result = await claudeRes.json();
     const summary = result.content?.filter((b) => b.type === "text").map((b) => b.text).join("\n") ?? "";
-    return res.status(200).json({
-      ok: true,
-      summary,
-      usedBroadcasts: Boolean(broadcasts?.length),
-      _debug: { stop_reason: result.stop_reason, usage: result.usage, blockTypes: result.content?.map((b) => b.type) },
-    });
+    return res.status(200).json({ ok: true, summary, usedBroadcasts: Boolean(broadcasts?.length) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
