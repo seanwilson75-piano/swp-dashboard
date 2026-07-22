@@ -99,7 +99,13 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: process.env.SUMMARY_MODEL || DEFAULT_MODEL,
-        max_tokens: 1200,
+        // Sonnet 5 runs adaptive thinking by default, and max_tokens caps
+        // thinking + text combined — a low ceiling gets fully consumed by
+        // thinking, returning an empty answer. This is a bounded summarization
+        // task that doesn't need extended reasoning, so thinking is disabled
+        // and the ceiling is generous enough for the ~400-word recap.
+        max_tokens: 2048,
+        thinking: { type: "disabled" },
         messages: [{ role: "user", content: buildPrompt(period, data, broadcasts) }],
       }),
     });
@@ -109,12 +115,7 @@ export default async function handler(req, res) {
     }
     const result = await claudeRes.json();
     const summary = result.content?.filter((b) => b.type === "text").map((b) => b.text).join("\n") ?? "";
-    return res.status(200).json({
-      ok: true,
-      summary,
-      usedBroadcasts: Boolean(broadcasts?.length),
-      _debug: { stop_reason: result.stop_reason, usage: result.usage, blockTypes: result.content?.map((b) => b.type) },
-    });
+    return res.status(200).json({ ok: true, summary, usedBroadcasts: Boolean(broadcasts?.length) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
