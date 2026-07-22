@@ -1,0 +1,50 @@
+{
+  "_comment": "SureCart subscription IDs known to be card-testing fraud, not real members. Excluded from subscriptions.mjs lifecycle metrics (snapshot, cohortRetention, retentionCurve, monthlyFlow, trailing6) so fraud never counts as a real signup, cancellation, or churn. See Notion 'Fraud & Security' runbook (Systems /AI /Dashboards area) for the incident history. Append new waves below with their own dated block — never remove old entries.",
+  "waves": [
+    {
+      "label": "2026-07-19 to 2026-07-22 card-testing wave",
+      "detectedVia": "Member email (luisew@gmail.com) reported a trial receipt she never ordered; cross-checked via SureCart order emails, Stripe fraudulent refunds, and Cesar's SureCart export",
+      "sourceFile": "fraud_trial_subscriptions.csv (Sean/Cesar export, 2026-07-22)",
+      "subscriptionIds": [
+        "571e4577-dd08-4bd7-a8be-c9d2a9df7739",
+        "94f2d6f1-ec66-4436-b534-7c35eb2ee98c",
+        "21449eff-8196-443d-9ca7-1bd4aabfb397",
+        "b0716bac-7dc4-428c-bb42-db886f5aceda",
+        "c3b18985-4390-46ab-bbc2-99b65cd010a7",
+        "6894bf11-6572-430a-9b61-b80076f9be53",
+        "a043dd70-b85d-4c46-87d8-2f2be29553fb",
+        "04010d98-ad13-4661-a604-a29e97262cd2",
+        "6e367a35-cfd5-4bf7-a5af-7e46837dad1b",
+        "8f1071dc-0470-428f-a76d-b994e3d9aa03",
+        "fa427bbe-f49c-426e-a1bf-9027dfb1eeef",
+        "5f15b7f2-4897-48cd-ba3e-795a24e6583f",
+        "a09b12f9-8f73-4c37-99f4-2d9fcc1ee28f",
+        "629b099e-7639-4432-84fb-c261e58d2b30",
+        "519c16e5-9e06-4a52-8948-915a764c0287",
+        "b2f41024-3136-4fbc-9f52-d48110a58770",
+        "7cc887e7-1f1b-4269-a0e1-eb207f32b39f",
+        "566cda53-bd93-4922-9fea-f4e5f1ea8b3f",
+        "254e1b3a-c356-469d-85b2-ea9b14cec4ac",
+        "144d87bb-b8fb-43fe-936a-584e18566db6",
+        "4b569ccc-e38a-4902-b167-52894552fc5c",
+        "f555cb4d-b78e-47c9-b0f2-417351fce903",
+        "1f8223d6-c3e0-42f9-9d15-16d9ffda4178",
+        "f4304f8b-6196-403e-a90a-43046dfaf9c3",
+        "d26012c6-f41b-4f05-a7f8-44f5fa296225",
+        "013eac40-5593-4fe7-b4cf-052e42f5f043",
+        "d99add96-f6bc-4745-9da7-8bca1fe16c51",
+        "8ede9b72-0626-4adf-bd0b-8ce81eee8f5d",
+        "e66c8926-43de-4b52-add3-e75439b2c03c",
+        "303a1ca9-8843-4182-8e07-71346ef002f4",
+        "7e3909be-843c-488c-8fa2-d4d0690cae4e"
+      ],
+      "pendingManualReview": [
+        "21449eff-8196-443d-9ca7-1bd4aabfb397",
+        "6894bf11-6572-430a-9b61-b80076f9be53",
+        "303a1ca9-8843-4182-8e07-71346ef002f4",
+        "7e3909be-843c-488c-8fa2-d4d0690cae4e"
+      ],
+      "pendingManualReviewNote": "These 4 are still marked NOT_CANCELLED_NEEDS_REVIEW in the source export as of 2026-07-22 — excluded from dashboard metrics as fraud, but still need someone to actually cancel/refund them in SureCart."
+    }
+  ]
+}

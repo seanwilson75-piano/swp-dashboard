@@ -20,12 +20,29 @@
 //   - live_mode             boolean — we keep only true (defensive; a live key
 //                           already only returns live rows)
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
 const API_BASE = "https://api.surecart.com/v1";
 const REQUEST_TIMEOUT_MS = 20_000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
 const DAY = 86400; // seconds
 const AVG_MONTH_DAYS = 30.44;
+
+// Known-fraud SureCart subscription IDs (card-testing waves) — excluded from
+// every lifecycle metric below so fraud never counts as a real signup,
+// cancellation, or churn. See fraud-exclusions.json for the source-of-truth
+// list and Notion's "Fraud & Security" runbook (Systems /AI /Dashboards area)
+// for incident history.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+function loadFraudExclusionIds() {
+  const path = join(__dirname, "fraud-exclusions.json");
+  const { waves } = JSON.parse(readFileSync(path, "utf8"));
+  return new Set(waves.flatMap((w) => w.subscriptionIds));
+}
+const FRAUD_SUBSCRIPTION_IDS = loadFraudExclusionIds();
 
 // Milestones for cohort retention: day 30 / 60 / 90 = "month 1 / 2 / 3".
 const RETENTION_MILESTONE_DAYS = [30, 60, 90];
@@ -80,7 +97,7 @@ async function fetchAllLiveSubscriptions(apiKey) {
     const rows = result.data ?? [];
     if (!rows.length) break;
     for (const sub of rows) {
-      if (sub.live_mode) all.push(sub);
+      if (sub.live_mode && !FRAUD_SUBSCRIPTION_IDS.has(sub.id)) all.push(sub);
     }
     if (rows.length < 100) break;
     page += 1;
