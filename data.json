@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-07-30T12:58:59.278Z",
-  "date": "2026-07-29",
+  "generatedAt": "2026-07-31T13:10:40.772Z",
+  "date": "2026-07-30",
   "yesterday": {
-    "orders": 13,
-    "revenueCents": 29700,
+    "orders": 10,
+    "revenueCents": 16500,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 5,
-        "revenueCents": 11800
+        "orders": 4,
+        "revenueCents": 6000
       },
       {
-        "name": "Premium Membership",
+        "name": "Master Beginner Fundamentals in 4 Days",
         "orders": 2,
-        "revenueCents": 9400
+        "revenueCents": 5400
       },
       {
-        "name": "Basic Membership",
+        "name": "Beginner Practice Plan - for 4 Songs ",
         "orders": 2,
-        "revenueCents": 5800
+        "revenueCents": 3400
       }
     ]
   },
   "week": {
-    "orders": 122,
-    "revenueCents": 286095
+    "orders": 109,
+    "revenueCents": 256700
   },
   "month": {
-    "orders": 528,
-    "revenueCents": 1203360
+    "orders": 538,
+    "revenueCents": 1219860
   },
   "ytd": {
-    "orders": 1758,
-    "revenueCents": 3621550
+    "orders": 1768,
+    "revenueCents": 3638050
   }
 }
