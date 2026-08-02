@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-08-01T12:32:37.987Z",
-  "date": "2026-07-31",
+  "generatedAt": "2026-08-02T12:32:39.325Z",
+  "date": "2026-08-01",
   "yesterday": {
-    "orders": 9,
-    "revenueCents": 18400,
+    "orders": 16,
+    "revenueCents": 38100,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 3,
-        "revenueCents": 8700
+        "orders": 8,
+        "revenueCents": 17600
       },
       {
         "name": "Basic Membership",
-        "orders": 2,
-        "revenueCents": 5000
+        "orders": 6,
+        "revenueCents": 15800
       },
       {
-        "name": "Single Course - Dan's Signature Sounds",
+        "name": "Premium Membership",
         "orders": 1,
         "revenueCents": 4700
       }
     ]
   },
   "week": {
-    "orders": 118,
-    "revenueCents": 275100
+    "orders": 116,
+    "revenueCents": 268000
   },
   "month": {
-    "orders": 547,
-    "revenueCents": 1238260
+    "orders": 16,
+    "revenueCents": 38100
   },
   "ytd": {
-    "orders": 1777,
-    "revenueCents": 3656450
+    "orders": 1793,
+    "revenueCents": 3694550
   }
 }
