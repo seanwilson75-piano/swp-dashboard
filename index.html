@@ -3166,7 +3166,7 @@ function renderSales() {
   const maxSignups = Math.max(1,...monthlyTrend.map(m=>m.count));
   const trendChart = monthlyTrend.length ? `
     <div class="section-card">
-      <div class="section-head"><span>New Signups by Month — ${DATA_YEAR}</span><span style="font-weight:400;font-size:10px">weekly refresh</span></div>
+      <div class="section-head"><span>New Signups by Month — ${DATA_YEAR}</span><span style="font-weight:400;font-size:10px">updated daily</span></div>
       <div style="padding:16px 16px 8px;display:flex;align-items:flex-end;gap:10px;height:110px">
         ${monthlyTrend.map(m=>{
           const h = Math.max(6,(m.count/maxSignups)*80);

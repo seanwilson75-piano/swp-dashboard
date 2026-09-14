@@ -3,54 +3,42 @@
 // 7:30am path. SKILL.md remains the human-readable explanation of the
 // logic and the manual fallback if this script ever needs to be re-derived.
 //
-// KNOWN GAPS (intentionally deferred from this v1, not silently dropped):
-//  - Step 1C (Sunday new-signups/renewals growth refresh) is NOT implemented.
-//    SC_DATA.growth is carried forward unchanged from the live dashboard on
-//    every run, every day, until a follow-up adds it.
-//  - Per-product New Signups / Renewals split in the Daily Product Stats
-//    Airtable write is NOT implemented (requires per-order subscription
-//    status, out of scope for this pass) — those two fields are left unset.
+// ORDERS ARE RE-DERIVED FOR A TRAILING WINDOW, NOT JUST YESTERDAY: a failed
+// renewal charge is retried on the original order and flips to paid up to 14
+// days later (see surecart.mjs). Each run re-reads the last LOOKBACK_DAYS of
+// paid orders and corrects any stored day whose sales changed. Approved by
+// Sean on 2026-09-14 after an audit (audit.mjs) found $1,105 of August renewals
+// missing from the dashboard. Fathom and every period rollup still follow the
+// single-window convention: rollups come from Airtable, never the live source.
+//
+// KNOWN GAPS (intentionally deferred, not silently dropped):
 //  - Step 3B (weekly Funnel Chains analysis sync) is NOT implemented — still
 //    a manual/agent task if needed.
-// None of these affect the traffic+orders+revenue numbers that make up the
-// bulk of the daily refresh cost this script exists to eliminate.
 
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchFathomData } from "./fathom.mjs";
-import { fetchSureCartDailyBreakdown, fetchRecentPaidOrders } from "./surecart.mjs";
+import { fetchSureCartDailyBreakdowns, fetchRecentPaidOrders } from "./surecart.mjs";
 import { fetchSubscriptionLifecycleData } from "./subscriptions.mjs";
-import { upsertDailyProductStats, buildPeriodRollups, upsertSubscriptionSnapshot } from "./airtable.mjs";
+import {
+  fetchDailyProductStats,
+  buildDayWrites,
+  applyWrites,
+  upsertDailyProductStats,
+  buildPeriodRollups,
+  buildGrowth,
+  upsertSubscriptionSnapshot,
+} from "./airtable.mjs";
 import { injectDashboardData, runAnomalyCheck } from "./inject.mjs";
-import { PRODUCTS, BUMPS } from "./config.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_DIR = path.resolve(__dirname, "..", "..");
 const HTML_PATH = path.join(REPO_DIR, "index.html");
 
-function pad(n) {
-  return String(n).padStart(2, "0");
-}
-
-// Finds the UTC instant matching a given America/New_York wall-clock time,
-// correctly handling DST via iterative correction against Intl formatting.
-function etWallClockToUTC(dateStr, hh, mm, ss) {
-  let guessMs = Date.parse(`${dateStr}T${pad(hh)}:${pad(mm)}:${pad(ss)}.000-05:00`);
-  const want = `${dateStr}T${pad(hh)}:${pad(mm)}:${pad(ss)}`;
-  for (let i = 0; i < 3; i++) {
-    const fmt = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-    });
-    const parts = Object.fromEntries(fmt.formatToParts(new Date(guessMs)).map((p) => [p.type, p.value]));
-    const got = `${parts.year}-${parts.month}-${parts.day}T${parts.hour === "24" ? "00" : parts.hour}:${parts.minute}:${parts.second}`;
-    if (got === want) break;
-    guessMs += Date.parse(want + "Z") - Date.parse(got + "Z");
-  }
-  return Math.floor(guessMs / 1000);
-}
+// All late payments Jan–Sep 2026 landed within 14 days; 21 leaves margin.
+const LOOKBACK_DAYS = 21;
 
 function addDaysISO(isoDate, n) {
   const d = new Date(`${isoDate}T00:00:00Z`);
@@ -64,14 +52,6 @@ function todayET() {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function extractLiveBlock(repoDir) {
-  const liveHtml = execSync("git show origin/main:index.html", { cwd: repoDir, encoding: "utf8" });
-  const block = liveHtml.split("// [DASHBOARD-DATA-START]")[1]?.split("// [DASHBOARD-DATA-END]")[0];
-  const sandbox = {};
-  new Function("exports", block.replace(/^const /gm, "exports."))(sandbox);
-  return sandbox;
-}
-
 async function main() {
   const cliDate = process.argv.find((a) => a.startsWith("--date="))?.split("=")[1];
   const dryRun = process.argv.includes("--dry-run");
@@ -83,11 +63,13 @@ async function main() {
     sevenDaysAgo: addDaysISO(yesterday, -6),
     fourteenDaysAgo: addDaysISO(yesterday, -13),
     eightDaysAgo: addDaysISO(yesterday, -7),
+    thirtyDaysAgo: addDaysISO(yesterday, -29),
     ytdStart: `${year}-01-01`,
     monthStart: `${yesterday.slice(0, 7)}-01`,
   };
   const priorMonthEnd = addDaysISO(dates.monthStart, -1);
   const priorMonthStart = `${priorMonthEnd.slice(0, 7)}-01`;
+  const lookbackStart = addDaysISO(yesterday, -(LOOKBACK_DAYS - 1));
 
   console.log(`[refresh] Running for "yesterday" = ${yesterday}${dryRun ? "  [DRY RUN — no Airtable writes, no git commit/push]" : ""}`);
 
@@ -98,16 +80,10 @@ async function main() {
   console.log("[refresh] Step 1A — Fathom...");
   const fathom = await fetchFathomData({ token: FATHOM_API_TOKEN, ...dates });
 
-  console.log("[refresh] Step 1B — SureCart...");
-  const yesterdayStartUnix = etWallClockToUTC(yesterday, 0, 0, 0);
-  const yesterdayEndUnix = etWallClockToUTC(yesterday, 23, 59, 59);
-  const { breakdown, orderCount } = await fetchSureCartDailyBreakdown({
-    apiKey: SURECART_API_KEY,
-    yesterdayStartUnix,
-    yesterdayEndUnix,
-  });
+  console.log(`[refresh] Step 1B — SureCart paid orders ${lookbackStart}..${yesterday}...`);
+  const salesByDay = await fetchSureCartDailyBreakdowns({ apiKey: SURECART_API_KEY, fromDay: lookbackStart, toDay: yesterday });
   const recentOrders = await fetchRecentPaidOrders({ apiKey: SURECART_API_KEY, limit: 8 });
-  console.log(`[refresh] SureCart: ${orderCount} paid orders on ${yesterday}`);
+  console.log(`[refresh] SureCart: ${salesByDay[yesterday]?.orderCount ?? 0} paid orders on ${yesterday}`);
 
   console.log("[refresh] Step 1E — SureCart subscription lifecycle (retention/churn/MRR)...");
   // Full subscription re-pull each run: subscription STATUS is mutable, so
@@ -123,54 +99,36 @@ async function main() {
     await upsertSubscriptionSnapshot(AIRTABLE_API_KEY, yesterday, RETENTION_DATA.snapshot, RETENTION_DATA.trailing6);
   }
 
-  console.log("[refresh] Step 1D — Airtable upsert...");
-  const productRows = Object.entries(PRODUCTS).map(([name, meta]) => {
-    const sc = breakdown[name] ?? { count: 0, revenue: 0 };
-    const fathomEntry = fathom.FATHOM_DAILY[meta.slug] ?? { pageviews: 0, uniques: 0 };
-    return {
-      productName: name,
-      productType: meta.type,
-      checkoutPageViews: fathomEntry.pageviews,
-      checkoutUniques: fathomEntry.uniques,
-      orders: sc.count,
-      revenue: sc.revenue,
-    };
-  });
-  // Bump rows: anything in `breakdown` not already covered by a main product name above.
-  const bumpRows = Object.entries(breakdown)
-    .filter(([name]) => !PRODUCTS[name])
-    .map(([name, sc]) => ({
-      productName: name,
-      productType: "Bump",
-      orders: sc.count,
-      revenue: sc.revenue,
-      parentOrders: sc.count,
-      ...(BUMPS[name] ? { parentProduct: BUMPS[name] } : {}),
-    }));
+  console.log(`[refresh] Step 1D — Airtable upsert (yesterday, plus corrections back to ${lookbackStart})...`);
+  const storedRows = await fetchDailyProductStats(AIRTABLE_API_KEY, lookbackStart, yesterday);
+  const writes = [];
+  for (let day = lookbackStart; day <= yesterday; day = addDaysISO(day, 1)) {
+    const dayWrites = buildDayWrites({
+      day,
+      breakdown: salesByDay[day]?.breakdown ?? {},
+      existing: storedRows.filter((row) => row.day === day && row.keyed),
+      pageViews: day === yesterday ? fathom.FATHOM_DAILY : null,
+    });
+    if (day !== yesterday && dayWrites.length) {
+      console.log(`[refresh]   correcting ${day}: ${dayWrites.map((w) => `${w.name} → ${w.orders} / $${(w.revenueCents / 100).toFixed(2)}`).join("; ")}`);
+    }
+    writes.push(...dayWrites);
+  }
   if (dryRun) {
-    console.log("[refresh] DRY RUN — would upsert these Daily Product Stats rows (not written):");
-    console.log(JSON.stringify([...productRows, ...bumpRows], null, 2));
+    console.log(`[refresh] DRY RUN — would upsert these ${writes.length} Daily Product Stats rows (not written):`);
+    console.log(JSON.stringify(writes, null, 2));
   } else {
-    await upsertDailyProductStats(AIRTABLE_API_KEY, yesterday, [...productRows, ...bumpRows]);
+    await upsertDailyProductStats(AIRTABLE_API_KEY, writes);
   }
 
-  console.log("[refresh] Step 2 — Building byProductPeriod + SC_PREV_30 from Airtable...");
-  const { byProductPeriod, SC_PREV_30 } = await buildPeriodRollups(AIRTABLE_API_KEY, { ...dates, priorMonthStart, priorMonthEnd });
-  if (dryRun) {
-    // Airtable doesn't have yesterday's row yet (we didn't write it above), so
-    // byProductPeriod.daily/weekly/monthly/ytd here are STALE BY ONE DAY —
-    // they reflect Airtable's state before this run. Swap in the freshly
-    // fetched SureCart breakdown for "daily" so the dry-run preview still
-    // shows what yesterday's numbers actually are.
-    byProductPeriod.daily = Object.entries(breakdown)
-      .filter(([, v]) => v.count > 0 || v.revenue > 0)
-      .map(([name, v]) => [name, { count: v.count, revenue: Math.round(v.revenue * 100) }]);
-    console.log("[refresh] DRY RUN note: weekly/monthly/ytd/SC_PREV_30 below are from Airtable's CURRENT state (yesterday's row not written yet), only 'daily' reflects the fresh SureCart pull.");
-  }
-
-  console.log("[refresh] Carrying forward SC_DATA.growth from live dashboard (Step 1C not yet automated)...");
-  const live = extractLiveBlock(REPO_DIR);
-  const growth = live.SC_DATA?.growth ?? { week: {}, month: {}, ytd: {}, monthlyNewSignups: [] };
+  console.log("[refresh] Step 2 — Building byProductPeriod, SC_PREV_30 and growth from Airtable...");
+  const rollupStart = [dates.ytdStart, priorMonthStart, dates.thirtyDaysAgo].sort()[0];
+  const fetchedRows = await fetchDailyProductStats(AIRTABLE_API_KEY, rollupStart, yesterday);
+  // A dry run didn't write, so layer the pending writes over what's stored.
+  const rows = dryRun ? applyWrites(fetchedRows, writes) : fetchedRows;
+  const { byProductPeriod, SC_PREV_30 } = buildPeriodRollups(rows, { ...dates, priorMonthStart, priorMonthEnd });
+  const growth = buildGrowth(rows, dates);
+  console.log(`[refresh] Growth: 7d ${growth.week.newSignups} new / ${growth.week.renewals} renewals · 30d ${growth.month.newSignups} new / ${growth.month.renewals} renewals · YTD ${growth.ytd.newSignups} new`);
   const byProduct = byProductPeriod.ytd; // same definition as today: Airtable cumulative-to-date
 
   const todayTotals = sumPeriod(byProductPeriod.daily);
@@ -229,6 +187,8 @@ async function main() {
 
   if (dryRun) {
     console.log(`[refresh] DRY RUN — wrote preview to ${previewPath}. Real index.html untouched, nothing committed/pushed, nothing written to Airtable.`);
+    console.log(`[refresh] DRY RUN summary: ${JSON.stringify({ yesterday: briefingSummary.yesterday, week: briefingSummary.week, month: briefingSummary.month, ytd: briefingSummary.ytd })}`);
+    console.log(`[refresh] DRY RUN growth: ${JSON.stringify(growth)}`);
   } else {
     console.log("[refresh] Step 5 — Publish...");
     publish(yesterday);

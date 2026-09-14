@@ -1,8 +1,9 @@
 // Direct Airtable REST API calls (https://api.airtable.com/v0/{baseId}/{tableId}),
 // replacing the Airtable MCP tools. Airtable stays the canonical data store —
-// this script's only Airtable writes are the same daily per-product upsert the
-// agent-driven skill already did, so any future second dashboard can read this
-// table directly without depending on this script at all.
+// this script's only Airtable writes are the daily per-product upsert (plus
+// corrections to recent days) and the subscription snapshot, so any future
+// second dashboard can read these tables directly without depending on this
+// script at all.
 
 import {
   AIRTABLE_BASE_ID,
@@ -10,9 +11,19 @@ import {
   AIRTABLE_SUBSCRIPTION_SNAPSHOTS_TABLE,
   DAILY_PRODUCT_STATS_FIELDS as F,
   SUBSCRIPTION_SNAPSHOT_FIELDS as SF,
+  PRODUCTS,
+  BUMPS,
 } from "./config.mjs";
 
 const API_BASE = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
+const WRITE_PACE_MS = 250; // Airtable allows 5 requests/second per base
+// Airtable allows max 25 records per write request (422 INVALID_RECORDS above
+// that, confirmed 2026-09-14) — a day plus lookback corrections can exceed it.
+const MAX_RECORDS_PER_WRITE = 25;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function airtableFetch(token, path, { method = "GET", body } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -49,39 +60,171 @@ async function listAllRecords(token, formula) {
   return records;
 }
 
-// Writes one Daily Product Stats record per product for `date` (YYYY-MM-DD).
-// Upserts via Airtable's native performUpsert on the Record ID field, so this
-// is safe to re-run for the same date without creating duplicates.
-export async function upsertDailyProductStats(token, date, productRows) {
-  const records = productRows.map((row) => ({
-    fields: {
-      [F.recordId]: `${date}|${row.productName}`,
-      [F.date]: date,
-      [F.productName]: row.productName,
-      [F.productType]: row.productType,
-      ...(row.parentProduct ? { [F.parentProduct]: row.parentProduct } : {}),
-      [F.checkoutPageViews]: row.checkoutPageViews ?? 0,
-      [F.checkoutUniques]: row.checkoutUniques ?? 0,
-      [F.orders]: row.orders ?? 0,
-      [F.revenue]: row.revenue ?? 0,
-      ...(row.newSignups !== undefined ? { [F.newSignups]: row.newSignups } : {}),
-      ...(row.renewals !== undefined ? { [F.renewals]: row.renewals } : {}),
-      ...(row.parentOrders !== undefined ? { [F.parentOrders]: row.parentOrders } : {}),
-    },
-  }));
-
-  // Airtable allows max 50 records per request.
-  for (let i = 0; i < records.length; i += 50) {
-    const batch = records.slice(i, i + 50);
+async function patchInBatches(token, body, records) {
+  for (let i = 0; i < records.length; i += MAX_RECORDS_PER_WRITE) {
     await airtableFetch(token, `/${AIRTABLE_DAILY_PRODUCT_STATS_TABLE}`, {
       method: "PATCH",
-      body: {
-        performUpsert: { fieldsToMergeOn: [F.recordId] },
-        records: batch,
-        typecast: true,
-      },
+      body: { ...body, records: records.slice(i, i + MAX_RECORDS_PER_WRITE) },
     });
+    await sleep(WRITE_PACE_MS);
   }
+}
+
+const toCents = (dollars) => Math.round(Number(dollars ?? 0) * 100);
+
+function withoutUndefined(obj) {
+  return Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined));
+}
+
+// Reads Daily Product Stats rows dated from..to (inclusive, YYYY-MM-DD) into a
+// flat shape with money in cents. Missing numeric fields read as 0; page views
+// stay undefined when never written, so callers can tell "unset" from 0.
+//
+// `keyed` is false for rows whose Record ID isn't "Date|Product Name". The
+// upsert can't reach those, so a rebuilt day would count them twice — 30 June
+// 2026 rows written by the old agent-driven skill have no Record ID at all.
+// Callers compare against keyed rows only; backfill.mjs zeroes the rest.
+export async function fetchDailyProductStats(token, from, to) {
+  // Plain `{field} = 'date'` does NOT match Airtable date-type fields
+  // reliably (confirmed live on 2026-06-22 — returned 0 rows against a
+  // known-good date) — IS_AFTER/IS_BEFORE on the neighboring days is.
+  const records = await listAllRecords(token, `AND(IS_AFTER({${F.date}}, '${addDays(from, -1)}'), IS_BEFORE({${F.date}}, '${addDays(to, 1)}'))`);
+  return records
+    .filter((rec) => rec.fields[F.productName] && rec.fields[F.date])
+    .map((rec) => {
+      const f = rec.fields;
+      return {
+        airtableId: rec.id,
+        keyed: f[F.recordId] === `${f[F.date]}|${f[F.productName]}`,
+        day: f[F.date],
+        name: f[F.productName],
+        productType: f[F.productType],
+        orders: Number(f[F.orders] ?? 0),
+        revenueCents: toCents(f[F.revenue]),
+        newSignups: Number(f[F.newSignups] ?? 0),
+        renewals: Number(f[F.renewals] ?? 0),
+        newSignupRevenueCents: toCents(f[F.newSignupRevenue]),
+        renewalRevenueCents: toCents(f[F.renewalRevenue]),
+        checkoutPageViews: f[F.checkoutPageViews],
+        checkoutUniques: f[F.checkoutUniques],
+        notes: f[F.notes],
+      };
+    });
+}
+
+// Sales numbers compared when deciding whether a stored row needs rewriting.
+const SALES_KEYS = ["orders", "revenueCents", "newSignups", "renewals", "newSignupRevenueCents", "renewalRevenueCents"];
+
+// Decides which Daily Product Stats rows to write for one day, given what
+// SureCart says now (`breakdown`, from surecart.mjs) and the keyed rows
+// Airtable already holds for that day (`existing`). Returns only rows that
+// would change:
+//   - products whose sales differ from what's stored (late payments landing),
+//   - stored rows SureCart no longer has sales for (refunds, renamed
+//     products) — zeroed rather than deleted,
+//   - when `pageViews` is given ({ "/slug/": {pageviews, uniques} } — yesterday
+//     in the daily run, every day in a backfill): one row per configured
+//     product carrying its page views, even with zero sales.
+// With `pageViews` null, page-view fields are left off, so correcting an older
+// day's sales never overwrites the page views captured for it.
+export function buildDayWrites({ day, breakdown, existing, pageViews }) {
+  const storedByName = new Map(existing.map((row) => [row.name, row]));
+  const names = new Set([...Object.keys(breakdown), ...storedByName.keys(), ...(pageViews ? Object.keys(PRODUCTS) : [])]);
+  const writes = [];
+
+  for (const name of names) {
+    const sales = breakdown[name];
+    const stored = storedByName.get(name);
+    const meta = PRODUCTS[name];
+    const row = {
+      day,
+      name,
+      productType: meta?.type ?? (sales ? (sales.isBump ? "Bump" : sales.isRecurring ? "Subscription" : "Product") : undefined),
+      parentProduct: BUMPS[name],
+      orders: sales?.count ?? 0,
+      revenueCents: sales?.revenueCents ?? 0,
+      newSignups: sales?.newSignups ?? 0,
+      renewals: sales?.renewals ?? 0,
+      newSignupRevenueCents: sales?.newSignupRevenueCents ?? 0,
+      renewalRevenueCents: sales?.renewalRevenueCents ?? 0,
+      parentOrders: sales?.isBump ? sales.count : undefined,
+    };
+
+    let viewsChanged = false;
+    if (pageViews && meta) {
+      const views = pageViews[meta.slug] ?? { pageviews: 0, uniques: 0 };
+      row.checkoutPageViews = views.pageviews;
+      row.checkoutUniques = views.uniques;
+      viewsChanged = stored?.checkoutPageViews !== views.pageviews || stored?.checkoutUniques !== views.uniques;
+    }
+    const salesChanged = SALES_KEYS.some((key) => (stored?.[key] ?? 0) !== row[key]);
+    if (salesChanged || viewsChanged) writes.push(row);
+  }
+  return writes;
+}
+
+// Applies rows from buildDayWrites to an in-memory copy of fetched rows, so a
+// dry run can preview rollups exactly as they'd look after writing. Unkeyed
+// rows stay separate entries — writes can't reach them, so neither can this.
+export function applyWrites(rows, writes) {
+  const keyOf = (row) => (row.keyed === false ? `id:${row.airtableId}` : `${row.day}|${row.name}`);
+  const byKey = new Map(rows.map((row) => [keyOf(row), row]));
+  for (const write of writes) {
+    const key = `${write.day}|${write.name}`;
+    byKey.set(key, { ...byKey.get(key), ...withoutUndefined(write), keyed: true });
+  }
+  return [...byKey.values()];
+}
+
+// Upserts rows from buildDayWrites via Airtable's native performUpsert on the
+// Record ID field (`YYYY-MM-DD|Product Name`), so re-running a day never
+// creates duplicates. Undefined fields aren't sent, and PATCH leaves unsent
+// fields untouched on existing records.
+export async function upsertDailyProductStats(token, rows) {
+  const records = rows.map((row) => ({
+    fields: withoutUndefined({
+      [F.recordId]: `${row.day}|${row.name}`,
+      [F.date]: row.day,
+      [F.productName]: row.name,
+      [F.productType]: row.productType,
+      [F.parentProduct]: row.parentProduct,
+      [F.checkoutPageViews]: row.checkoutPageViews,
+      [F.checkoutUniques]: row.checkoutUniques,
+      [F.orders]: row.orders,
+      [F.revenue]: row.revenueCents / 100,
+      [F.newSignups]: row.newSignups,
+      [F.renewals]: row.renewals,
+      [F.newSignupRevenue]: row.newSignupRevenueCents / 100,
+      [F.renewalRevenue]: row.renewalRevenueCents / 100,
+      [F.parentOrders]: row.parentOrders,
+    }),
+  }));
+  await patchInBatches(token, { performUpsert: { fieldsToMergeOn: [F.recordId] }, typecast: true }, records);
+}
+
+// Zeroes the sales and page-view fields of unkeyed rows (see
+// fetchDailyProductStats) on days that have been rebuilt as keyed rows, so they
+// stop double-counting. Records are kept and their original numbers recorded
+// in Notes rather than deleted.
+export async function zeroOutUnkeyedRows(token, rows, today) {
+  const records = rows.map((row) => {
+    const note = `Legacy row without Record ID, superseded by the keyed row for this day and zeroed ${today} (was ${row.orders} orders / $${(row.revenueCents / 100).toFixed(2)} / ${row.checkoutPageViews ?? 0} page views)`;
+    return {
+      id: row.airtableId,
+      fields: {
+        [F.orders]: 0,
+        [F.revenue]: 0,
+        [F.newSignups]: 0,
+        [F.renewals]: 0,
+        [F.newSignupRevenue]: 0,
+        [F.renewalRevenue]: 0,
+        [F.checkoutPageViews]: 0,
+        [F.checkoutUniques]: 0,
+        [F.notes]: row.notes ? `${row.notes} · ${note}` : note,
+      },
+    };
+  });
+  await patchInBatches(token, {}, records);
 }
 
 // Writes one daily snapshot row (active/churn/MRR) for `date` (YYYY-MM-DD).
@@ -116,50 +259,70 @@ export async function upsertSubscriptionSnapshot(token, date, snapshot, trailing
   });
 }
 
-function sumByProduct(records) {
-  const totals = {}; // productName -> { count, revenue } (revenue in dollars)
-  for (const rec of records) {
-    const name = rec.fields[F.productName];
-    if (!name) continue;
-    if (!totals[name]) totals[name] = { count: 0, revenue: 0 };
-    totals[name].count += Number(rec.fields[F.orders] ?? 0);
-    totals[name].revenue += Number(rec.fields[F.revenue] ?? 0);
+function sumByProduct(rows) {
+  const totals = {}; // productName -> { count, revenue } (revenue in cents)
+  for (const row of rows) {
+    const total = (totals[row.name] ??= { count: 0, revenue: 0 });
+    total.count += row.orders;
+    total.revenue += row.revenueCents;
   }
   return totals;
 }
 
-function toCentsTuples(totals) {
-  return Object.entries(totals)
-    .filter(([, v]) => v.count > 0 || v.revenue > 0)
-    .map(([name, v]) => [name, { count: v.count, revenue: Math.round(v.revenue * 100) }]);
+function toTuples(totals) {
+  return Object.entries(totals).filter(([, v]) => v.count > 0 || v.revenue > 0);
 }
 
 // Builds SC_DATA.byProductPeriod (daily/weekly/monthly/ytd) and SC_PREV_30
 // (prior full calendar month — the variable the LIVE dashboard JS actually
 // reads as of 2026-06-22; see task_1223089d for the SC_PREV_WEEK doc/code
-// drift this intentionally does NOT follow until that's resolved).
-export async function buildPeriodRollups(token, { yesterday, sevenDaysAgo, monthStart, ytdStart, priorMonthStart, priorMonthEnd }) {
-  const dateField = F.date;
-
-  const [dailyRecs, weeklyRecs, monthlyRecs, ytdRecs, priorMonthRecs] = await Promise.all([
-    // Plain `{field} = 'date'` does NOT match Airtable date-type fields
-    // reliably (confirmed live on 2026-06-22 — returned 0 rows against a
-    // known-good date) — IS_SAME(...,'day') is the correct comparison.
-    listAllRecords(token, `IS_SAME({${dateField}}, '${yesterday}', 'day')`),
-    listAllRecords(token, `AND(IS_AFTER({${dateField}}, '${addDays(sevenDaysAgo, -1)}'), IS_BEFORE({${dateField}}, '${addDays(yesterday, 1)}'))`),
-    listAllRecords(token, `AND(IS_AFTER({${dateField}}, '${addDays(monthStart, -1)}'), IS_BEFORE({${dateField}}, '${addDays(yesterday, 1)}'))`),
-    listAllRecords(token, `AND(IS_AFTER({${dateField}}, '${addDays(ytdStart, -1)}'), IS_BEFORE({${dateField}}, '${addDays(yesterday, 1)}'))`),
-    listAllRecords(token, `AND(IS_AFTER({${dateField}}, '${addDays(priorMonthStart, -1)}'), IS_BEFORE({${dateField}}, '${addDays(priorMonthEnd, 1)}'))`),
-  ]);
-
+// drift this intentionally does NOT follow until that's resolved) from rows
+// returned by fetchDailyProductStats covering all of those windows.
+export function buildPeriodRollups(rows, { yesterday, sevenDaysAgo, monthStart, ytdStart, priorMonthStart, priorMonthEnd }) {
+  const between = (from, to) => rows.filter((row) => row.day >= from && row.day <= to);
+  const priorMonthRows = between(priorMonthStart, priorMonthEnd);
   return {
     byProductPeriod: {
-      daily: toCentsTuples(sumByProduct(dailyRecs)),
-      weekly: toCentsTuples(sumByProduct(weeklyRecs)),
-      monthly: toCentsTuples(sumByProduct(monthlyRecs)),
-      ytd: toCentsTuples(sumByProduct(ytdRecs)),
+      daily: toTuples(sumByProduct(between(yesterday, yesterday))),
+      weekly: toTuples(sumByProduct(between(sevenDaysAgo, yesterday))),
+      monthly: toTuples(sumByProduct(between(monthStart, yesterday))),
+      ytd: toTuples(sumByProduct(between(ytdStart, yesterday))),
     },
-    SC_PREV_30: priorMonthRecs.length ? Object.fromEntries(toCentsTuples(sumByProduct(priorMonthRecs))) : {},
+    SC_PREV_30: priorMonthRows.length ? Object.fromEntries(toTuples(sumByProduct(priorMonthRows))) : {},
+  };
+}
+
+// Builds SC_DATA.growth for the Sales tab's "New Signups vs Renewals" card:
+// rolling 7-day / 30-day / YTD totals (money in cents) plus new signups per
+// calendar month this year, the current month flagged partial.
+export function buildGrowth(rows, { yesterday, sevenDaysAgo, thirtyDaysAgo, ytdStart }) {
+  const windowTotals = (from) => {
+    const totals = { newSignups: 0, newRevenue: 0, renewals: 0, renewalRevenue: 0 };
+    for (const row of rows) {
+      if (row.day < from || row.day > yesterday) continue;
+      totals.newSignups += row.newSignups;
+      totals.newRevenue += row.newSignupRevenueCents;
+      totals.renewals += row.renewals;
+      totals.renewalRevenue += row.renewalRevenueCents;
+    }
+    return { ...totals, totalRevenue: totals.newRevenue + totals.renewalRevenue };
+  };
+
+  const monthlyNewSignups = [];
+  for (let month = ytdStart.slice(0, 7); month <= yesterday.slice(0, 7); month = addMonths(month, 1)) {
+    const count = rows
+      .filter((row) => row.day.startsWith(month) && row.day <= yesterday)
+      .reduce((sum, row) => sum + row.newSignups, 0);
+    const label = new Date(`${month}-01T00:00:00Z`).toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+    monthlyNewSignups.push({ month: label, count });
+  }
+  if (monthlyNewSignups.length) monthlyNewSignups[monthlyNewSignups.length - 1].partial = true;
+
+  return {
+    week: windowTotals(sevenDaysAgo),
+    month: windowTotals(thirtyDaysAgo),
+    ytd: windowTotals(ytdStart),
+    monthlyNewSignups,
   };
 }
 
@@ -167,4 +330,10 @@ function addDays(isoDate, n) {
   const d = new Date(`${isoDate}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
+}
+
+function addMonths(yearMonth, n) {
+  const d = new Date(`${yearMonth}-01T00:00:00Z`);
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return d.toISOString().slice(0, 7);
 }

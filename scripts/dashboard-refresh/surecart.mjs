@@ -7,7 +7,7 @@
 //   - GET /v1/orders?status[]=paid&limit=100&page=N returns newest-first by
 //     created_at — no separate sort param needed, no date-filter param on
 //     this endpoint. We paginate from page 1 and stop as soon as we pass
-//     yesterday's window, since results are already newest-first.
+//     the window, since results are already newest-first.
 //   - Expanding nested resources uses REPEATED `expand[]=` params (array
 //     bracket syntax), NOT a comma-separated single param:
 //       expand[]=checkout&expand[]=checkout.line_items&expand[]=line_item.price&expand[]=price.product
@@ -18,6 +18,24 @@
 //     prices ($47/$9/$1/$17) matching exactly.
 //   - The order object itself has NO amount field — `checkout.total_amount`
 //     (cents) is the order's paid amount; you must expand `checkout` to get it.
+//
+// VERIFIED LIVE on 2026-09-14:
+//   - The LIST endpoint honors the same expand[] params, so one page call
+//     returns 100 orders with their line items — no per-order fetches.
+//   - api.surecart.com sits behind Cloudflare, which temporarily bans an IP
+//     (HTTP 429, error 1015) for bursty traffic — 5 concurrent requests tripped
+//     it. Calls here are sequential and paced, and a 429 waits a full minute.
+//   - SureCart's own daily order statistics bucket orders by created_at in
+//     America/New_York. Bucketing the same way makes our days match its reports.
+//   - A failed renewal charge is retried on the SAME order, whose status flips
+//     to paid 1–14 days after created_at (all 266 late payments Jan–Sep 2026
+//     landed within 336h). A run that reads only yesterday misses them for
+//     good, so index.mjs re-derives a trailing window of days on every run.
+//   - order_type is "checkout" (customer-initiated purchase) or "subscription"
+//     (billing-cycle charge). A recurring-price line item in a checkout order is
+//     a NEW SIGNUP (incl. $1 trial starts); in a subscription order it's a
+//     RENEWAL (incl. trial→paid conversions). August 2026 new signups by this
+//     rule (95) matched subscriptions.mjs's created_at count exactly.
 
 import { BUMPS } from "./config.mjs";
 
@@ -27,104 +45,112 @@ const LINE_ITEM_EXPAND = "expand[]=checkout&expand[]=checkout.line_items&expand[
 const REQUEST_TIMEOUT_MS = 20_000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 1000;
+const RATE_LIMIT_WAIT_MS = 65_000;
+const PAGE_PACE_MS = 400;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Retries on timeouts, network drops, and 5xx — these are the transient
-// failures seen in practice (e.g. a stalled connection that undici reports
-// as `TypeError: terminated`). 4xx errors are not retried since they won't
-// resolve themselves.
+const etDayFormatter = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" });
+
+// YYYY-MM-DD of a unix-seconds instant in America/New_York.
+export function etDay(unixSeconds) {
+  return etDayFormatter.format(new Date(unixSeconds * 1000));
+}
+
+// Retries timeouts, network drops (e.g. undici's `TypeError: terminated`),
+// 5xx, and Cloudflare 429s. Other 4xx errors won't resolve themselves and
+// fail immediately.
 async function scFetch(apiKey, path) {
-  let lastErr;
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const endpoint = path.split("?")[0];
+  for (let attempt = 0; ; attempt++) {
+    let res;
     try {
-      const res = await fetch(`${API_BASE}${path}`, {
+      res = await fetch(`${API_BASE}${path}`, {
         headers: { Authorization: `Bearer ${apiKey}` },
-        signal: controller.signal,
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
-      if (res.ok) return await res.json();
-      const text = await res.text();
-      const err = new Error(`SureCart API ${res.status} on GET ${path}: ${text}`);
-      if (res.status < 500) throw err;
-      lastErr = err;
     } catch (err) {
-      lastErr = err.name === "AbortError"
-        ? new Error(`SureCart API request timed out after ${REQUEST_TIMEOUT_MS}ms on GET ${path}`)
-        : err;
-    } finally {
-      clearTimeout(timer);
+      const message = err.name === "TimeoutError" ? `timed out after ${REQUEST_TIMEOUT_MS}ms` : err.message;
+      if (attempt >= MAX_RETRIES) throw new Error(`SureCart API request failed on GET ${endpoint}: ${message}`);
+      console.warn(`[surecart] retrying GET ${endpoint} after error: ${message} (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      await sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
+      continue;
     }
-    if (attempt < MAX_RETRIES) {
-      const delay = RETRY_BASE_DELAY_MS * 2 ** attempt;
-      console.warn(`[surecart] retrying GET ${path} after error: ${lastErr.message} (attempt ${attempt + 1}/${MAX_RETRIES})`);
-      await sleep(delay);
-    }
+    if (res.ok) return res.json();
+
+    const rateLimited = res.status === 429;
+    const detail = rateLimited ? "rate limited by Cloudflare" : (await res.text()).slice(0, 300);
+    const err = new Error(`SureCart API ${res.status} on GET ${endpoint}: ${detail}`);
+    if ((!rateLimited && res.status < 500) || attempt >= MAX_RETRIES) throw err;
+    const delay = rateLimited ? RATE_LIMIT_WAIT_MS : RETRY_BASE_DELAY_MS * 2 ** attempt;
+    console.warn(`[surecart] ${err.message} — retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+    await sleep(delay);
   }
-  throw lastErr;
 }
 
 async function* iteratePaidOrdersNewestFirst(apiKey) {
-  let page = 1;
-  for (;;) {
-    const result = await scFetch(apiKey, `/orders?status[]=paid&limit=100&page=${page}`);
+  for (let page = 1; ; page++) {
+    const result = await scFetch(apiKey, `/orders?status[]=paid&limit=100&page=${page}&${LINE_ITEM_EXPAND}`);
     if (!result.data?.length) return;
     for (const order of result.data) yield order;
     if (result.data.length < 100) return;
-    page += 1;
+    await sleep(PAGE_PACE_MS);
   }
 }
 
-// Orders are newest-first, so we can stop paginating the moment we see an
-// order older than the window start — no need to walk all ~6000+ paid orders.
-async function listPaidOrdersForDay(apiKey, startUnix, endUnix) {
-  const orders = [];
-  for await (const order of iteratePaidOrdersNewestFirst(apiKey)) {
-    if (order.created_at > endUnix) continue; // newer than window (shouldn't normally happen on page 1, but skip rather than break)
-    if (order.created_at < startUnix) break; // walked past the window — done
-    orders.push(order);
-  }
-  return orders;
-}
-
-async function expandOrderLineItems(apiKey, orderId) {
-  const order = await scFetch(apiKey, `/orders/${orderId}?${LINE_ITEM_EXPAND}`);
-  const lineItems = order?.checkout?.line_items?.data ?? [];
-  return { order, lineItems };
-}
-
-function lineItemProductName(lineItem) {
-  return lineItem?.price?.product?.name ?? null;
-}
-
-function lineItemRevenueDollars(lineItem) {
-  return (lineItem?.total_amount ?? 0) / 100;
-}
-
-// Builds { "Product Name": { count, revenue } } for yesterday. The line
-// item's own `bump` field (non-null = bump) is authoritative for whether
-// something is a bump; config.BUMPS is only used as a name cross-check.
-export async function fetchSureCartDailyBreakdown({ apiKey, yesterdayStartUnix, yesterdayEndUnix }) {
-  const orders = await listPaidOrdersForDay(apiKey, yesterdayStartUnix, yesterdayEndUnix);
-
-  const breakdown = {};
+// Builds per-day, per-product sales for paid orders created fromDay..toDay
+// (inclusive, ET dates):
+//   { "YYYY-MM-DD": { orderCount, breakdown: { "Product Name": {
+//       count, revenueCents, newSignups, newSignupRevenueCents,
+//       renewals, renewalRevenueCents, isBump, isRecurring } } } }
+// The line item's own `bump` field (non-null = bump) is authoritative for
+// whether something is a bump; config.BUMPS is only a name cross-check.
+// Product names are trimmed — SureCart has at least one with a trailing space.
+export async function fetchSureCartDailyBreakdowns({ apiKey, fromDay, toDay }) {
+  const byDay = {};
   const unmatchedLineItems = [];
 
-  for (const order of orders) {
-    const { lineItems } = await expandOrderLineItems(apiKey, order.id);
-    for (const li of lineItems) {
-      const name = lineItemProductName(li);
+  for await (const order of iteratePaidOrdersNewestFirst(apiKey)) {
+    const createdDay = etDay(order.created_at);
+    if (createdDay > toDay) continue;
+    if (createdDay < fromDay) break; // newest-first: walked past the window
+    if (typeof order.checkout !== "object" || order.checkout === null) {
+      throw new Error(`SureCart list response did not expand checkout for order ${order.id} — expand[] params no longer honored on /orders?`);
+    }
+
+    const day = (byDay[createdDay] ??= { orderCount: 0, breakdown: {} });
+    day.orderCount += 1;
+    for (const li of order.checkout.line_items?.data ?? []) {
+      const name = li.price?.product?.name?.trim();
       if (!name) {
         unmatchedLineItems.push({ orderId: order.id, raw: li });
         continue;
       }
-      const isBump = li.bump != null || Object.prototype.hasOwnProperty.call(BUMPS, name);
-      if (!breakdown[name]) breakdown[name] = { count: 0, revenue: 0, isBump };
-      breakdown[name].count += 1;
-      breakdown[name].revenue += lineItemRevenueDollars(li);
+      const cents = li.total_amount ?? 0;
+      const recurring = li.price?.recurring_interval != null;
+      const entry = (day.breakdown[name] ??= {
+        count: 0,
+        revenueCents: 0,
+        newSignups: 0,
+        newSignupRevenueCents: 0,
+        renewals: 0,
+        renewalRevenueCents: 0,
+        isBump: false,
+        isRecurring: false,
+      });
+      entry.count += 1;
+      entry.revenueCents += cents;
+      entry.isBump ||= li.bump != null || Object.prototype.hasOwnProperty.call(BUMPS, name);
+      entry.isRecurring ||= recurring;
+      if (recurring && order.order_type === "checkout") {
+        entry.newSignups += 1;
+        entry.newSignupRevenueCents += cents;
+      } else if (recurring && order.order_type === "subscription") {
+        entry.renewals += 1;
+        entry.renewalRevenueCents += cents;
+      }
     }
   }
 
@@ -135,20 +161,13 @@ export async function fetchSureCartDailyBreakdown({ apiKey, yesterdayStartUnix, 
     );
   }
 
-  return { breakdown, orderCount: orders.length };
+  return byDay;
 }
 
 // Most recent N paid orders, any date — for SC_DATA.recentOrders.
 export async function fetchRecentPaidOrders({ apiKey, limit = 8 }) {
-  const orders = [];
-  for await (const order of iteratePaidOrdersNewestFirst(apiKey)) {
-    orders.push(order);
-    if (orders.length >= limit) break;
-  }
-  const expanded = await Promise.all(
-    orders.map((order) => scFetch(apiKey, `/orders/${order.id}?expand[]=checkout`))
-  );
-  return expanded.map((order) => ({
+  const result = await scFetch(apiKey, `/orders?status[]=paid&limit=${limit}&page=1&expand[]=checkout`);
+  return (result.data ?? []).map((order) => ({
     id: order.id,
     number: order.number,
     created_at: order.created_at,

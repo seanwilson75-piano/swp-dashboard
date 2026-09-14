@@ -113,6 +113,10 @@ export const DAILY_PRODUCT_STATS_FIELDS = {
   revenue: "fld73O4I32t6EizEU",
   newSignups: "fldJDfygpRc6dKjy4",
   renewals: "fldQoPfOyrhXFAT2B",
+  // Added 2026-09-14 for the growth card's revenue split (see surecart.mjs
+  // for the new-signup vs renewal rule). Currency fields, dollars.
+  newSignupRevenue: "fldMWIgVBHBC0txlX",
+  renewalRevenue: "fldkCoZYOEv8qOYAW",
   parentOrders: "fldDZmOLIgOm6H6tY",
   manyChatClicks: "fldccyzSz9rcoMPF3",
   manyChatKeyword: "fldlx2D6TU9wiJMFu",

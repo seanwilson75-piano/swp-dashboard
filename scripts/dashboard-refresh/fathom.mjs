@@ -6,6 +6,13 @@ import { FATHOM_SITE_ID, TRACKED_PATHNAMES } from "./config.mjs";
 
 const API_BASE = "https://api.usefathom.com/v1/aggregations";
 
+// Pathname-grouped queries must return every tracked page, not just the top
+// few. With the old limit of 25, any tracked page outside that window's top 25
+// was recorded as 0 views — confirmed 2026-09-14: Premium checkout logged 0
+// views for August against 61 in Fathom. Omitting `limit` caps at 500 rows and
+// values above 1000 are rejected; 1000 covers every page with traffic YTD.
+const PATHNAME_LIMIT = 1000;
+
 function buildEmptyEntry() {
   return { pageviews: 0, uniques: 0, avg_duration: 0, bounce_rate: 0 };
 }
@@ -65,11 +72,11 @@ export async function fetchFathomData({ token, yesterday, sevenDaysAgo, fourteen
   // (free/lower tiers allow 5 in flight) and this call set is 8+ wide once
   // spike attribution is included. A daily refresh has no latency requirement,
   // so there's no reason to risk a 429 for parallelism we don't need.
-  const dailyRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: yesterday, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: 25, timezone });
-  const weeklyRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: sevenDaysAgo, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: 25, timezone });
-  const ytdRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: ytdStart, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: 25, timezone });
+  const dailyRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: yesterday, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: PATHNAME_LIMIT, timezone });
+  const weeklyRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: sevenDaysAgo, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: PATHNAME_LIMIT, timezone });
+  const ytdRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: ytdStart, date_to: yesterday, field_grouping: "pathname", sort_by: "pageviews:desc", limit: PATHNAME_LIMIT, timezone });
   const monthlyRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: "pageviews,uniques,visits", date_from: ytdStart, date_to: yesterday, date_grouping: "month", timezone });
-  const priorWeekRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: fourteenDaysAgo, date_to: eightDaysAgo, field_grouping: "pathname", sort_by: "pageviews:desc", limit: 25, timezone });
+  const priorWeekRows = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: fourteenDaysAgo, date_to: eightDaysAgo, field_grouping: "pathname", sort_by: "pageviews:desc", limit: PATHNAME_LIMIT, timezone });
   const dailyTotals = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: yesterday, date_to: yesterday, timezone });
   const weeklyTotals = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: sevenDaysAgo, date_to: yesterday, timezone });
   const ytdTotals = await callFathom(token, { entity: "pageview", entity_id: FATHOM_SITE_ID, aggregates: commonAggregates, date_from: ytdStart, date_to: yesterday, timezone });
@@ -162,4 +169,29 @@ export async function fetchFathomData({ token, yesterday, sevenDaysAgo, fourteen
   const WEEKLY_SOURCES = await fetchSources(sevenDaysAgo, yesterday);
 
   return { FATHOM_DAILY, FATHOM_WEEKLY, FATHOM_YTD, MONTHLY, SITE_TOTALS, PREV_PERIOD, SPIKE_REFERRERS, DAILY_SOURCES, WEEKLY_SOURCES };
+}
+
+// Per-day pageviews/uniques for every tracked pathname over a date range:
+//   { "YYYY-MM-DD": { "/path/": { pageviews, uniques } } }
+// Used by backfill.mjs to rebuild Checkout Page Views history. Fathom ANDs
+// multiple filters on the same property, so it's one call per pathname.
+export async function fetchTrackedPageviewsByDay({ token, from, to, timezone = "America/New_York" }) {
+  const byDay = {};
+  for (const path of new Set(TRACKED_PATHNAMES)) {
+    const rows = await callFathom(token, {
+      entity: "pageview",
+      entity_id: FATHOM_SITE_ID,
+      aggregates: "pageviews,uniques",
+      date_from: from,
+      date_to: to,
+      date_grouping: "day",
+      filters: JSON.stringify([{ property: "pathname", operator: "is", value: path }]),
+      timezone,
+    });
+    for (const row of rows) {
+      const day = String(row.date).slice(0, 10);
+      (byDay[day] ??= {})[path] = { pageviews: Number(row.pageviews ?? 0), uniques: Number(row.uniques ?? 0) };
+    }
+  }
+  return byDay;
 }
