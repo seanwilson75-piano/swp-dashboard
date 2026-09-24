@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-09-23T15:29:54.955Z",
-  "date": "2026-09-22",
+  "generatedAt": "2026-09-24T15:52:21.534Z",
+  "date": "2026-09-23",
   "yesterday": {
-    "orders": 18,
-    "revenueCents": 30700,
+    "orders": 16,
+    "revenueCents": 31300,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 7,
-        "revenueCents": 17500
+        "orders": 8,
+        "revenueCents": 20400
       },
       {
         "name": "Basic Membership",
@@ -16,22 +16,22 @@
         "revenueCents": 8700
       },
       {
-        "name": "Master Beginner Fundamentals in 4 Days",
+        "name": "27 Musicians Pro Musicians Bundle Pack",
         "orders": 1,
-        "revenueCents": 2700
+        "revenueCents": 2200
       }
     ]
   },
   "week": {
-    "orders": 115,
-    "revenueCents": 265825
+    "orders": 117,
+    "revenueCents": 265425
   },
   "month": {
-    "orders": 396,
-    "revenueCents": 837325
+    "orders": 413,
+    "revenueCents": 873325
   },
   "ytd": {
-    "orders": 5243,
-    "revenueCents": 11575400
+    "orders": 5260,
+    "revenueCents": 11611400
   }
 }
