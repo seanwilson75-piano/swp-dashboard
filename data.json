@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-09-24T15:52:21.534Z",
-  "date": "2026-09-23",
+  "generatedAt": "2026-09-25T15:52:18.605Z",
+  "date": "2026-09-24",
   "yesterday": {
-    "orders": 16,
-    "revenueCents": 31300,
+    "orders": 11,
+    "revenueCents": 26600,
     "topProducts": [
       {
+        "name": "Premium Membership",
+        "orders": 2,
+        "revenueCents": 9400
+      },
+      {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 8,
-        "revenueCents": 20400
+        "orders": 5,
+        "revenueCents": 8900
       },
       {
         "name": "Basic Membership",
         "orders": 3,
-        "revenueCents": 8700
-      },
-      {
-        "name": "27 Musicians Pro Musicians Bundle Pack",
-        "orders": 1,
-        "revenueCents": 2200
+        "revenueCents": 8300
       }
     ]
   },
   "week": {
-    "orders": 117,
-    "revenueCents": 265425
+    "orders": 108,
+    "revenueCents": 250725
   },
   "month": {
-    "orders": 413,
-    "revenueCents": 873325
+    "orders": 424,
+    "revenueCents": 899925
   },
   "ytd": {
-    "orders": 5260,
-    "revenueCents": 11611400
+    "orders": 5271,
+    "revenueCents": 11638000
   }
 }
