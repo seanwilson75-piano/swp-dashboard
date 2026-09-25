@@ -13,6 +13,7 @@ import {
   SUBSCRIPTION_SNAPSHOT_FIELDS as SF,
   PRODUCTS,
   BUMPS,
+  UNTRACKED_PRODUCT_TYPES,
 } from "./config.mjs";
 
 const API_BASE = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
@@ -99,6 +100,7 @@ export async function fetchDailyProductStats(token, from, to) {
         day: f[F.date],
         name: f[F.productName],
         productType: f[F.productType],
+        parentProduct: f[F.parentProduct],
         orders: Number(f[F.orders] ?? 0),
         revenueCents: toCents(f[F.revenue]),
         newSignups: Number(f[F.newSignups] ?? 0),
@@ -122,6 +124,7 @@ const SALES_KEYS = ["orders", "revenueCents", "newSignups", "renewals", "newSign
 //   - products whose sales differ from what's stored (late payments landing),
 //   - stored rows SureCart no longer has sales for (refunds, renamed
 //     products) — zeroed rather than deleted,
+//   - rows whose Product Type / Parent Product no longer match config,
 //   - when `pageViews` is given ({ "/slug/": {pageviews, uniques} } — yesterday
 //     in the daily run, every day in a backfill): one row per configured
 //     product carrying its page views, even with zero sales.
@@ -139,7 +142,10 @@ export function buildDayWrites({ day, breakdown, existing, pageViews }) {
     const row = {
       day,
       name,
-      productType: meta?.type ?? (sales ? (sales.isBump ? "Bump" : sales.isRecurring ? "Subscription" : "Product") : undefined),
+      productType:
+        meta?.type ??
+        UNTRACKED_PRODUCT_TYPES[name] ??
+        (sales ? (sales.isBump ? "Bump" : sales.isRecurring ? "Subscription" : "Product") : undefined),
       parentProduct: BUMPS[name],
       orders: sales?.count ?? 0,
       revenueCents: sales?.revenueCents ?? 0,
@@ -158,7 +164,12 @@ export function buildDayWrites({ day, breakdown, existing, pageViews }) {
       viewsChanged = stored?.checkoutPageViews !== views.pageviews || stored?.checkoutUniques !== views.uniques;
     }
     const salesChanged = SALES_KEYS.some((key) => (stored?.[key] ?? 0) !== row[key]);
-    if (salesChanged || viewsChanged) writes.push(row);
+    // Rows written before a product was configured can carry a stale type or
+    // parent (e.g. a free download typed "Bump"); rewrite them when known.
+    const labelsChanged =
+      (row.productType !== undefined && stored?.productType !== row.productType) ||
+      (row.parentProduct !== undefined && stored?.parentProduct !== row.parentProduct);
+    if (salesChanged || viewsChanged || labelsChanged) writes.push(row);
   }
   return writes;
 }

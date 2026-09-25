@@ -37,7 +37,7 @@
 //     RENEWAL (incl. trial→paid conversions). August 2026 new signups by this
 //     rule (95) matched subscriptions.mjs's created_at count exactly.
 
-import { BUMPS } from "./config.mjs";
+import { BUMPS, PRODUCT_ALIASES } from "./config.mjs";
 
 const API_BASE = "https://api.surecart.com/v1";
 const LINE_ITEM_EXPAND = "expand[]=checkout&expand[]=checkout.line_items&expand[]=line_item.price&expand[]=price.product";
@@ -107,7 +107,8 @@ async function* iteratePaidOrdersNewestFirst(apiKey) {
 //       renewals, renewalRevenueCents, isBump, isRecurring } } } }
 // The line item's own `bump` field (non-null = bump) is authoritative for
 // whether something is a bump; config.BUMPS is only a name cross-check.
-// Product names are trimmed — SureCart has at least one with a trailing space.
+// Product names are trimmed — SureCart has at least one with a trailing space —
+// then mapped through config.PRODUCT_ALIASES to the dashboard's product name.
 export async function fetchSureCartDailyBreakdowns({ apiKey, fromDay, toDay }) {
   const byDay = {};
   const unmatchedLineItems = [];
@@ -123,7 +124,8 @@ export async function fetchSureCartDailyBreakdowns({ apiKey, fromDay, toDay }) {
     const day = (byDay[createdDay] ??= { orderCount: 0, breakdown: {} });
     day.orderCount += 1;
     for (const li of order.checkout.line_items?.data ?? []) {
-      const name = li.price?.product?.name?.trim();
+      const scName = li.price?.product?.name?.trim();
+      const name = PRODUCT_ALIASES[scName] ?? scName;
       if (!name) {
         unmatchedLineItems.push({ orderId: order.id, raw: li });
         continue;

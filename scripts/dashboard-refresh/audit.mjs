@@ -18,6 +18,8 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import {
   PRODUCTS,
   BUMPS,
+  PRODUCT_ALIASES,
+  UNTRACKED_PRODUCT_TYPES,
   TRACKED_PATHNAMES,
   FATHOM_SITE_ID,
   AIRTABLE_BASE_ID,
@@ -103,7 +105,7 @@ function summarizeOrder(order, checkout) {
     totalCents: checkout.total_amount ?? 0,
     refundedCents: checkout.refunded_amount ?? 0,
     lines: (checkout.line_items?.data ?? []).map((li) => ({
-      name: li.price?.product?.name?.trim() || null,
+      name: (PRODUCT_ALIASES[li.price?.product?.name?.trim()] ?? li.price?.product?.name?.trim()) || null,
       cents: li.total_amount ?? 0,
       bump: li.bump != null,
       recurring: li.price?.recurring_interval != null,
@@ -253,7 +255,7 @@ async function main() {
       const p = (day.byProduct[line.name] ??= { count: 0, cents: 0 });
       p.count += 1;
       p.cents += line.cents;
-      if (!PRODUCTS[line.name] && !BUMPS[line.name]) {
+      if (!PRODUCTS[line.name] && !BUMPS[line.name] && !UNTRACKED_PRODUCT_TYPES[line.name]) {
         const u = (unknownProducts[line.name] ??= { count: 0, cents: 0, bump: line.bump });
         u.count += 1;
         u.cents += line.cents;
@@ -335,7 +337,7 @@ async function main() {
   }
 
   console.log("\n=== ORDER TYPES ===", JSON.stringify(orderTypes));
-  console.log("\n=== PRODUCTS NOT IN config PRODUCTS/BUMPS (still counted in totals, but typed 'Bump' in Airtable) ===");
+  console.log("\n=== PRODUCTS NOT IN config (still counted in totals; Airtable type inferred from the order) ===");
   for (const [name, u] of Object.entries(unknownProducts)) console.log(`   ${name}: ${u.count} items, ${usd(u.cents)}${u.bump ? " (bump)" : ""}`);
 
   console.log("\n=== LATE-PAID ORDERS (paid on a later ET day than created) ===");

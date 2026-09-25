@@ -28,7 +28,8 @@ export const TRACKED_PATHNAMES = [
   "/new-1trial-registration-page/",
   "/27-bundle-waitlist/",
   "/9sus4-to-dominant-release/",
-  "/half-dim-locrian-arpeggio-download-page/",
+  "/sean-harmony-chart/",
+  "/september-practice-guide-checkout/",
   // Bump accept/not-accept thank-you pages for the Half-Diminished Exercises
   // checkout — not a "product" page, but tracking both lets pageviews on
   // each serve as a proxy for bump offers-shown/acceptance-rate, which
@@ -56,7 +57,28 @@ export const PRODUCTS = {
   "Roadmap Lead": { type: "Lead Magnet", slug: "/our-roadmap-offer/" },
   "Major vs Minor Quiz": { type: "Lead Magnet", slug: "/major-vs-minor-quiz/" },
   "Scales Charts": { type: "Lead Magnet", slug: "/scales-charts/" },
-  "Get the Half-Diminished Exercises": { type: "Product", slug: "/half-dim-locrian-arpeggio-download-page/" }, // added 2026-06-25, $1
+  // Added 2026-09-25 — both were selling with no config entry.
+  "Sean's Free Harmony Framework": { type: "Lead Magnet", slug: "/sean-harmony-chart/" },
+  "September Practice Guide": { type: "Product", slug: "/september-practice-guide-checkout/" },
+};
+
+// SureCart product name (trimmed) -> the PRODUCTS name its sales are stored
+// under. For products whose SureCart name differs from the dashboard name, so
+// their sales land on the row that carries the product's page views instead of
+// a separate unconfigured row (which left the configured row at $0).
+export const PRODUCT_ALIASES = {
+  "Single Course - Dan's Signature Sounds": "Dan's Signature Sounds",
+  "Get the Drop 2 Practice Files and Charts!": "Mediant Drop 2 Exercise",
+  "April Practice Guide": "April Focus Guide",
+};
+
+// Products sold in SureCart that have no tracked page, so they're not in
+// PRODUCTS, but whose type can't be inferred from the order (free downloads
+// would otherwise be typed "Product").
+export const UNTRACKED_PRODUCT_TYPES = {
+  "Get the Download for Praise Him (FREE)": "Lead Magnet",
+  "Jesus Loves Me by Joy Bloom Piano Sheet and Midi File": "Lead Magnet",
+  "Tutorial for Take 6 Song - Let the Words of My Mouth": "Lead Magnet",
 };
 
 // Bumps: Bump Name (exact) -> parent product name.
@@ -75,6 +97,9 @@ export const BUMPS = {
   // thank-you-page pair being attached to the Half-Diminished Exercises
   // checkout flow — confirm with Sean if this is ever wrong.
   "Half-Diminished Arpeggio Companion Video(s)": "Get the Half-Diminished Exercises",
+  // Added 2026-09-25.
+  "Drop 2 Practice Exercise Video to Switch Keys": "Mediant Drop 2 Exercise",
+  "The Momentum Log — Weekly Practice Tracker": "September Practice Guide",
 };
 
 // SureCart bump line items are matched against this set by name. Per the
