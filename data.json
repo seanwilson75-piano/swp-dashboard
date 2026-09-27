@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-09-26T15:02:20.749Z",
-  "date": "2026-09-25",
+  "generatedAt": "2026-09-27T15:42:31.639Z",
+  "date": "2026-09-26",
   "yesterday": {
-    "orders": 21,
-    "revenueCents": 67400,
+    "orders": 12,
+    "revenueCents": 30600,
     "topProducts": [
       {
-        "name": "Annual Standard Membership",
-        "orders": 1,
+        "name": "Basic Membership — 7 Day $1 Trial",
+        "orders": 7,
         "revenueCents": 20300
       },
       {
-        "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 8,
-        "revenueCents": 17600
+        "name": "Premium Membership",
+        "orders": 1,
+        "revenueCents": 4700
       },
       {
-        "name": "Basic Membership",
-        "orders": 6,
-        "revenueCents": 17000
+        "name": "Dan's Signature Sounds",
+        "orders": 1,
+        "revenueCents": 4700
       }
     ]
   },
   "week": {
-    "orders": 107,
-    "revenueCents": 260500
+    "orders": 112,
+    "revenueCents": 267400
   },
   "month": {
-    "orders": 445,
-    "revenueCents": 967325
+    "orders": 458,
+    "revenueCents": 1000825
   },
   "ytd": {
-    "orders": 5292,
-    "revenueCents": 11705400
+    "orders": 5305,
+    "revenueCents": 11738900
   }
 }
