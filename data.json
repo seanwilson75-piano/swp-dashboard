@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-09-30T16:53:04.166Z",
-  "date": "2026-09-29",
+  "generatedAt": "2026-10-01T17:26:22.073Z",
+  "date": "2026-09-30",
   "yesterday": {
-    "orders": 8,
-    "revenueCents": 18200,
+    "orders": 14,
+    "revenueCents": 20000,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 5,
-        "revenueCents": 8900
-      },
-      {
-        "name": "Premium Membership",
-        "orders": 1,
-        "revenueCents": 4700
+        "orders": 9,
+        "revenueCents": 12100
       },
       {
         "name": "Basic Membership",
+        "orders": 3,
+        "revenueCents": 7900
+      },
+      {
+        "name": "Hear Any Chord — Free Ear Training Chart",
         "orders": 1,
-        "revenueCents": 2900
+        "revenueCents": 0
       }
     ]
   },
   "week": {
-    "orders": 109,
-    "revenueCents": 279900
+    "orders": 110,
+    "revenueCents": 276900
   },
   "month": {
-    "orders": 507,
-    "revenueCents": 1124825
+    "orders": 526,
+    "revenueCents": 1158925
   },
   "ytd": {
-    "orders": 5354,
-    "revenueCents": 11862900
+    "orders": 5373,
+    "revenueCents": 11897000
   }
 }
