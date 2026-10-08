@@ -22,6 +22,14 @@
   --swp-ph-ink: #5E4800;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
+/* Full width: break each section out of the theme's content column, edge to edge. */
+.swp-lhm {
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0 calc(50% - 50vw) !important;
+}
+body { overflow-x: hidden; }
+@supports (overflow: clip) { body { overflow-x: clip; } }
 .swp-lhm {
   font-size: 18px;
   line-height: 1.6;
@@ -1529,9 +1537,36 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
 
+  /* Remove the theme's empty space above the first section (the white bar).
+     Walks up from the first section and zeroes top padding/margins only on
+     wrappers that have nothing visible above the section, so a real site
+     header is never touched. */
+  function removeTopGap() {
+    var first = document.getElementById('swp-lhm-a');
+    if (!first) return;
+    var el = first;
+    while (el && el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
+      var parent = el.parentElement;
+      for (var sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
+        if (sib.getBoundingClientRect().height > 0) return;
+        sib.style.setProperty('margin-top', '0', 'important');
+        sib.style.setProperty('margin-bottom', '0', 'important');
+      }
+      el.style.setProperty('margin-top', '0', 'important');
+      parent.style.setProperty('padding-top', '0', 'important');
+      parent.style.setProperty('margin-top', '0', 'important');
+      parent.style.setProperty('border-top-width', '0', 'important');
+      el = parent;
+    }
+    for (var s = el.previousElementSibling; s; s = s.previousElementSibling) {
+      if (s.getBoundingClientRect().height > 0) return;
+    }
+    el.style.setProperty('margin-top', '0', 'important');
+  }
+
   LHM.refresh = refresh;
 
-  function start() { refresh(); updateSticky(); }
+  function start() { removeTopGap(); refresh(); updateSticky(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
   setInterval(refresh, 1000);
