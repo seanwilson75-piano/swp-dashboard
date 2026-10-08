@@ -1,0 +1,1230 @@
+<!-- ===== BLOCK 0: STYLES — paste into its own Custom HTML block ===== -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------- Base ---------- */
+.swp-lhm {
+  --swp-navy: #0B1527;
+  --swp-navy-2: #132038;
+  --swp-navy-line: #26344F;
+  --swp-coral: #E8472A;
+  --swp-coral-dark: #C9381D;
+  --swp-ink: #0B1527;
+  --swp-body: #3B4456;
+  --swp-muted: #687186;
+  --swp-paper: #FFFFFF;
+  --swp-mist: #F3F5F8;
+  --swp-line: #E1E5EC;
+  --swp-on-dark: #C5CDDA;
+  --swp-ph-bg: #FFF6D4;
+  --swp-ph-line: #D4A20A;
+  --swp-ph-ink: #5E4800;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--swp-body);
+  background: var(--swp-paper);
+  padding: 64px 20px;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+.swp-lhm *,
+.swp-lhm *::before,
+.swp-lhm *::after { box-sizing: border-box; }
+:where(.swp-lhm) :where(h1, h2, h3, p, ul, ol, li, figure, blockquote, table) { margin: 0; padding: 0; }
+:where(.swp-lhm) :where(ul) { list-style: none; }
+.swp-lhm strong { color: inherit; font-weight: 700; }
+
+.swp-lhm--dark { background: var(--swp-navy); color: var(--swp-on-dark); }
+.swp-lhm--mist { background: var(--swp-mist); }
+.swp-lhm--flush-top { padding-top: 0; }
+
+.swp-lhm-wrap { max-width: 1080px; margin: 0 auto; }
+.swp-lhm-narrow { max-width: 720px; margin: 0 auto; }
+.swp-lhm-center { text-align: center; }
+.swp-lhm-stack > * + * { margin-top: 20px; }
+
+/* ---------- Type ---------- */
+.swp-lhm-headline {
+  font-size: clamp(38px, 8.4vw, 72px);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+.swp-lhm-headline em { font-style: normal; color: var(--swp-coral); }
+.swp-lhm-sub {
+  font-size: clamp(19px, 2.4vw, 23px);
+  line-height: 1.5;
+  color: var(--swp-on-dark);
+  max-width: 640px;
+  margin: 24px auto 0;
+  text-wrap: pretty;
+}
+.swp-lhm-h2 {
+  font-size: clamp(30px, 5.4vw, 48px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--swp-ink);
+  text-wrap: balance;
+}
+.swp-lhm--dark .swp-lhm-h2 { color: #FFFFFF; }
+.swp-lhm-h2 em { font-style: normal; color: var(--swp-coral); }
+.swp-lhm-h3 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--swp-ink);
+}
+.swp-lhm--dark .swp-lhm-h3 { color: #FFFFFF; }
+.swp-lhm-lead { font-size: 20px; line-height: 1.55; text-wrap: pretty; }
+.swp-lhm-small { font-size: 16px; color: var(--swp-muted); }
+.swp-lhm--dark .swp-lhm-small { color: var(--swp-on-dark); }
+
+/* ---------- Placeholders ---------- */
+.swp-lhm-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: 24px;
+  border: 2px dashed var(--swp-ph-line);
+  border-radius: 12px;
+  background: var(--swp-ph-bg);
+  color: var(--swp-ph-ink);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: pretty;
+}
+.swp-lhm-ph--mockup { aspect-ratio: 16 / 10; }
+.swp-lhm-ph--video { aspect-ratio: 16 / 9; }
+
+/* ---------- Video embed (Bunny) ---------- */
+.swp-lhm-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+}
+.swp-lhm-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.swp-lhm-e-video { max-width: 820px; margin: 56px auto 0; }
+
+/* ---------- Screenshot testimonials ---------- */
+.swp-lhm-shots {
+  display: grid;
+  gap: 16px;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.swp-lhm-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 12px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.swp-lhm-ph--chart { aspect-ratio: 4 / 3; min-height: 0; border-radius: 8px; font-size: 13px; }
+.swp-lhm-ph--inline {
+  display: inline-block;
+  min-height: 0;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+/* ---------- Button ---------- */
+.swp-lhm-btn {
+  display: block;
+  width: 100%;
+  padding: 20px 28px;
+  border-radius: 10px;
+  background: var(--swp-coral);
+  color: #FFFFFF !important;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none !important;
+  box-shadow: 0 10px 28px -10px rgba(232, 71, 42, 0.65);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.swp-lhm-btn:hover { background: var(--swp-coral-dark); transform: translateY(-1px); }
+.swp-lhm-btn:active { transform: translateY(0); }
+.swp-lhm-cta { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 28px; }
+
+/* ---------- Price ladder ---------- */
+.swp-lhm-ladder-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--swp-coral);
+  text-align: center;
+}
+.swp-lhm-ladder {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.swp-lhm-tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 26px 8px 16px;
+  border: 1px solid var(--swp-line);
+  border-radius: 12px;
+  background: var(--swp-paper);
+  text-align: center;
+}
+.swp-lhm--dark .swp-lhm-tier { background: var(--swp-navy-2); border-color: var(--swp-navy-line); }
+.swp-lhm-tier-date {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--swp-muted);
+}
+.swp-lhm--dark .swp-lhm-tier-date { color: var(--swp-on-dark); }
+.swp-lhm-tier-price {
+  font-size: clamp(26px, 6vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--swp-ink);
+  font-variant-numeric: tabular-nums;
+}
+.swp-lhm--dark .swp-lhm-tier-price { color: #FFFFFF; }
+.swp-lhm-tier-flag {
+  display: none;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 9px;
+  line-height: 1.4;
+  border-radius: 999px;
+  background: var(--swp-ink);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.swp-lhm-tier.is-current { background: var(--swp-coral); border-color: var(--swp-coral); }
+.swp-lhm-tier.is-current .swp-lhm-tier-date,
+.swp-lhm-tier.is-current .swp-lhm-tier-price { color: #FFFFFF; }
+.swp-lhm-tier.is-current .swp-lhm-tier-flag { display: block; }
+.swp-lhm--dark .swp-lhm-tier.is-current .swp-lhm-tier-flag { background: #FFFFFF; color: var(--swp-ink); }
+.swp-lhm-tier.is-past { opacity: 0.5; }
+.swp-lhm-tier.is-past .swp-lhm-tier-price { text-decoration: line-through; text-decoration-thickness: 2px; }
+
+.swp-lhm-countdown {
+  font-size: 15px;
+  color: var(--swp-muted);
+  text-align: center;
+}
+.swp-lhm--dark .swp-lhm-countdown { color: var(--swp-on-dark); }
+.swp-lhm-countdown-time { font-weight: 700; color: var(--swp-coral); font-variant-numeric: tabular-nums; }
+.swp-lhm-countdown[hidden], .swp-lhm-today[hidden] { display: none; }
+
+/* ---------- A: Big Promise ---------- */
+.swp-lhm-a { padding-top: 88px; padding-bottom: 40px; text-align: center; }
+.swp-lhm-a .swp-lhm-wrap { max-width: 920px; }
+
+/* ---------- B: Product Review ---------- */
+.swp-lhm-b { padding-top: 24px; padding-bottom: 88px; }
+.swp-lhm-b .swp-lhm-ph--mockup { max-width: 920px; margin: 0 auto; }
+.swp-lhm-mockup { display: block; width: 100%; max-width: 1080px; height: auto; margin: 0 auto; }
+.swp-lhm-b-line {
+  max-width: 620px;
+  margin: 24px auto 0;
+  text-align: center;
+  font-size: 18px;
+  color: var(--swp-on-dark);
+  text-wrap: pretty;
+}
+.swp-lhm-b-price { max-width: 560px; margin: 48px auto 0; }
+
+/* ---------- C: Proof ---------- */
+.swp-lhm-c .swp-lhm-wrap > * + * { margin-top: 56px; }
+.swp-lhm-video-caption {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--swp-ink);
+}
+.swp-lhm-quote {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 36px 28px;
+  border-radius: 16px;
+  background: var(--swp-mist);
+}
+.swp-lhm-quote-who { font-size: 16px; font-weight: 600; color: var(--swp-muted); }
+.swp-lhm-quote blockquote {
+  margin-top: 12px;
+  font-size: clamp(22px, 3.4vw, 30px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--swp-ink);
+  text-wrap: pretty;
+}
+
+/* ---------- D: Problem ---------- */
+.swp-lhm-story > p {
+  font-size: clamp(21px, 3vw, 26px);
+  line-height: 1.45;
+  color: var(--swp-ink);
+  text-wrap: pretty;
+}
+.swp-lhm-story > p + p { margin-top: 18px; }
+.swp-lhm-story .swp-lhm-story-hit { font-weight: 800; color: var(--swp-coral); }
+.swp-lhm-pains {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 44px;
+}
+.swp-lhm-pains li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border: 1px solid var(--swp-line);
+  border-radius: 12px;
+  background: var(--swp-paper);
+  font-size: 18px;
+  color: var(--swp-ink);
+}
+.swp-lhm-pains li::before {
+  content: "";
+  flex: 0 0 10px;
+  height: 10px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background: var(--swp-coral);
+}
+.swp-lhm-cost {
+  margin-top: 44px;
+  padding: 32px 28px;
+  border-radius: 16px;
+  background: var(--swp-navy);
+  color: #FFFFFF;
+  font-size: clamp(20px, 2.8vw, 24px);
+  font-weight: 600;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ---------- E: Solution ---------- */
+.swp-lhm-e-intro { max-width: 780px; margin: 0 auto; text-align: center; }
+.swp-lhm-e-intro .swp-lhm-lead { margin-top: 18px; color: var(--swp-on-dark); }
+.swp-lhm-method {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 44px;
+}
+.swp-lhm-method-card {
+  padding: 28px 24px;
+  border: 1px solid var(--swp-navy-line);
+  border-radius: 16px;
+  background: var(--swp-navy-2);
+}
+.swp-lhm-method-card p { margin-top: 12px; font-size: 17px; }
+.swp-lhm-rules {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 56px;
+}
+.swp-lhm-rule {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px 16px 26px;
+  border-radius: 16px;
+  background: var(--swp-paper);
+  color: var(--swp-body);
+}
+.swp-lhm-rule-body { padding: 0 8px; }
+.swp-lhm-rule-img { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 592; object-fit: cover; border-radius: 10px; background: var(--swp-navy); }
+.swp-lhm-rule-head { display: flex; align-items: center; gap: 14px; }
+.swp-lhm-rule-num {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--swp-coral);
+  color: #FFFFFF;
+  font-size: 22px;
+  font-weight: 800;
+}
+.swp-lhm-rule-name { font-size: 24px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.15; color: var(--swp-ink); }
+.swp-lhm-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.swp-lhm-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--swp-mist);
+  color: var(--swp-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.swp-lhm-tag--note { background: var(--swp-ink); color: #FFFFFF; }
+.swp-lhm-rule-desc { margin-top: 12px; font-size: 17px; text-wrap: pretty; }
+.swp-lhm-outcome {
+  max-width: 760px;
+  margin: 56px auto 0;
+  text-align: center;
+  font-size: clamp(22px, 3.2vw, 30px);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+
+/* ---------- F: Offer ---------- */
+.swp-lhm-f-intro { max-width: 720px; margin: 0 auto; text-align: center; }
+.swp-lhm-f-intro .swp-lhm-lead { margin-top: 16px; }
+.swp-lhm-benefits {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px 28px;
+  max-width: 920px;
+  margin: 44px auto 0;
+}
+.swp-lhm-benefits li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  font-size: 18px;
+  color: var(--swp-ink);
+}
+.swp-lhm-benefits li::before {
+  content: "\2713";
+  flex: 0 0 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--swp-coral);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* ---------- G: Deliverables ---------- */
+.swp-lhm-deliverables {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.swp-lhm-deliverable {
+  padding: 28px 24px;
+  border: 1px solid var(--swp-line);
+  border-radius: 16px;
+  background: var(--swp-paper);
+}
+.swp-lhm-deliverable-num {
+  display: block;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--swp-coral);
+}
+.swp-lhm-deliverable .swp-lhm-h3 { margin-top: 14px; }
+.swp-lhm-deliverable p { margin-top: 10px; font-size: 17px; text-wrap: pretty; }
+
+/* ---------- H: Value ---------- */
+.swp-lhm-honest > p { font-size: clamp(21px, 3vw, 26px); line-height: 1.45; color: var(--swp-ink); text-wrap: pretty; }
+.swp-lhm-honest > p + p { margin-top: 16px; }
+.swp-lhm-honest .swp-lhm-honest-q { font-weight: 800; }
+.swp-lhm-valuecard {
+  max-width: 720px;
+  margin: 56px auto 0;
+  padding: 32px 22px;
+  border: 1px solid var(--swp-line);
+  border-radius: 20px;
+  background: var(--swp-paper);
+  box-shadow: 0 30px 60px -30px rgba(11, 21, 39, 0.25);
+}
+.swp-lhm-stack-table { width: 100%; border-collapse: collapse; font-size: 17px; }
+.swp-lhm-stack-table th,
+.swp-lhm-stack-table td { padding: 14px 4px; border-bottom: 1px solid var(--swp-line); text-align: left; vertical-align: top; }
+.swp-lhm-stack-table th { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--swp-muted); }
+.swp-lhm-stack-table td { color: var(--swp-ink); font-weight: 600; }
+.swp-lhm-stack-table th:last-child,
+.swp-lhm-stack-table td:last-child { text-align: right; white-space: nowrap; padding-left: 16px; }
+.swp-lhm-stack-table tfoot td { border-bottom: 0; font-weight: 800; font-size: 19px; }
+.swp-lhm-stack-sum {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--swp-ink);
+}
+.swp-lhm-valuecard .swp-lhm-ladder-wrap { margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--swp-line); }
+.swp-lhm-today { margin-top: 24px; text-align: center; font-size: 22px; font-weight: 800; color: var(--swp-ink); }
+.swp-lhm-use { margin-top: 6px; text-align: center; font-size: 18px; color: var(--swp-body); }
+
+/* ---------- I: Close ---------- */
+.swp-lhm-i { padding-bottom: 0; }
+.swp-lhm-faq { margin-top: 56px; border-top: 1px solid var(--swp-line); }
+.swp-lhm-faq details { border-bottom: 1px solid var(--swp-line); }
+.swp-lhm-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 2px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--swp-ink);
+}
+.swp-lhm-faq summary::-webkit-details-marker { display: none; }
+.swp-lhm-faq summary::after {
+  content: "+";
+  flex: 0 0 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--swp-mist);
+  color: var(--swp-coral);
+  font-size: 22px;
+  font-weight: 600;
+  transition: transform 0.2s ease;
+}
+.swp-lhm-faq details[open] summary::after { transform: rotate(45deg); }
+.swp-lhm-faq details p { padding: 0 48px 24px 2px; font-size: 17px; text-wrap: pretty; }
+.swp-lhm-final {
+  margin: 88px -20px 0;
+  padding: 88px 20px;
+  background: var(--swp-navy);
+  color: var(--swp-on-dark);
+}
+.swp-lhm-final .swp-lhm-h2 { color: #FFFFFF; text-align: center; }
+.swp-lhm-final .swp-lhm-ladder-wrap { max-width: 560px; margin: 40px auto 0; }
+.swp-lhm-final .swp-lhm-tier { background: var(--swp-navy-2); border-color: var(--swp-navy-line); }
+.swp-lhm-final .swp-lhm-tier-date { color: var(--swp-on-dark); }
+.swp-lhm-final .swp-lhm-tier-price { color: #FFFFFF; }
+.swp-lhm-final .swp-lhm-tier.is-current { background: var(--swp-coral); border-color: var(--swp-coral); }
+.swp-lhm-final .swp-lhm-tier.is-current .swp-lhm-tier-flag { background: #FFFFFF; color: var(--swp-ink); }
+.swp-lhm-final .swp-lhm-countdown { color: var(--swp-on-dark); }
+.swp-lhm-anchor { display: block; height: 0; }
+
+/* ---------- Tablet & up ---------- */
+@media (min-width: 720px) {
+  .swp-lhm { padding: 104px 32px; }
+  .swp-lhm-a { padding-top: 128px; padding-bottom: 48px; }
+  .swp-lhm-b { padding-top: 24px; padding-bottom: 112px; }
+  .swp-lhm-btn { display: inline-block; width: auto; min-width: 380px; padding: 22px 40px; font-size: 21px; }
+  .swp-lhm-quote { padding: 48px 56px; }
+  .swp-lhm-method { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .swp-lhm-method-card { padding: 36px 32px; }
+  .swp-lhm-rules { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .swp-lhm-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .swp-lhm-deliverables { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .swp-lhm-valuecard { padding: 48px 48px; }
+  .swp-lhm-cost { padding: 40px 44px; }
+  .swp-lhm-final { margin: 104px -32px 0; padding: 120px 32px; }
+}
+</style>
+<!-- ===== END BLOCK 0 ===== -->
+
+
+<!-- ===== BLOCK A: BIG PROMISE — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-a" class="swp-lhm swp-lhm--dark swp-lhm-a">
+  <div class="swp-lhm-wrap">
+
+    <!-- Headline -->
+    <h1 class="swp-lhm-headline">Finally know what your <em>left hand</em> should play during songs</h1>
+
+    <!-- Subheading -->
+    <p class="swp-lhm-sub">I will teach you what to play in your Left Hand for every type of chord so you can sound complete on the piano.</p>
+
+  </div>
+</section>
+<!-- ===== END BLOCK A ===== -->
+
+
+<!-- ===== BLOCK B: PRODUCT REVIEW — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-b" class="swp-lhm swp-lhm--dark swp-lhm-b">
+  <div class="swp-lhm-wrap">
+
+    <!-- Mockup image -->
+    <img class="swp-lhm-mockup" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-bundle-mockup.webp" alt="Left Hand Mastery: video lessons, song lessons, and Practice Charts PDF">
+
+    <!-- Line under the mockup -->
+    <p class="swp-lhm-b-line">Over an hour of lessons. 3 full song lessons. Play-along Practice Charts for every rule, in all 12 keys.</p>
+
+    <div class="swp-lhm-b-price">
+
+      <!-- Price ladder: title -->
+      <p class="swp-lhm-ladder-title">Launch price goes up every day.</p>
+
+      <!-- Price ladder: tiers (current tier highlights automatically) -->
+      <ul class="swp-lhm-ladder">
+        <li class="swp-lhm-tier" data-swp-tier="1">
+          <span class="swp-lhm-tier-flag">Today</span>
+          <span class="swp-lhm-tier-date">Oct 11</span>
+          <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
+        </li>
+        <li class="swp-lhm-tier" data-swp-tier="2">
+          <span class="swp-lhm-tier-flag">Today</span>
+          <span class="swp-lhm-tier-date">Oct 12</span>
+          <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$24</span></span>
+        </li>
+        <li class="swp-lhm-tier" data-swp-tier="3">
+          <span class="swp-lhm-tier-flag">Today</span>
+          <span class="swp-lhm-tier-date">After</span>
+          <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$24</span></span>
+        </li>
+      </ul>
+
+      <div class="swp-lhm-cta">
+        <!-- Button -->
+        <a class="swp-lhm-btn" href="#swp-lhm-checkout">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+
+        <!-- Countdown -->
+        <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$24</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ===== END BLOCK B ===== -->
+
+
+<!-- ===== BLOCK C: PROOF — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-c" class="swp-lhm swp-lhm-c">
+  <div class="swp-lhm-wrap">
+
+    <!-- Authority (placeholder) -->
+    <div class="swp-lhm-narrow">
+      <div class="swp-lhm-ph">[Authority placeholder: the difference this teaching makes in the lives of the musicians Sean teaches. To be written.]</div>
+    </div>
+
+    <!-- Origin story video: Sean's father correcting his left hand -->
+    <div class="swp-lhm-video">
+      <iframe src="https://iframe.mediadelivery.net/embed/490495/df4387ae-0693-4dc8-aa6c-df9fa38c4a22?autoplay=false&amp;preload=true&amp;responsive=true" loading="lazy" allow="accelerometer; gyroscope; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Why I started searching for what to play in my left hand"></iframe>
+    </div>
+
+    <div>
+      <!-- Before/after clip (placeholder, 16:9) -->
+      <div class="swp-lhm-ph swp-lhm-ph--video">[30-second clip: the same progression played with octaves first, then with the right rule]</div>
+
+      <!-- Clip caption -->
+      <p class="swp-lhm-video-caption">Same chords. Same right hand. Only the left hand changed.</p>
+    </div>
+
+    <!-- Credibility quote -->
+    <figure class="swp-lhm-quote">
+      <p class="swp-lhm-quote-who">Chevonne, who works on my team, said:</p>
+      <blockquote>&ldquo;I feel like I am gonna be married to this over the next few months. Wow, you have so much helpful content in here!&rdquo;</blockquote>
+    </figure>
+
+    <!-- Student results: YouTube comment screenshots (upload to Media Library and replace each src URL) -->
+    <div class="swp-lhm-shots">
+      <img class="swp-lhm-shot" src="sales-assets/testimonial-1.jpg" alt="YouTube comment from @jeddlawrence: You are so correct. When we learn we all only concentrate on the right hand... Feel like you were speaking to me personally there... Lol" loading="lazy">
+      <img class="swp-lhm-shot" src="sales-assets/testimonial-2.jpg" alt="YouTube comment from @marl-author2531: This is pretty much a cliff notes video to everything you need to know in Gospel music! Put this regimen in every key and you are fluent!" loading="lazy">
+    </div>
+
+  </div>
+</section>
+<!-- ===== END BLOCK C ===== -->
+
+
+<!-- ===== BLOCK D: PROBLEM — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-d" class="swp-lhm swp-lhm--mist swp-lhm-d">
+  <div class="swp-lhm-narrow">
+
+    <!-- Problem story -->
+    <div class="swp-lhm-story">
+      <p>You learn the chord. Your right hand gets it right.</p>
+      <p>Then your left hand plays octaves. Or just the root. Or whatever feels safe.</p>
+      <p class="swp-lhm-story-hit">In a modern song, that sounds ancient.</p>
+      <p>It makes you look like you don't know what you're doing. Even when you do.</p>
+      <p>Musicians can hear it. And deep down, you know when you're guessing.</p>
+    </div>
+
+    <!-- Pain points -->
+    <ul class="swp-lhm-pains">
+      <li>You play octaves under every song, old or new.</li>
+      <li>You're not sure when to play the bass note and when to leave it out.</li>
+      <li>You don't know where on the keyboard your left hand belongs.</li>
+      <li>Your right hand is right, but the whole thing still sounds off.</li>
+    </ul>
+
+    <!-- What happens if nothing changes -->
+    <p class="swp-lhm-cost">You keep learning new chords, and your sound stays the same. Because the problem was never your right hand.</p>
+
+  </div>
+</section>
+<!-- ===== END BLOCK D ===== -->
+
+
+<!-- ===== BLOCK E: SOLUTION — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-e" class="swp-lhm swp-lhm--dark swp-lhm-e">
+  <div class="swp-lhm-wrap">
+
+    <div class="swp-lhm-e-intro">
+      <!-- Headline -->
+      <h2 class="swp-lhm-h2">The bass plays a note. Your left hand needs an answer.</h2>
+
+      <!-- Intro line -->
+      <p class="swp-lhm-lead">My method has two parts.</p>
+    </div>
+
+    <div class="swp-lhm-method">
+      <!-- The Zone -->
+      <div class="swp-lhm-method-card">
+        <h3 class="swp-lhm-h3">The Zone tells you where to play.</h3>
+        <p>Do you know what part of the keyboard your left hand needs to be in? If not, the Zone will tell you. Step outside the Zone and it won't sound right, even with the right notes.</p>
+      </div>
+
+      <!-- The 6 Rules -->
+      <div class="swp-lhm-method-card">
+        <h3 class="swp-lhm-h3">The 6 Rules tell you what to play.</h3>
+        <p>Each rule is a job your left hand does in a song. Learn all six, and you'll know which one the moment needs.</p>
+      </div>
+    </div>
+
+    <!-- The 6 Rules grid -->
+    <div class="swp-lhm-rules">
+
+      <!-- Rule 1 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 1 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-1.png" alt="Rule 1: Heavy Bottom lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">1</span>
+            <h3 class="swp-lhm-rule-name">Heavy Bottom</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">Octaves</span>
+          </div>
+          <p class="swp-lhm-rule-desc">For the big moments, like endings and key parts of a song. Low, full, and strong.</p>
+        </div>
+      </article>
+
+      <!-- Rule 2 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 2 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-2.png" alt="Rule 2: Root Support lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">2</span>
+            <h3 class="swp-lhm-rule-name">Root Support</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">Root + chord</span>
+          </div>
+          <p class="swp-lhm-rule-desc">Sometimes the bass note has to be there. Learn when to keep it, and when to let it go.</p>
+        </div>
+      </article>
+
+      <!-- Rule 3 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 3 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-3.png" alt="Rule 3: 2-Note Tritone lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">3</span>
+            <h3 class="swp-lhm-rule-name">2-Note Tritone</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">3rd + b7</span>
+          </div>
+          <p class="swp-lhm-rule-desc">Where everyone should start dropping the bass note. It's all you need for passing chords, gospel bumps, shout music, and fast songs.</p>
+        </div>
+      </article>
+
+      <!-- Rule 4 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 4 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-4.png" alt="Rule 4: 3-Note Tritone lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">4</span>
+            <h3 class="swp-lhm-rule-name">3-Note Tritone</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">Add one note</span>
+            <span class="swp-lhm-tag swp-lhm-tag--note">Builds on Rule 3</span>
+          </div>
+          <p class="swp-lhm-rule-desc">Builds on Rule 3. Covers dominant, diminished, and half-diminished chords. You already know two notes. Now you learn one more.</p>
+        </div>
+      </article>
+
+      <!-- Rule 5 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 5 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-5.png" alt="Rule 5: Target Chords lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">5</span>
+            <h3 class="swp-lhm-rule-name">Target Chords</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">Major + minor</span>
+          </div>
+          <p class="swp-lhm-rule-desc">Most chords in a song are major or minor. Know exactly what your left hand plays under them, from triads to 7ths and 9ths.</p>
+        </div>
+      </article>
+
+      <!-- Rule 6 -->
+      <article class="swp-lhm-rule">
+        <!-- Rule 6 image: upload to Media Library and replace the src URL -->
+        <img class="swp-lhm-rule-img" src="sales-assets/rule-6.png" alt="Rule 6: Passing lesson slide">
+        <div class="swp-lhm-rule-body">
+          <div class="swp-lhm-rule-head">
+            <span class="swp-lhm-rule-num">6</span>
+            <h3 class="swp-lhm-rule-name">Passing</h3>
+          </div>
+          <div class="swp-lhm-tags">
+            <span class="swp-lhm-tag">Walk-downs</span>
+            <span class="swp-lhm-tag swp-lhm-tag--note">Most advanced</span>
+          </div>
+          <p class="swp-lhm-rule-desc">The highest level. Your left hand stops just holding chords and starts making melody and movement.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Sample lesson video: diminished 7th chord in the left hand (Rule 4) -->
+    <div class="swp-lhm-video swp-lhm-e-video">
+      <iframe src="https://iframe.mediadelivery.net/embed/490495/a94909ac-00ed-4b9a-a6fe-589983d3bd9c?autoplay=false&amp;preload=true&amp;responsive=true" loading="lazy" allow="accelerometer; gyroscope; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Playing a diminished 7th chord in the left hand"></iframe>
+    </div>
+
+    <!-- The outcome -->
+    <p class="swp-lhm-outcome">No more guessing. Your left hand supports every chord, and your whole sound gets better.</p>
+
+  </div>
+</section>
+<!-- ===== END BLOCK E ===== -->
+
+
+<!-- ===== BLOCK F: OFFER — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-f" class="swp-lhm swp-lhm-f">
+  <div class="swp-lhm-wrap">
+
+    <div class="swp-lhm-f-intro">
+      <!-- Headline -->
+      <h2 class="swp-lhm-h2">Introducing <em>Left Hand Mastery</em></h2>
+
+      <!-- Intro line -->
+      <p class="swp-lhm-lead">This is Milestone 1 of my Intermediate Roadmap. For the first time, you can get it on its own.</p>
+    </div>
+
+    <!-- Benefits -->
+    <ul class="swp-lhm-benefits">
+      <li>Know what your left hand plays under any chord.</li>
+      <li>Know when to keep the bass note, and when to drop it.</li>
+      <li>Play passing chords, gospel bumps, and shout music with just 2 notes.</li>
+      <li>Handle dominant, diminished, and half-diminished chords by adding one note.</li>
+      <li>Sound modern on today's songs instead of stuck in octaves.</li>
+      <li>Use your left hand to create movement, not just hold chords.</li>
+      <li>Practice every rule in all 12 keys.</li>
+    </ul>
+
+  </div>
+</section>
+<!-- ===== END BLOCK F ===== -->
+
+
+<!-- ===== BLOCK G: DELIVERABLES — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-g" class="swp-lhm swp-lhm--mist swp-lhm-g">
+  <div class="swp-lhm-wrap">
+    <div class="swp-lhm-deliverables">
+
+      <!-- Deliverable 1: The Lessons -->
+      <div class="swp-lhm-deliverable">
+        <span class="swp-lhm-deliverable-num">1</span>
+        <h3 class="swp-lhm-h3">The Lessons</h3>
+        <p>Over an hour of video. The Zone, all 6 Rules, and Rule 4's three chord types: dominant, diminished, and half-diminished.</p>
+      </div>
+
+      <!-- Deliverable 2: 3 Song Lessons -->
+      <div class="swp-lhm-deliverable">
+        <span class="swp-lhm-deliverable-num">2</span>
+        <h3 class="swp-lhm-h3">3 Song Lessons</h3>
+        <p>Amazing Grace, Praise Him, and I Will Bless the Lord. 10–15 minutes each. See every rule used in a real song.</p>
+      </div>
+
+      <!-- Deliverable 3: The Practice Charts PDF -->
+      <div class="swp-lhm-deliverable">
+        <span class="swp-lhm-deliverable-num">3</span>
+        <h3 class="swp-lhm-h3">The Practice Charts PDF</h3>
+        <p>Play along, download, and print. Charts for every rule in all 12 keys, with everything from the course on paper. <span class="swp-lhm-ph swp-lhm-ph--inline">[Page count]</span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ===== END BLOCK G ===== -->
+
+
+<!-- ===== BLOCK H: VALUE — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-h" class="swp-lhm swp-lhm-h">
+  <div class="swp-lhm-wrap">
+
+    <!-- Be honest with yourself -->
+    <div class="swp-lhm-narrow swp-lhm-honest">
+      <p class="swp-lhm-honest-q">How long would it take you to figure out what your left hand plays under every chord? In all 12 keys?</p>
+      <p>Months of guessing. Most players never figure it out.</p>
+      <p>I put it all in one course. Six rules. Three songs. Every key.</p>
+    </div>
+
+    <div class="swp-lhm-valuecard">
+
+      <!-- Value stack -->
+      <table class="swp-lhm-stack-table">
+        <thead>
+          <tr>
+            <th>What you get</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>The 6 Rules (6 lessons × <span data-swp-price="rule-each">$24</span>)</td>
+            <td><span data-swp-price="rules">$24</span></td>
+          </tr>
+          <tr>
+            <td>Play-along Practice Charts (all 12 keys)</td>
+            <td><span data-swp-price="charts">$24</span></td>
+          </tr>
+          <tr>
+            <td>3 Song Lessons (3 × <span data-swp-price="song-each">$24</span>)</td>
+            <td><span data-swp-price="songs">$24</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total value</td>
+            <td><span data-swp-price="total">$24</span></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Value summary -->
+      <p class="swp-lhm-stack-sum">Total value: <span data-swp-price="total">$24</span>. Regular price: <span data-swp-price="regular">$24</span>.</p>
+
+      <div class="swp-lhm-ladder-wrap">
+
+        <!-- Price ladder: tiers -->
+        <ul class="swp-lhm-ladder">
+          <li class="swp-lhm-tier" data-swp-tier="1">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">Oct 11</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
+          </li>
+          <li class="swp-lhm-tier" data-swp-tier="2">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">Oct 12</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$24</span></span>
+          </li>
+          <li class="swp-lhm-tier" data-swp-tier="3">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">After Oct 12</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$24</span></span>
+          </li>
+        </ul>
+
+        <!-- Today line (shows on Oct 11 and earlier) -->
+        <p class="swp-lhm-today" data-swp-show-tier="1">Today: <span data-swp-price>$24</span>. That's 75% off the regular price.</p>
+
+        <!-- Today line (shows on Oct 12) -->
+        <p class="swp-lhm-today" data-swp-show-tier="2" hidden>Today: <span data-swp-price>$24</span>. About half off the regular price.</p>
+
+        <!-- Closing line -->
+        <p class="swp-lhm-use">You'll use this in every song you play.</p>
+
+        <div class="swp-lhm-cta">
+          <!-- Button -->
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+
+          <!-- Countdown -->
+          <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$24</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ===== END BLOCK H ===== -->
+
+
+<!-- ===== BLOCK I: CLOSE — paste into its own Custom HTML block ===== -->
+<section id="swp-lhm-i" class="swp-lhm swp-lhm--mist swp-lhm-i">
+  <div class="swp-lhm-wrap">
+
+    <!-- Additional testimonial: YouTube comment screenshot (upload to Media Library and replace the src URL) -->
+    <div class="swp-lhm-shots">
+      <img class="swp-lhm-shot" src="sales-assets/testimonial-3.jpg" alt="YouTube comment from @thabomahlagare9001: Like I was wondering what to do with my left hand just last night, and then boom I bump into this! So dope!!!!" loading="lazy">
+    </div>
+
+    <!-- FAQ -->
+    <div class="swp-lhm-narrow swp-lhm-faq">
+
+      <!-- FAQ 1 -->
+      <details>
+        <summary>Is this for my level?</summary>
+        <p>It's built for intermediate players. If you're a beginner, start now. Learning your left hand the right way early gives you a strong foundation.</p>
+      </details>
+
+      <!-- FAQ 2 -->
+      <details>
+        <summary>Do I need to read music?</summary>
+        <p>No. Every chart shows the note names. Find the bass note, read across, and play.</p>
+      </details>
+
+      <!-- FAQ 3 -->
+      <details>
+        <summary>Is this only for gospel?</summary>
+        <p>No. It covers gospel and modern songs. Octaves that work in an old hymn can sound ancient in a modern song. This course shows you the difference.</p>
+      </details>
+
+      <!-- FAQ 4 -->
+      <details>
+        <summary>I play with a bass player. Do I still need this?</summary>
+        <p>Yes. Rule 2 shows when the root is needed and when it isn't. When the bass player has the low end, your left hand has a different job.</p>
+      </details>
+
+      <!-- FAQ 5 -->
+      <details>
+        <summary>I'm already a member. Should I buy this?</summary>
+        <p>No. It's in your Intermediate Roadmap on Oct 13.</p>
+      </details>
+
+      <!-- FAQ 6 -->
+      <details>
+        <summary>How long do I have access?</summary>
+        <p>Forever. Buy it once and it's yours.</p>
+      </details>
+
+      <!-- FAQ 7 -->
+      <details>
+        <summary>Can I get a refund?</summary>
+        <p>No. All sales are final.</p>
+      </details>
+
+      <!-- FAQ 8 -->
+      <details>
+        <summary>Why is the price going up?</summary>
+        <p>This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$24</span> on Oct 12, then <span data-swp-price="tier3">$24</span>.</p>
+      </details>
+
+    </div>
+  </div>
+
+  <!-- Final call -->
+  <div class="swp-lhm-final">
+    <div class="swp-lhm-wrap">
+
+      <!-- Final headline -->
+      <h2 class="swp-lhm-h2">Stop guessing. Know what your left hand plays.</h2>
+
+      <div class="swp-lhm-ladder-wrap">
+
+        <!-- Price ladder: tiers -->
+        <ul class="swp-lhm-ladder">
+          <li class="swp-lhm-tier" data-swp-tier="1">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">Oct 11</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
+          </li>
+          <li class="swp-lhm-tier" data-swp-tier="2">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">Oct 12</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$24</span></span>
+          </li>
+          <li class="swp-lhm-tier" data-swp-tier="3">
+            <span class="swp-lhm-tier-flag">Today</span>
+            <span class="swp-lhm-tier-date">After</span>
+            <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$24</span></span>
+          </li>
+        </ul>
+
+        <div class="swp-lhm-cta">
+          <!-- Button -->
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+
+          <!-- Countdown -->
+          <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$24</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout anchor: every button scrolls here. Put the SureCart checkout block directly below this block. -->
+  <span id="swp-lhm-checkout" class="swp-lhm-anchor"></span>
+</section>
+<!-- ===== END BLOCK I ===== -->
+
+
+<!-- ===== BLOCK J: CHECKOUT — add a Shortcode block directly below Block I and paste this line into it ===== -->
+[sc_form id=1030412]
+<!-- ===== END BLOCK J ===== -->
+
+
+<!-- ===== BLOCK Z: SCRIPT — paste into its own Custom HTML block ===== -->
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- EDIT PRICES & DATES HERE ---------- */
+  /* Each tier ends at midnight Eastern (EDT = -04:00 in October). */
+  var TIERS = [
+    { id: 1, price: '$24', endsAt: '2026-10-12T00:00:00-04:00' }, // Oct 11 (and before)
+    { id: 2, price: '$47', endsAt: '2026-10-13T00:00:00-04:00' }, // Oct 12
+    { id: 3, price: '$67', endsAt: null }                          // After Oct 12
+  ];
+
+  /* Fixed prices used in the value stack and elsewhere. */
+  var PRICES = {
+    'tier1': '$24',
+    'tier2': '$47',
+    'tier3': '$67',
+    'regular': '$67',
+    'rule-each': '$25',
+    'rules': '$150',
+    'charts': '$99',
+    'song-each': '$24',
+    'songs': '$72',
+    'total': '$321'
+  };
+
+  /* Testing: add ?swp_now=2026-10-12T09:00:00-04:00 to the page URL. */
+  var lastOverride = null;
+  var offset = 0;
+
+  function readOverride() {
+    var fromUrl = null;
+    try { fromUrl = new URLSearchParams(window.location.search).get('swp_now'); } catch (e) {}
+    return window.SWP_LHM_NOW || fromUrl || null;
+  }
+
+  function now() {
+    var override = readOverride();
+    if (override !== lastOverride) {
+      lastOverride = override;
+      var t = override ? Date.parse(override) : NaN;
+      offset = isNaN(t) ? 0 : t - Date.now();
+    }
+    return Date.now() + offset;
+  }
+
+  function currentTierIndex(t) {
+    for (var i = 0; i < TIERS.length; i++) {
+      if (!TIERS[i].endsAt || t < Date.parse(TIERS[i].endsAt)) return i;
+    }
+    return TIERS.length - 1;
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function formatRemaining(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var d = Math.floor(s / 86400);
+    var h = Math.floor((s % 86400) / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    return (d > 0 ? d + 'd ' : '') + pad(h) + 'h ' + pad(m) + 'm ' + pad(sec) + 's';
+  }
+
+  function each(selector, fn) {
+    var nodes = document.querySelectorAll(selector);
+    for (var i = 0; i < nodes.length; i++) fn(nodes[i]);
+  }
+
+  function refresh() {
+    var t = now();
+    var idx = currentTierIndex(t);
+    var tier = TIERS[idx];
+    var next = TIERS[idx + 1] || null;
+
+    each('[data-swp-price]', function (el) {
+      var key = el.getAttribute('data-swp-price');
+      if (!key) el.textContent = tier.price;
+      else if (key === 'next') el.textContent = next ? next.price : tier.price;
+      else if (PRICES[key]) el.textContent = PRICES[key];
+    });
+
+    each('[data-swp-tier]', function (el) {
+      var id = Number(el.getAttribute('data-swp-tier'));
+      el.classList.toggle('is-current', id === tier.id);
+      el.classList.toggle('is-past', id < tier.id);
+    });
+
+    each('[data-swp-show-tier]', function (el) {
+      el.hidden = Number(el.getAttribute('data-swp-show-tier')) !== tier.id;
+    });
+
+    each('[data-swp-countdown]', function (el) {
+      if (!next || !tier.endsAt) { el.hidden = true; return; }
+      el.hidden = false;
+      var timeEl = el.querySelector('[data-swp-countdown-time]');
+      if (timeEl) timeEl.textContent = formatRemaining(Date.parse(tier.endsAt) - t);
+    });
+  }
+
+  /* Smooth scroll for every button that points at the checkout. */
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest ? e.target.closest('a[href="#swp-lhm-checkout"]') : null;
+    if (!link) return;
+    var target = document.getElementById('swp-lhm-checkout');
+    if (!target) return;
+    e.preventDefault();
+    var top = target.getBoundingClientRect().top + window.pageYOffset - 24;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  });
+
+  window.SWP_LHM = { refresh: refresh };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh);
+  else refresh();
+  setInterval(refresh, 1000);
+})();
+</script>
+<!-- ===== END BLOCK Z ===== -->
