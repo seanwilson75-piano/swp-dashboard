@@ -1,0 +1,321 @@
+<!-- ===== LEFT HAND MASTERY: THANK-YOU PAGE — paste this whole file into ONE Custom HTML block (HTML tab only) ===== -->
+<!-- Page: https://seanwilsonpiano.com/left-hand-mastery-thank-you/ -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------- Base ---------- */
+.swp-ty {
+  --swp-navy: #0B1527;
+  --swp-navy-2: #132038;
+  --swp-navy-line: #26344F;
+  --swp-coral: #E8472A;
+  --swp-coral-dark: #C9381D;
+  --swp-ink: #0B1527;
+  --swp-body: #3B4456;
+  --swp-muted: #687186;
+  --swp-paper: #FFFFFF;
+  --swp-mist: #F3F5F8;
+  --swp-line: #E1E5EC;
+  --swp-on-dark: #C5CDDA;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--swp-body);
+  background: var(--swp-paper);
+  padding: 64px 20px;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+/* Full width: break each section out of the theme's content column, edge to edge. */
+.swp-ty {
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0 calc(50% - 50vw) !important;
+}
+body { overflow-x: hidden; }
+@supports (overflow: clip) { body { overflow-x: clip; } }
+
+.swp-ty *,
+.swp-ty *::before,
+.swp-ty *::after { box-sizing: border-box; }
+:where(.swp-ty) :where(h1, h2, h3, p, ul, ol, li, figure) { margin: 0; padding: 0; }
+:where(.swp-ty) :where(ul, ol) { list-style: none; }
+
+.swp-ty--dark { background: var(--swp-navy); color: var(--swp-on-dark); }
+.swp-ty--mist { background: var(--swp-mist); }
+.swp-ty-wrap { max-width: 1080px; margin: 0 auto; }
+.swp-ty-narrow { max-width: 760px; margin: 0 auto; }
+.swp-ty-center { text-align: center; }
+
+/* ---------- Type ---------- */
+.swp-ty-eyebrow {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--swp-coral);
+}
+.swp-ty-h1 {
+  margin-top: 14px;
+  font-size: clamp(36px, 7.6vw, 64px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+.swp-ty-h1 em,
+.swp-ty-h2 em { font-style: normal; color: var(--swp-coral); }
+.swp-ty-sub {
+  max-width: 600px;
+  margin: 22px auto 0;
+  font-size: clamp(19px, 2.4vw, 22px);
+  line-height: 1.5;
+  color: var(--swp-on-dark);
+  text-wrap: pretty;
+}
+.swp-ty-h2 {
+  font-size: clamp(30px, 5.4vw, 44px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--swp-ink);
+  text-wrap: balance;
+}
+.swp-ty--dark .swp-ty-h2 { color: #FFFFFF; }
+.swp-ty-lead { margin-top: 14px; font-size: 20px; line-height: 1.55; text-wrap: pretty; }
+.swp-ty-small { font-size: 15px; color: var(--swp-muted); }
+.swp-ty--dark .swp-ty-small { color: var(--swp-on-dark); }
+.swp-ty-small a { color: inherit; text-decoration: underline; }
+
+/* ---------- Check badge ---------- */
+.swp-ty-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 22px;
+  border-radius: 50%;
+  background: var(--swp-coral);
+  box-shadow: 0 0 0 10px rgba(232, 71, 42, 0.18);
+}
+.swp-ty-badge svg { width: 36px; height: 36px; }
+
+/* ---------- Button ---------- */
+.swp-ty-cta { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 32px; }
+.swp-ty-btn {
+  display: block;
+  width: 100%;
+  padding: 20px 28px;
+  border-radius: 10px;
+  background: var(--swp-coral);
+  color: #FFFFFF !important;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none !important;
+  box-shadow: 0 10px 28px -10px rgba(232, 71, 42, 0.65);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.swp-ty-btn:hover { background: var(--swp-coral-dark); transform: translateY(-1px); }
+.swp-ty-btn:active { transform: translateY(0); }
+
+/* ---------- Hero ---------- */
+.swp-ty-hero { padding-top: 72px; padding-bottom: 0; text-align: center; overflow: hidden; }
+.swp-ty-mockup { display: block; width: 100%; max-width: 900px; height: auto; margin: 56px auto 0; }
+
+/* ---------- Steps ---------- */
+.swp-ty-steps { display: grid; gap: 16px; margin-top: 40px; counter-reset: swp-ty-step; }
+.swp-ty-step {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 24px 22px;
+  border: 1px solid var(--swp-line);
+  border-radius: 16px;
+  background: var(--swp-paper);
+}
+.swp-ty-step::before {
+  counter-increment: swp-ty-step;
+  content: counter(swp-ty-step);
+  flex: 0 0 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--swp-coral);
+  color: #FFFFFF;
+  font-size: 22px;
+  font-weight: 800;
+}
+.swp-ty-step h3 { font-size: 21px; font-weight: 800; line-height: 1.25; letter-spacing: -0.01em; color: var(--swp-ink); }
+.swp-ty-step p { margin-top: 6px; font-size: 17px; text-wrap: pretty; }
+
+/* ---------- What's inside ---------- */
+.swp-ty-inside { display: grid; gap: 16px; margin-top: 40px; }
+.swp-ty-card {
+  padding: 26px 24px;
+  border: 1px solid var(--swp-line);
+  border-radius: 16px;
+  background: var(--swp-paper);
+}
+.swp-ty-card h3 { font-size: 20px; font-weight: 800; color: var(--swp-ink); }
+.swp-ty-card p { margin-top: 8px; font-size: 17px; text-wrap: pretty; }
+
+/* ---------- Final ---------- */
+.swp-ty-final .swp-ty-h2 { text-align: center; }
+
+/* ---------- Tablet & up ---------- */
+@media (min-width: 720px) {
+  .swp-ty { padding: 96px 32px; }
+  .swp-ty-hero { padding-top: 96px; padding-bottom: 0; }
+  .swp-ty-btn { display: inline-block; width: auto; min-width: 380px; padding: 22px 40px; font-size: 21px; }
+  .swp-ty-step { padding: 28px 30px; }
+  .swp-ty-inside { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+}
+</style>
+
+
+<!-- ===== HERO ===== -->
+<section id="swp-ty-hero" class="swp-ty swp-ty--dark swp-ty-hero">
+  <div class="swp-ty-narrow">
+
+    <!-- Check badge -->
+    <span class="swp-ty-badge" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </span>
+
+    <p class="swp-ty-eyebrow">Order complete</p>
+    <h1 class="swp-ty-h1">You're in. Let's get your <em>left hand</em> right.</h1>
+    <p class="swp-ty-sub">Left Hand Mastery is ready for you right now. Watch the first lesson today, while it's fresh.</p>
+
+    <div class="swp-ty-cta">
+      <a class="swp-ty-btn" href="https://seanwilsonpiano.com/mycourse/milestone-1-know-how-to-use-your-left-hand-on-any-chord/" data-swp-ty-cta="hero">👉 Start Left Hand Mastery</a>
+      <p class="swp-ty-small">Your receipt is on its way to your email.</p>
+    </div>
+  </div>
+
+  <!-- Mockup (same image as the sales page) -->
+  <img class="swp-ty-mockup" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-bundle-mockup.webp" width="1280" height="800" alt="Left Hand Mastery: video lessons, song lessons, and Practice Charts PDF">
+</section>
+
+
+<!-- ===== START HERE: 3 STEPS ===== -->
+<section id="swp-ty-steps" class="swp-ty swp-ty--mist">
+  <div class="swp-ty-narrow">
+    <div class="swp-ty-center">
+      <p class="swp-ty-eyebrow">Start here</p>
+      <h2 class="swp-ty-h2" style="margin-top: 12px;">Do these 3 things first</h2>
+    </div>
+
+    <ol class="swp-ty-steps">
+      <li class="swp-ty-step">
+        <div>
+          <h3>Watch the Zone lesson first.</h3>
+          <p>It shows you where on the keyboard your left hand belongs. Every rule sounds better once you're in the Zone.</p>
+        </div>
+      </li>
+      <li class="swp-ty-step">
+        <div>
+          <h3>Print your Practice Charts.</h3>
+          <p>They're in the course as a PDF. Keep them on your piano. Every rule is there in all 12 keys.</p>
+        </div>
+      </li>
+      <li class="swp-ty-step">
+        <div>
+          <h3>Take one rule at a time.</h3>
+          <p>Go in order. Get a rule working in a few keys before you move on. Rule 4 builds on Rule 3, so learn Rule 3 first.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ===== WHAT'S INSIDE ===== -->
+<section id="swp-ty-inside" class="swp-ty">
+  <div class="swp-ty-wrap">
+    <div class="swp-ty-center">
+      <h2 class="swp-ty-h2">What's waiting for you</h2>
+    </div>
+
+    <div class="swp-ty-inside">
+      <div class="swp-ty-card">
+        <h3>The Lessons</h3>
+        <p>Over an hour of video. The Zone and all 6 Rules, from Heavy Bottom to Passing Movements.</p>
+      </div>
+      <div class="swp-ty-card">
+        <h3>3 Song Lessons</h3>
+        <p>Amazing Grace, Praise Him, and I Will Bless the Lord. See every rule used in a real song.</p>
+      </div>
+      <div class="swp-ty-card">
+        <h3>Practice Charts PDF</h3>
+        <p>Every rule in all 12 keys. Play along, download, and print.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== FINAL CALL ===== -->
+<section id="swp-ty-final" class="swp-ty swp-ty--dark swp-ty-final">
+  <div class="swp-ty-narrow swp-ty-center">
+    <h2 class="swp-ty-h2">Your first lesson is one click away.</h2>
+
+    <div class="swp-ty-cta">
+      <a class="swp-ty-btn" href="https://seanwilsonpiano.com/mycourse/milestone-1-know-how-to-use-your-left-hand-on-any-chord/" data-swp-ty-cta="final">👉 Start Left Hand Mastery</a>
+      <p class="swp-ty-small">Can't get in? Click <strong>Support</strong> at the top of this page and my team will help.</p>
+    </div>
+  </div>
+</section>
+
+
+<script>
+(function () {
+  'use strict';
+
+  /* Fathom: count clicks on the Start buttons. */
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest ? e.target.closest('[data-swp-ty-cta]') : null;
+    if (!link) return;
+    try {
+      if (window.fathom && typeof window.fathom.trackEvent === 'function') {
+        window.fathom.trackEvent('LHM thank-you start click: ' + link.getAttribute('data-swp-ty-cta'));
+      }
+    } catch (err) {}
+  });
+
+  /* Remove the theme's empty padding above the first section and below the
+     last one, so the dark bands sit flush against the title bar and footer.
+     Only wrappers with nothing visible on that side are touched. */
+  function flush(section, side) {
+    var Side = side === 'top' ? 'Top' : 'Bottom';
+    var el = section;
+    while (el && el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
+      var parent = el.parentElement;
+      var sib = side === 'top' ? el.previousElementSibling : el.nextElementSibling;
+      for (; sib; sib = side === 'top' ? sib.previousElementSibling : sib.nextElementSibling) {
+        if (sib.getBoundingClientRect().height > 0) return;
+        sib.style.setProperty('margin-top', '0', 'important');
+        sib.style.setProperty('margin-bottom', '0', 'important');
+      }
+      el.style.setProperty('margin-' + side, '0', 'important');
+      parent.style.setProperty('padding-' + side, '0', 'important');
+      parent.style.setProperty('margin-' + side, '0', 'important');
+      parent.style.setProperty('border-' + side + '-width', '0', 'important');
+      el = parent;
+    }
+  }
+
+  function start() {
+    flush(document.getElementById('swp-ty-hero'), 'top');
+    flush(document.getElementById('swp-ty-final'), 'bottom');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
+<!-- ===== END THANK-YOU PAGE ===== -->
