@@ -7,6 +7,7 @@ Specs: Notion › Products & Offers DB › 🎹 Left Hand Mastery
 |---|---|
 | `left-hand-mastery-blocks.html` | **The page HTML + CSS.** Paste the whole file into one Custom HTML block (HTML tab only). |
 | `lhm-page-scripts.php` | **The page JavaScript**, as a Code Snippets PHP snippet. Loads only on this page. |
+| `lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt` | The same snippet without the opening `<?php` line. **This is the one to paste** into Code Snippets. Regenerate it whenever the .php changes: `tail -n +2 lhm-page-scripts.php > lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt`. |
 | `thank-you-page.html` | The thank-you page. Paste into one Custom HTML block on `/left-hand-mastery-thank-you/`. |
 | `wp-uploads/` | 7 images. Upload them to the Media Library **without renaming them**. |
 | `preview.html` | Preview only (HTML + scripts combined). Never paste it into WordPress. |
@@ -20,8 +21,8 @@ Code Snippets prints the script straight into the page, and the coupon part runs
 ## Install
 
 1. **Page HTML:** copy `left-hand-mastery-blocks.html` (GitHub › Copy raw file), replace everything in the block's HTML tab, Update.
-2. **Scripts:** Snippets › Add New › PHP snippet. Name it "Left Hand Mastery sales page scripts". Paste `lhm-page-scripts.php`
-   (if the editor already shows `<?php` at the top, leave out the first line). Set it to **Only run on site front-end**, then **Save and Activate**.
+2. **Scripts:** Snippets › Add New. Keep the type on **Functions (PHP)**. Name it "Left Hand Mastery sales page scripts".
+   Paste `lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt`. Set it to **Only run on site front-end**, then **Save Changes and Activate**.
 3. **Check in an incognito window:** the countdown under the first button should be ticking, and the address bar should show `?coupon=LHM-DAY1`
    (before Sunday) or `LHM-DAY2` (Monday).
 4. **Images:** Media › Add New, drag in all 7 files from `wp-uploads/`. Upload them in October so they land in `/wp-content/uploads/2026/10/`.
