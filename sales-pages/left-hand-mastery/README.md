@@ -37,12 +37,24 @@ The SureCart product is **$67**. Launch prices come from coupons, and the page a
 | Mon Oct 12 | $47 | `LHM-DAY2` |
 | Oct 13 on | $67, launch ladder and countdown hidden | none |
 
-- SureCart reads `?coupon=` from the page URL. Block 0 puts the right code there.
+- SureCart reads `?coupon=` from the page URL. The header script in `lhm-page-scripts.php` puts the right code there.
 - A link carrying an old launch code (a Sunday email clicked on Monday) gets switched to that day's code.
 - **Any other code is left alone.** VIP links like `/left-hand-mastery/?coupon=LHM-VIP-DAY2` and `?coupon=LHM-VIP20` work as is.
-- Coupon codes, prices, and dates are all in `TIERS` and `PRICES` at the top of `lhm-page-scripts.php`. **The codes must match SureCart exactly.** Notion lists `LHM-DAY1` / `LHM-DAY2` as "suggested", so confirm them.
+- Coupon codes, prices, and dates are all in `TIERS` and `PRICES` at the top of `lhm-page-scripts.php`. **The codes must match SureCart exactly.**
 
 **Test any day before it happens:** add `?swp_now=2026-10-12T09:00:00-04:00` to the URL. This only changes what the page shows. SureCart still checks the coupon's real start and end dates.
+
+## Coupon test links (confirmed codes)
+
+| Test | Link | Checkout total |
+|---|---|---|
+| Sunday (everyone) | `/left-hand-mastery/?coupon=LHM-DAY1` | $24.00 |
+| Monday (public) | `/left-hand-mastery/?coupon=LHM-DAY2` | $47.00 |
+| Monday (VIP) | `/left-hand-mastery/?coupon=LHM-VIP-DAY2` | $37.60 |
+| After Monday (VIP) | `/left-hand-mastery/?coupon=LHM-VIP20` | $53.60 |
+| No coupon | `/left-hand-mastery/` | script adds that day's code: $24 Sun, $47 Mon, $67 after |
+
+VIP links keep their code. The page still shows the public price for that day (for example $47 on Monday) while the checkout shows the lower VIP total.
 
 ## Tracking
 
