@@ -1,4 +1,7 @@
-<!-- ===== BLOCK 0: STYLES + CONFIG — paste into its own Custom HTML block. Must be the FIRST block on the page. ===== -->
+<!-- ===== LEFT HAND MASTERY SALES PAGE — paste this whole file into ONE Custom HTML block (HTML tab only).
+     The JavaScript is NOT in this file. It loads from the Code Snippets plugin: see lhm-page-scripts.php.
+     (The Custom HTML block on this site shows <script> tags but doesn't run them.) ===== -->
+<!-- ===== BLOCK 0: STYLES ===== -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -30,6 +33,9 @@
 }
 body { overflow-x: hidden; }
 @supports (overflow: clip) { body { overflow-x: clip; } }
+/* Remove the theme's white bar above the hero: #content and .col-full each add 15px of top padding. */
+#content.inner,
+#content .col-full { padding-top: 0 !important; margin-top: 0 !important; }
 .swp-lhm {
   font-size: 18px;
   line-height: 1.6;
@@ -723,92 +729,6 @@ body { overflow-x: hidden; }
 }
 </style>
 
-<script>
-/* ===== Shared config + coupon sync. Runs before the SureCart form loads. ===== */
-(function () {
-  'use strict';
-
-  /* ---------- EDIT PRICES, DATES & COUPONS HERE ---------- */
-  /* Each tier ends at midnight Eastern (EDT = -04:00 in October).            */
-  /* coupon = the SureCart code for that day. It must match SureCart exactly. */
-  var TIERS = [
-    { id: 1, price: '$24', coupon: 'LHM-DAY1', endsAt: '2026-10-12T00:00:00-04:00' }, // Oct 11 (and before)
-    { id: 2, price: '$47', coupon: 'LHM-DAY2', endsAt: '2026-10-13T00:00:00-04:00' }, // Oct 12
-    { id: 3, price: '$67', coupon: null,       endsAt: null }                          // Oct 13 and after
-  ];
-
-  /* Fixed prices used in the value stack and elsewhere. */
-  var PRICES = {
-    'tier1': '$24',
-    'tier2': '$47',
-    'tier3': '$67',
-    'regular': '$67',
-    'save1': '$43',
-    'save2': '$20',
-    'rule-each': '$25',
-    'rules': '$150',
-    'charts': '$99',
-    'song-each': '$24',
-    'songs': '$72',
-    'total': '$321'
-  };
-
-  /* Testing: add ?swp_now=2026-10-12T09:00:00-04:00 to the page URL. */
-  var lastOverride = null;
-  var offset = 0;
-
-  function readOverride() {
-    var fromUrl = null;
-    try { fromUrl = new URLSearchParams(window.location.search).get('swp_now'); } catch (e) {}
-    return window.SWP_LHM_NOW || fromUrl || null;
-  }
-
-  function now() {
-    var override = readOverride();
-    if (override !== lastOverride) {
-      lastOverride = override;
-      var t = override ? Date.parse(override) : NaN;
-      offset = isNaN(t) ? 0 : t - Date.now();
-    }
-    return Date.now() + offset;
-  }
-
-  function tierIndex(t) {
-    for (var i = 0; i < TIERS.length; i++) {
-      if (!TIERS[i].endsAt || t < Date.parse(TIERS[i].endsAt)) return i;
-    }
-    return TIERS.length - 1;
-  }
-
-  /* SureCart reads ?coupon= from the page URL when the checkout loads.
-     Put today's launch code in the URL. Swap out a launch code from an
-     earlier day (an old email link). Leave any other code alone, so the
-     VIP codes from the waitlist emails still work. */
-  function syncCoupon(idx) {
-    try {
-      var url = new URL(window.location.href);
-      var current = url.searchParams.get('coupon');
-      var launchCodes = TIERS.map(function (x) { return (x.coupon || '').toUpperCase(); });
-      if (current && launchCodes.indexOf(current.toUpperCase()) === -1) return;
-      var want = TIERS[idx].coupon;
-      if (want && current !== want) url.searchParams.set('coupon', want);
-      else if (!want && current) url.searchParams.delete('coupon');
-      else return;
-      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
-    } catch (e) {}
-  }
-
-  window.SWP_LHM = {
-    TIERS: TIERS,
-    PRICES: PRICES,
-    now: now,
-    tierIndex: tierIndex,
-    syncCoupon: syncCoupon
-  };
-
-  syncCoupon(tierIndex(now()));
-})();
-</script>
 <!-- ===== END BLOCK 0 ===== -->
 
 
@@ -1418,216 +1338,11 @@ body { overflow-x: hidden; }
 <!-- ===== END BLOCK J ===== -->
 
 
-<!-- ===== BLOCK Z: STICKY BAR + SCRIPT — paste into its own Custom HTML block. Must be the LAST block on the page. ===== -->
+<!-- ===== BLOCK Z: STICKY BAR (its script is in lhm-page-scripts.php) ===== -->
 <!-- Sticky buy bar (phones only) -->
 <div class="swp-lhm-sticky" data-swp-sticky aria-hidden="true">
   <span class="swp-lhm-sticky-text"><strong>Left Hand Mastery</strong><span><span data-swp-price>$24</span> today</span></span>
   <a class="swp-lhm-sticky-btn" href="#swp-lhm-checkout" data-swp-cta="sticky" tabindex="-1">👉 Get it now</a>
 </div>
 
-<script>
-/* Remove the theme's white bar above the first section. Runs on its own,
-   so it still works if anything else on the page fails. */
-(function () {
-  'use strict';
-
-  /* Real content = has size AND has text or media. Empty spacers, empty
-     paragraphs and theme padding don't count. */
-  function hasContent(el) {
-    if (el.id === 'wpadminbar') return false;
-    var r = el.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1) return false;
-    var cs = window.getComputedStyle(el);
-    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
-    if (cs.position === 'fixed' && (r.bottom <= 0 || r.top >= window.innerHeight)) return false;
-    if ((el.innerText || '').trim()) return true;
-    return /^(IMG|SVG|VIDEO|IFRAME|CANVAS|PICTURE)$/i.test(el.tagName) ||
-      !!el.querySelector('img, svg, video, iframe, canvas, picture');
-  }
-
-  /* Step 1: zero top padding/margins on wrappers above the section that have
-     no real content above it. A real site header stops the walk. */
-  function clearWrappers(first) {
-    var el = first;
-    while (el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
-      for (var sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
-        if (hasContent(sib)) return;
-        sib.style.setProperty('margin-top', '0', 'important');
-        sib.style.setProperty('margin-bottom', '0', 'important');
-        sib.style.setProperty('padding-top', '0', 'important');
-        sib.style.setProperty('padding-bottom', '0', 'important');
-      }
-      if (el !== first) el.style.setProperty('margin-top', '0', 'important');
-      el.parentElement.style.setProperty('padding-top', '0', 'important');
-      el.parentElement.style.setProperty('margin-top', '0', 'important');
-      el.parentElement.style.setProperty('border-top-width', '0', 'important');
-      el = el.parentElement;
-    }
-    /* Reached the top of the page. If nothing real sits above, clear the
-       page body's own top spacing too. */
-    for (var s = el.previousElementSibling; s; s = s.previousElementSibling) {
-      if (hasContent(s)) return;
-    }
-    if (el !== first) el.style.setProperty('margin-top', '0', 'important');
-    document.body.style.setProperty('padding-top', '0', 'important');
-    document.body.style.setProperty('margin-top', '0', 'important');
-    document.body.style.setProperty('border-top-width', '0', 'important');
-  }
-
-  /* Bottom edge of the last real content above the section (or the top of
-     the page, below the WordPress admin bar). */
-  function contentBottomAbove(node, first, acc) {
-    for (var c = node.firstElementChild; c; c = c.nextElementSibling) {
-      if (c === first) return acc;
-      if (c.contains(first)) return contentBottomAbove(c, first, acc);
-      if (hasContent(c)) acc = Math.max(acc, c.getBoundingClientRect().bottom);
-    }
-    return acc;
-  }
-
-  /* Step 2: whatever gap is left, pull the section up to close it. */
-  var pulled = 0;
-  function closeGap(first) {
-    var top = document.documentElement.getBoundingClientRect().top;
-    var gap = first.getBoundingClientRect().top - contentBottomAbove(document.body, first, top);
-    if (Math.abs(gap) < 0.5) return;
-    var next = Math.min(0, pulled - gap);
-    if (next < -400) return;
-    pulled = next;
-    first.style.setProperty('margin-top', pulled + 'px', 'important');
-  }
-
-  function run() {
-    var first = document.getElementById('swp-lhm-a');
-    if (!first) return;
-    clearWrappers(first);
-    closeGap(first);
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
-  else run();
-  window.addEventListener('load', run);
-})();
-</script>
-
-<script>
-(function () {
-  'use strict';
-
-  /* Prices, dates and coupons live in Block 0. */
-  var LHM = window.SWP_LHM;
-  if (!LHM) return;
-  var TIERS = LHM.TIERS;
-  var PRICES = LHM.PRICES;
-  var lastIdx = null;
-
-  function pad(n) { return n < 10 ? '0' + n : String(n); }
-
-  function formatRemaining(ms) {
-    var s = Math.max(0, Math.floor(ms / 1000));
-    var d = Math.floor(s / 86400);
-    var h = Math.floor((s % 86400) / 3600);
-    var m = Math.floor((s % 3600) / 60);
-    var sec = s % 60;
-    return (d > 0 ? d + 'd ' : '') + pad(h) + 'h ' + pad(m) + 'm ' + pad(sec) + 's';
-  }
-
-  function each(selector, fn) {
-    var nodes = document.querySelectorAll(selector);
-    for (var i = 0; i < nodes.length; i++) fn(nodes[i]);
-  }
-
-  function refresh() {
-    var t = LHM.now();
-    var idx = LHM.tierIndex(t);
-    var tier = TIERS[idx];
-    var next = TIERS[idx + 1] || null;
-    var launchOver = !tier.endsAt;
-
-    /* The day changed while the page was open: move the coupon too. */
-    if (lastIdx !== null && idx !== lastIdx) LHM.syncCoupon(idx);
-    lastIdx = idx;
-
-    each('[data-swp-price]', function (el) {
-      var key = el.getAttribute('data-swp-price');
-      if (!key) el.textContent = tier.price;
-      else if (key === 'next') el.textContent = next ? next.price : tier.price;
-      else if (PRICES[key]) el.textContent = PRICES[key];
-    });
-
-    each('[data-swp-tier]', function (el) {
-      var id = Number(el.getAttribute('data-swp-tier'));
-      el.classList.toggle('is-current', id === tier.id);
-      el.classList.toggle('is-past', id < tier.id);
-    });
-
-    each('[data-swp-show-tier]', function (el) {
-      el.hidden = Number(el.getAttribute('data-swp-show-tier')) !== tier.id;
-    });
-
-    each('[data-swp-launch-only]', function (el) {
-      el.hidden = launchOver;
-    });
-
-    each('[data-swp-countdown]', function (el) {
-      if (!next || !tier.endsAt) { el.hidden = true; return; }
-      el.hidden = false;
-      var timeEl = el.querySelector('[data-swp-countdown-time]');
-      if (timeEl) timeEl.textContent = formatRemaining(Date.parse(tier.endsAt) - t);
-    });
-  }
-
-  /* Smooth scroll for every button that points at the checkout. */
-  document.addEventListener('click', function (e) {
-    var link = e.target.closest ? e.target.closest('a[href="#swp-lhm-checkout"]') : null;
-    if (!link) return;
-
-    /* Fathom: count clicks per button (hero, value, final, sticky). */
-    try {
-      if (window.fathom && typeof window.fathom.trackEvent === 'function') {
-        window.fathom.trackEvent('LHM buy click: ' + (link.getAttribute('data-swp-cta') || 'other'));
-      }
-    } catch (err) {}
-
-    var target = document.getElementById('swp-lhm-checkout');
-    if (!target) return;
-    e.preventDefault();
-    var top = target.getBoundingClientRect().top + window.pageYOffset - 24;
-    window.scrollTo({ top: top, behavior: 'smooth' });
-  });
-
-  /* Sticky bar: show it once the first button scrolls away. Hide it at the checkout. */
-  var sticky = document.querySelector('[data-swp-sticky]');
-  var firstCta = document.querySelector('#swp-lhm-b .swp-lhm-cta');
-  var checkout = document.getElementById('swp-lhm-j');
-  var ticking = false;
-
-  function updateSticky() {
-    ticking = false;
-    if (!sticky || !firstCta || !checkout) return;
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var show = firstCta.getBoundingClientRect().bottom < 0 && checkout.getBoundingClientRect().top > vh;
-    sticky.classList.toggle('is-visible', show);
-    sticky.setAttribute('aria-hidden', show ? 'false' : 'true');
-    var btn = sticky.querySelector('a');
-    if (btn) btn.tabIndex = show ? 0 : -1;
-  }
-
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(updateSticky);
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-
-  LHM.refresh = refresh;
-
-  function start() { refresh(); updateSticky(); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
-  setInterval(refresh, 1000);
-})();
-</script>
 <!-- ===== END BLOCK Z ===== -->
