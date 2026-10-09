@@ -166,6 +166,7 @@ body { overflow-x: hidden; }
   text-transform: uppercase;
   color: var(--swp-coral);
 }
+.swp-lhm-eyebrow--hero { font-size: 16.5px; }
 .swp-lhm-sub {
   font-size: clamp(19px, 2.4vw, 23px);
   line-height: 1.5;
@@ -474,6 +475,15 @@ body { overflow-x: hidden; }
 }
 .swp-lhm-story > p + p { margin-top: 18px; }
 .swp-lhm-story .swp-lhm-story-hit { font-weight: 800; color: var(--swp-coral); }
+.swp-lhm-pains-title {
+  margin-top: 44px;
+  font-size: clamp(22px, 3vw, 26px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--swp-ink);
+}
+.swp-lhm-pains-title + .swp-lhm-pains { margin-top: 16px; }
 .swp-lhm-pains {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -509,6 +519,15 @@ body { overflow-x: hidden; }
   font-weight: 600;
   line-height: 1.45;
   text-wrap: pretty;
+}
+.swp-lhm-cost p + p { margin-top: 16px; }
+.swp-lhm-cost .swp-lhm-cost-hit {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.15em;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--swp-coral);
 }
 
 /* ---------- E: Solution ---------- */
@@ -824,13 +843,13 @@ body { overflow-x: hidden; }
   <div class="swp-lhm-wrap">
 
     <!-- Eyebrow -->
-    <p class="swp-lhm-eyebrow">New course: Left Hand Mastery</p>
+    <p class="swp-lhm-eyebrow swp-lhm-eyebrow--hero">New course: Left Hand Mastery</p>
 
     <!-- Headline -->
-    <h1 class="swp-lhm-headline">Finally know what your <em>left hand</em> should play during songs</h1>
+    <h1 class="swp-lhm-headline">Finally know what to play in your <em>left hand</em></h1>
 
     <!-- Subheading -->
-    <p class="swp-lhm-sub">I will teach you what to play in your left hand for every type of chord so you can sound complete on the piano.</p>
+    <p class="swp-lhm-sub">I will teach you what to play in your left hand for every type of chord, so you can stop guessing.</p>
 
   </div>
 </section>
@@ -952,22 +971,27 @@ body { overflow-x: hidden; }
     <!-- Problem story -->
     <div class="swp-lhm-story">
       <p>You learn the chord. Your right hand gets it right.</p>
-      <p>Then your left hand plays octaves. Or just the root. Or whatever feels safe.</p>
-      <p class="swp-lhm-story-hit">In a modern song, that sounds ancient.</p>
-      <p>It makes you look like you don't know what you're doing. Even when you do.</p>
-      <p>Musicians can hear it. And deep down, you know when you're guessing.</p>
+      <p>Then your left hand plays octaves. Or just the bass note. Or whatever feels safe.</p>
+      <p class="swp-lhm-story-hit">In a modern song, that sounds old school.</p>
+      <p>Bass players, organists, and intermediate musicians can tell you don't know what to do with your left hand.</p>
+      <p>And deep down, you know you're guessing.</p>
     </div>
 
     <!-- Pain points -->
+    <h2 class="swp-lhm-pains-title">How to know if you need this</h2>
     <ul class="swp-lhm-pains">
-      <li>You play octaves under every song, old or new.</li>
+      <li>When an advanced chord comes up, you can't figure out what your left hand should play.</li>
+      <li>Octaves feel easier, so you fall back on them when a song gets hard.</li>
       <li>You're not sure when to play the bass note and when to leave it out.</li>
       <li>You don't know where on the keyboard your left hand belongs.</li>
       <li>Your right hand is right, but the whole thing still sounds off.</li>
     </ul>
 
-    <!-- What happens if nothing changes -->
-    <p class="swp-lhm-cost">You keep learning new chords, and your sound stays the same. Because the problem was never your right hand.</p>
+    <!-- Why it happens -->
+    <div class="swp-lhm-cost">
+      <p>You never learned what to play in your left hand because you were taught to split the chord: part in your left hand, part in your right.</p>
+      <p>I teach the opposite. <strong class="swp-lhm-cost-hit">The whole sound of the chord belongs in your left hand alone.</strong></p>
+    </div>
 
   </div>
 </section>
@@ -1005,7 +1029,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 1 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-1.webp" width="994" height="532" loading="lazy" alt="Rule 1: Heavy Bottom lesson slide">
+        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-1.webp" width="994" height="532" loading="lazy" alt="Rule 1: Heavy Bottom lesson slide" onerror="var n=(+this.getAttribute('data-swp-try')||0)+1;if(n&lt;3){this.setAttribute('data-swp-try',n);this.src='wp-uploads/lhm-rule-1-'+n+'.webp';}">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">1</span>
@@ -1097,16 +1121,16 @@ body { overflow-x: hidden; }
 
     </div>
 
-    <!-- Sample lesson video: diminished 7th chord in the left hand (Rule 4) -->
+    <!-- Sample lesson video: diminished chord in the left hand -->
     <div class="swp-lhm-e-video">
-    <p class="swp-lhm-video-intro">Sample lesson from Rule 4: the diminished 7th chord in your left hand</p>
+    <p class="swp-lhm-video-intro">Sample lesson: what your left hand should play on a diminished chord</p>
     <div class="swp-lhm-video">
       <iframe src="https://iframe.mediadelivery.net/embed/490495/a94909ac-00ed-4b9a-a6fe-589983d3bd9c?autoplay=false&amp;preload=false&amp;responsive=true" loading="lazy" allow="accelerometer; gyroscope; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Playing a diminished 7th chord in the left hand"></iframe>
     </div>
     </div>
 
     <!-- The outcome -->
-    <p class="swp-lhm-outcome">No more guessing. Your left hand supports every chord, and your whole sound gets better.</p>
+    <p class="swp-lhm-outcome">Your left hand is the chord. Until you know what it plays, you'll miss the sound, no matter what your right hand does.</p>
 
   </div>
 </section>
@@ -1127,13 +1151,13 @@ body { overflow-x: hidden; }
 
     <!-- Benefits -->
     <ul class="swp-lhm-benefits">
-      <li>Know what your left hand plays under any chord.</li>
-      <li>Know when to keep the bass note, and when to drop it.</li>
+      <li>Play the right left-hand shape under any chord.</li>
+      <li>Play dominant, diminished, and half-diminished chords in your left hand.</li>
+      <li>Keep or drop the bass note at the right time.</li>
       <li>Play passing chords, gospel bumps, and shout music with just 2 notes.</li>
-      <li>Handle dominant, diminished, and half-diminished chords by adding one note.</li>
-      <li>Sound modern on today's songs instead of stuck in octaves.</li>
-      <li>Use your left hand to create movement, not just hold chords.</li>
-      <li>Practice every rule in all 12 keys.</li>
+      <li>Move your left hand between chords instead of just holding them.</li>
+      <li>Sound modern on today's songs, not old school.</li>
+      <li>Practice every left-hand movement in all 12 keys.</li>
     </ul>
 
   </div>
@@ -1182,7 +1206,6 @@ body { overflow-x: hidden; }
       <p class="swp-lhm-honest-q">How long would it take you to figure out what your left hand plays under every chord? In all 12 keys?</p>
       <p>Months of guessing. Most players never figure it out.</p>
       <p>I put it all in one course. Six rules. Three songs. Every key.</p>
-      <p class="swp-lhm-reframe">You're not buying more chords. You're buying the half of your sound you've been guessing at.</p>
     </div>
 
     <div class="swp-lhm-valuecard">
