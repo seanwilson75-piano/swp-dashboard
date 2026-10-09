@@ -232,7 +232,8 @@ body { overflow-x: hidden; }
 }
 .swp-lhm-ladder {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 10px;
   margin-top: 16px;
 }
@@ -763,9 +764,9 @@ body { overflow-x: hidden; }
     <div class="swp-lhm-b-price">
 
       <!-- Price ladder: title (hidden after launch) -->
-      <p class="swp-lhm-ladder-title" data-swp-launch-only>Launch price goes up every day.</p>
+      <p class="swp-lhm-ladder-title" data-swp-launch-only><span data-swp-show-tier="1">Launch price goes up every day.</span><span data-swp-show-tier="2" hidden>Last day of launch pricing.</span></p>
 
-      <!-- Price ladder: tiers (current tier highlights automatically) -->
+      <!-- Price ladder: tiers (current tier highlights automatically; past days are hidden) -->
       <ul class="swp-lhm-ladder" data-swp-launch-only>
         <li class="swp-lhm-tier" data-swp-tier="1">
           <span class="swp-lhm-tier-flag">Today</span>
@@ -789,7 +790,7 @@ body { overflow-x: hidden; }
         <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="hero">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
 
         <!-- Countdown -->
-        <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+        <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
       </div>
 
     </div>
@@ -1171,7 +1172,7 @@ body { overflow-x: hidden; }
           <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="value">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
 
           <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
         </div>
 
       </div>
@@ -1251,7 +1252,7 @@ body { overflow-x: hidden; }
       <!-- FAQ 9 (hidden after launch) -->
       <details data-swp-launch-only>
         <summary>Why is the price going up?</summary>
-        <p>This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$47</span> on Oct 12, then <span data-swp-price="tier3">$67</span>.</p>
+        <p><span data-swp-show-tier="1">This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$47</span> on Oct 12, then <span data-swp-price="tier3">$67</span>.</span><span data-swp-show-tier="2" hidden>This is launch pricing, and today is the last day. It goes to <span data-swp-price="tier3">$67</span> on Oct 13.</span></p>
       </details>
 
     </div>
@@ -1290,7 +1291,7 @@ body { overflow-x: hidden; }
           <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="final">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
 
           <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
         </div>
 
       </div>

@@ -164,6 +164,8 @@ add_action( 'wp_footer', function () {
       var id = Number(el.getAttribute('data-swp-tier'));
       el.classList.toggle('is-current', id === tier.id);
       el.classList.toggle('is-past', id < tier.id);
+      /* Only show prices still available: on Oct 12, the Oct 11 price is gone. */
+      el.hidden = id < tier.id;
     });
 
     each('[data-swp-show-tier]', function (el) {
