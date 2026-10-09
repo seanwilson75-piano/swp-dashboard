@@ -1463,6 +1463,15 @@ body { overflow-x: hidden; }
       el.parentElement.style.setProperty('border-top-width', '0', 'important');
       el = el.parentElement;
     }
+    /* Reached the top of the page. If nothing real sits above, clear the
+       page body's own top spacing too. */
+    for (var s = el.previousElementSibling; s; s = s.previousElementSibling) {
+      if (hasContent(s)) return;
+    }
+    if (el !== first) el.style.setProperty('margin-top', '0', 'important');
+    document.body.style.setProperty('padding-top', '0', 'important');
+    document.body.style.setProperty('margin-top', '0', 'important');
+    document.body.style.setProperty('border-top-width', '0', 'important');
   }
 
   /* Bottom edge of the last real content above the section (or the top of
