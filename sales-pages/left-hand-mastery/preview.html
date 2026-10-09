@@ -1442,6 +1442,82 @@ body { overflow-x: hidden; }
 </div>
 
 <script>
+/* Remove the theme's white bar above the first section. Runs on its own,
+   so it still works if anything else on the page fails. */
+(function () {
+  'use strict';
+
+  /* Real content = has size AND has text or media. Empty spacers, empty
+     paragraphs and theme padding don't count. */
+  function hasContent(el) {
+    if (el.id === 'wpadminbar') return false;
+    var r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    var cs = window.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    if (cs.position === 'fixed' && (r.bottom <= 0 || r.top >= window.innerHeight)) return false;
+    if ((el.innerText || '').trim()) return true;
+    return /^(IMG|SVG|VIDEO|IFRAME|CANVAS|PICTURE)$/i.test(el.tagName) ||
+      !!el.querySelector('img, svg, video, iframe, canvas, picture');
+  }
+
+  /* Step 1: zero top padding/margins on wrappers above the section that have
+     no real content above it. A real site header stops the walk. */
+  function clearWrappers(first) {
+    var el = first;
+    while (el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
+      for (var sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
+        if (hasContent(sib)) return;
+        sib.style.setProperty('margin-top', '0', 'important');
+        sib.style.setProperty('margin-bottom', '0', 'important');
+        sib.style.setProperty('padding-top', '0', 'important');
+        sib.style.setProperty('padding-bottom', '0', 'important');
+      }
+      if (el !== first) el.style.setProperty('margin-top', '0', 'important');
+      el.parentElement.style.setProperty('padding-top', '0', 'important');
+      el.parentElement.style.setProperty('margin-top', '0', 'important');
+      el.parentElement.style.setProperty('border-top-width', '0', 'important');
+      el = el.parentElement;
+    }
+  }
+
+  /* Bottom edge of the last real content above the section (or the top of
+     the page, below the WordPress admin bar). */
+  function contentBottomAbove(node, first, acc) {
+    for (var c = node.firstElementChild; c; c = c.nextElementSibling) {
+      if (c === first) return acc;
+      if (c.contains(first)) return contentBottomAbove(c, first, acc);
+      if (hasContent(c)) acc = Math.max(acc, c.getBoundingClientRect().bottom);
+    }
+    return acc;
+  }
+
+  /* Step 2: whatever gap is left, pull the section up to close it. */
+  var pulled = 0;
+  function closeGap(first) {
+    var top = document.documentElement.getBoundingClientRect().top;
+    var gap = first.getBoundingClientRect().top - contentBottomAbove(document.body, first, top);
+    if (Math.abs(gap) < 0.5) return;
+    var next = Math.min(0, pulled - gap);
+    if (next < -400) return;
+    pulled = next;
+    first.style.setProperty('margin-top', pulled + 'px', 'important');
+  }
+
+  function run() {
+    var first = document.getElementById('swp-lhm-a');
+    if (!first) return;
+    clearWrappers(first);
+    closeGap(first);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+  window.addEventListener('load', run);
+})();
+</script>
+
+<script>
 (function () {
   'use strict';
 
@@ -1553,36 +1629,9 @@ body { overflow-x: hidden; }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
 
-  /* Remove the theme's empty space above the first section (the white bar).
-     Walks up from the first section and zeroes top padding/margins only on
-     wrappers that have nothing visible above the section, so a real site
-     header is never touched. */
-  function removeTopGap() {
-    var first = document.getElementById('swp-lhm-a');
-    if (!first) return;
-    var el = first;
-    while (el && el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
-      var parent = el.parentElement;
-      for (var sib = el.previousElementSibling; sib; sib = sib.previousElementSibling) {
-        if (sib.getBoundingClientRect().height > 0) return;
-        sib.style.setProperty('margin-top', '0', 'important');
-        sib.style.setProperty('margin-bottom', '0', 'important');
-      }
-      el.style.setProperty('margin-top', '0', 'important');
-      parent.style.setProperty('padding-top', '0', 'important');
-      parent.style.setProperty('margin-top', '0', 'important');
-      parent.style.setProperty('border-top-width', '0', 'important');
-      el = parent;
-    }
-    for (var s = el.previousElementSibling; s; s = s.previousElementSibling) {
-      if (s.getBoundingClientRect().height > 0) return;
-    }
-    el.style.setProperty('margin-top', '0', 'important');
-  }
-
   LHM.refresh = refresh;
 
-  function start() { removeTopGap(); refresh(); updateSticky(); }
+  function start() { refresh(); updateSticky(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
   setInterval(refresh, 1000);
