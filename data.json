@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-10-11T16:41:54.053Z",
-  "date": "2026-10-10",
+  "generatedAt": "2026-10-12T20:21:49.820Z",
+  "date": "2026-10-11",
   "yesterday": {
-    "orders": 19,
-    "revenueCents": 44300,
+    "orders": 57,
+    "revenueCents": 128300,
     "topProducts": [
       {
+        "name": "Left Hand Mastery Course",
+        "orders": 37,
+        "revenueCents": 88800
+      },
+      {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 7,
-        "revenueCents": 20300
+        "orders": 8,
+        "revenueCents": 12100
       },
       {
         "name": "Premium Membership",
         "orders": 2,
         "revenueCents": 9400
-      },
-      {
-        "name": "Basic Membership",
-        "orders": 2,
-        "revenueCents": 5800
       }
     ]
   },
   "week": {
-    "orders": 114,
-    "revenueCents": 280275
+    "orders": 159,
+    "revenueCents": 373775
   },
   "month": {
-    "orders": 168,
-    "revenueCents": 393675
+    "orders": 225,
+    "revenueCents": 521975
   },
   "ytd": {
-    "orders": 5543,
-    "revenueCents": 12298275
+    "orders": 5600,
+    "revenueCents": 12426575
   }
 }
