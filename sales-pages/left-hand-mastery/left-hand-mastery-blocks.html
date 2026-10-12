@@ -52,6 +52,7 @@ body { overflow-x: hidden; }
 :where(.swp-lhm) :where(ul) { list-style: none; }
 .swp-lhm strong { color: inherit; font-weight: 700; }
 .swp-lhm [hidden] { display: none !important; }
+.swp-lhm .swp-lhm-ladder .swp-lhm-tier[hidden] { display: flex !important; }
 
 .swp-lhm--dark { background: var(--swp-navy); color: var(--swp-on-dark); }
 .swp-lhm--mist { background: var(--swp-mist); }
@@ -786,7 +787,7 @@ body { overflow-x: hidden; }
       <p class="swp-lhm-ladder-title" data-swp-launch-only><span data-swp-show-tier="1">Launch price goes up every day.</span><span data-swp-show-tier="2" hidden>Last day of launch pricing.</span></p>
 
       <!-- Price ladder: tiers (current tier highlights automatically; past days are hidden) -->
-      <ul class="swp-lhm-ladder" data-swp-launch-only>
+      <ul class="swp-lhm-ladder">
         <li class="swp-lhm-tier" data-swp-tier="1">
           <span class="swp-lhm-tier-flag">Today</span>
           <span class="swp-lhm-tier-date">Oct 11</span>
@@ -1160,7 +1161,7 @@ body { overflow-x: hidden; }
       <div class="swp-lhm-ladder-wrap">
 
         <!-- Price ladder: tiers (hidden after launch) -->
-        <ul class="swp-lhm-ladder" data-swp-launch-only>
+        <ul class="swp-lhm-ladder">
           <li class="swp-lhm-tier" data-swp-tier="1">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 11</span>
@@ -1179,13 +1180,13 @@ body { overflow-x: hidden; }
         </ul>
 
         <!-- Today line (shows on Oct 11 and earlier) -->
-        <p class="swp-lhm-today" data-swp-show-tier="1">Today: <span data-swp-price>$24</span>. That's <span data-swp-price="save1">$43</span> off the regular price.</p>
+        <p class="swp-lhm-today" data-swp-show-tier="1">Today: <span data-swp-price>$24</span>. That's <span data-swp-price="save">$43</span> off the regular price.</p>
 
         <!-- Today line (shows on Oct 12) -->
-        <p class="swp-lhm-today" data-swp-show-tier="2" hidden>Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save2">$20</span> off the regular price.</p>
+        <p class="swp-lhm-today" data-swp-show-tier="2" hidden>Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$20</span> off the regular price.</p>
 
         <!-- Today line (shows after launch) -->
-        <p class="swp-lhm-today" data-swp-show-tier="3" hidden>One payment of <span data-swp-price="regular">$67</span>. Yours forever.</p>
+        <p class="swp-lhm-today" data-swp-show-tier="3" hidden>One payment of <span data-swp-price>$67</span>. Yours forever.</p>
 
         <!-- Closing line -->
         <p class="swp-lhm-use">You'll use this in every song you play.</p>
@@ -1291,7 +1292,7 @@ body { overflow-x: hidden; }
       <div class="swp-lhm-ladder-wrap">
 
         <!-- Price ladder: tiers (hidden after launch) -->
-        <ul class="swp-lhm-ladder" data-swp-launch-only>
+        <ul class="swp-lhm-ladder">
           <li class="swp-lhm-tier" data-swp-tier="1">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 11</span>
@@ -1370,3 +1371,92 @@ body { overflow-x: hidden; }
 </div>
 
 <!-- ===== END BLOCK Z ===== -->
+
+<!-- ===== PRICE LABELS: follow the date (Eastern time) and VIP coupons. Runs from the image below, because this block does not run <script> tags. Keep it the LAST thing in the block. ===== -->
+<img class="swp-lhm-labels-trigger" alt="" width="1" height="1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="(function () {
+  if (window.SWP_LHM_LABELS) return;
+  window.SWP_LHM_LABELS = true;
+
+  /* Same dates as the coupon script: each day ends at midnight Eastern. */
+  var TIERS = [
+    { id: 1, price: 24, endsAt: '2026-10-12T00:00:00-04:00' },
+    { id: 2, price: 47, endsAt: '2026-10-13T00:00:00-04:00' },
+    { id: 3, price: 67, endsAt: null }
+  ];
+  var REGULAR = 67;
+  var CARD = { tier1: 24, tier2: 47, tier3: 67, regular: 67 };
+
+  function money(n) { n = Math.round(n * 100) / 100; return '$' + (n % 1 ? n.toFixed(2) : String(n)); }
+
+  function now() {
+    var o = null;
+    try { o = new URLSearchParams(window.location.search).get('swp_now'); } catch (e) {}
+    var t = o ? Date.parse(o) : NaN;
+    if (isNaN(t)) return Date.now();
+    if (window.SWP_LHM_LABEL_OFFSET === undefined) window.SWP_LHM_LABEL_OFFSET = t - Date.now();
+    return Date.now() + window.SWP_LHM_LABEL_OFFSET;
+  }
+
+  function tierIndex(t) {
+    for (var i = 0; i < TIERS.length; i++) {
+      if (!TIERS[i].endsAt || t < Date.parse(TIERS[i].endsAt)) return i;
+    }
+    return TIERS.length - 1;
+  }
+
+  function coupon() {
+    try { return (new URLSearchParams(window.location.search).get('coupon') || '').toUpperCase(); } catch (e) { return ''; }
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function remaining(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+    return (d > 0 ? d + 'd ' : '') + pad(h) + 'h ' + pad(m) + 'm ' + pad(s % 60) + 's';
+  }
+
+  function each(sel, fn) { var n = document.querySelectorAll(sel); for (var i = 0; i < n.length; i++) fn(n[i]); }
+
+  function refresh() {
+    var t = now(), idx = tierIndex(t), tier = TIERS[idx], next = TIERS[idx + 1] || null;
+
+    /* Today's price for this visitor. VIP links show their own total. */
+    var c = coupon(), price = tier.price;
+    if (c === 'LHM-VIP-DAY2' && tier.id <= 2) price = 37.6;
+    if (c === 'LHM-VIP20') price = 53.6;
+
+    /* If the Code Snippets script is also running, keep it writing the same numbers. */
+    if (window.SWP_LHM && window.SWP_LHM.TIERS && window.SWP_LHM.TIERS[idx]) window.SWP_LHM.TIERS[idx].price = money(price);
+
+    each('[data-swp-price]', function (el) {
+      var key = el.getAttribute('data-swp-price');
+      var v = null;
+      if (!key) v = money(price);
+      else if (key === 'next') v = money(next ? next.price : price);
+      else if (key === 'save') v = money(REGULAR - price);
+      else if (CARD[key] !== undefined) v = money(CARD[key]);
+      if (v !== null && el.textContent !== v) el.textContent = v;
+    });
+
+    /* Price cards: past days crossed out, today highlighted, future days unchanged. */
+    each('[data-swp-tier]', function (el) {
+      var id = Number(el.getAttribute('data-swp-tier'));
+      el.classList.toggle('is-current', id === tier.id);
+      el.classList.toggle('is-past', id < tier.id);
+    });
+
+    each('[data-swp-show-tier]', function (el) { el.hidden = Number(el.getAttribute('data-swp-show-tier')) !== tier.id; });
+    each('[data-swp-launch-only]', function (el) { el.hidden = !tier.endsAt; });
+
+    each('[data-swp-countdown]', function (el) {
+      if (!next || !tier.endsAt) { el.hidden = true; return; }
+      el.hidden = false;
+      var te = el.querySelector('[data-swp-countdown-time]');
+      if (te) te.textContent = remaining(Date.parse(tier.endsAt) - t);
+    });
+  }
+
+  refresh();
+  setInterval(refresh, 1000);
+})();">
+<!-- ===== END PRICE LABELS ===== -->
