@@ -784,16 +784,16 @@ body { overflow-x: hidden; }
     <div class="swp-lhm-b-price">
 
       <!-- Price ladder: title (hidden after launch) -->
-      <p class="swp-lhm-ladder-title" data-swp-launch-only><span data-swp-show-tier="1">Launch price goes up every day.</span><span data-swp-show-tier="2" hidden>Last day of launch pricing.</span></p>
+      <p class="swp-lhm-ladder-title" data-swp-launch-only><span data-swp-show-tier="1" hidden>Launch price goes up every day.</span><span data-swp-show-tier="2">Last day of launch pricing.</span></p>
 
       <!-- Price ladder: tiers (current tier highlights automatically; past days are hidden) -->
       <ul class="swp-lhm-ladder">
-        <li class="swp-lhm-tier" data-swp-tier="1">
+        <li class="swp-lhm-tier is-past" data-swp-tier="1">
           <span class="swp-lhm-tier-flag">Today</span>
           <span class="swp-lhm-tier-date">Oct 11</span>
           <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
         </li>
-        <li class="swp-lhm-tier" data-swp-tier="2">
+        <li class="swp-lhm-tier is-current" data-swp-tier="2">
           <span class="swp-lhm-tier-flag">Today</span>
           <span class="swp-lhm-tier-date">Oct 12</span>
           <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
@@ -807,10 +807,10 @@ body { overflow-x: hidden; }
 
       <div class="swp-lhm-cta">
         <!-- Button -->
-        <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="hero">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+        <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="hero">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
 
         <!-- Countdown -->
-        <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+        <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
       </div>
 
     </div>
@@ -1162,12 +1162,12 @@ body { overflow-x: hidden; }
 
         <!-- Price ladder: tiers (hidden after launch) -->
         <ul class="swp-lhm-ladder">
-          <li class="swp-lhm-tier" data-swp-tier="1">
+          <li class="swp-lhm-tier is-past" data-swp-tier="1">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 11</span>
             <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
           </li>
-          <li class="swp-lhm-tier" data-swp-tier="2">
+          <li class="swp-lhm-tier is-current" data-swp-tier="2">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 12</span>
             <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
@@ -1180,10 +1180,10 @@ body { overflow-x: hidden; }
         </ul>
 
         <!-- Today line (shows on Oct 11 and earlier) -->
-        <p class="swp-lhm-today" data-swp-show-tier="1">Today: <span data-swp-price>$24</span>. That's <span data-swp-price="save">$43</span> off the regular price.</p>
+        <p class="swp-lhm-today" data-swp-show-tier="1" hidden>Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$43</span> off the regular price.</p>
 
         <!-- Today line (shows on Oct 12) -->
-        <p class="swp-lhm-today" data-swp-show-tier="2" hidden>Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$20</span> off the regular price.</p>
+        <p class="swp-lhm-today" data-swp-show-tier="2">Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$20</span> off the regular price.</p>
 
         <!-- Today line (shows after launch) -->
         <p class="swp-lhm-today" data-swp-show-tier="3" hidden>One payment of <span data-swp-price>$67</span>. Yours forever.</p>
@@ -1193,10 +1193,10 @@ body { overflow-x: hidden; }
 
         <div class="swp-lhm-cta">
           <!-- Button -->
-          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="value">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="value">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
 
           <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
         </div>
 
       </div>
@@ -1276,7 +1276,7 @@ body { overflow-x: hidden; }
       <!-- FAQ 9 (hidden after launch) -->
       <details data-swp-launch-only>
         <summary>Why is the price going up?</summary>
-        <p><span data-swp-show-tier="1">This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$47</span> on Oct 12, then <span data-swp-price="tier3">$67</span>.</span><span data-swp-show-tier="2" hidden>This is launch pricing, and today is the last day. It goes to <span data-swp-price="tier3">$67</span> on Oct 13.</span></p>
+        <p><span data-swp-show-tier="1" hidden>This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$47</span> on Oct 12, then <span data-swp-price="tier3">$67</span>.</span><span data-swp-show-tier="2">This is launch pricing, and today is the last day. It goes to <span data-swp-price="tier3">$67</span> on Oct 13.</span></p>
       </details>
 
     </div>
@@ -1293,12 +1293,12 @@ body { overflow-x: hidden; }
 
         <!-- Price ladder: tiers (hidden after launch) -->
         <ul class="swp-lhm-ladder">
-          <li class="swp-lhm-tier" data-swp-tier="1">
+          <li class="swp-lhm-tier is-past" data-swp-tier="1">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 11</span>
             <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
           </li>
-          <li class="swp-lhm-tier" data-swp-tier="2">
+          <li class="swp-lhm-tier is-current" data-swp-tier="2">
             <span class="swp-lhm-tier-flag">Today</span>
             <span class="swp-lhm-tier-date">Oct 12</span>
             <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
@@ -1312,10 +1312,10 @@ body { overflow-x: hidden; }
 
         <div class="swp-lhm-cta">
           <!-- Button -->
-          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="final">👉 Get Left Hand Mastery: <span data-swp-price>$24</span></a>
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="final">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
 
           <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$47</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
         </div>
 
       </div>
@@ -1340,7 +1340,7 @@ body { overflow-x: hidden; }
     <h2 class="swp-lhm-h2">Get <em>Left Hand Mastery</em></h2>
 
     <!-- Price (regular price is struck through during launch only) -->
-    <p class="swp-lhm-checkout-price">Today: <span data-swp-price>$24</span><s data-swp-launch-only><span data-swp-price="regular">$67</span></s></p>
+    <p class="swp-lhm-checkout-price">Today: <span data-swp-price>$47</span><s data-swp-launch-only><span data-swp-price="regular">$67</span></s></p>
 
     <!-- Reassurance -->
     <ul class="swp-lhm-assure">
@@ -1366,7 +1366,7 @@ body { overflow-x: hidden; }
 <!-- ===== BLOCK Z: STICKY BAR (its script is in lhm-page-scripts.php) ===== -->
 <!-- Sticky buy bar (phones only) -->
 <div class="swp-lhm-sticky" data-swp-sticky aria-hidden="true">
-  <span class="swp-lhm-sticky-text"><strong>Left Hand Mastery</strong><span><span data-swp-price>$24</span> today</span></span>
+  <span class="swp-lhm-sticky-text"><strong>Left Hand Mastery</strong><span><span data-swp-price>$47</span> today</span></span>
   <a class="swp-lhm-sticky-btn" href="#swp-lhm-checkout" data-swp-cta="sticky" tabindex="-1">👉 Get it now</a>
 </div>
 
