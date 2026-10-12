@@ -1,62 +1,45 @@
-# Left Hand Mastery: Sales Page
+# Left Hand Mastery: What to Paste
 
-Live URL: https://seanwilsonpiano.com/left-hand-mastery/
-Specs: Notion › Products & Offers DB › 🎹 Left Hand Mastery
+Only the `PASTE-...` files in this folder go into WordPress. Ignore `_dev/`.
 
-| File | What it is |
-|---|---|
-| `left-hand-mastery-blocks.html` | **The page HTML + CSS.** Paste the whole file into one Custom HTML block (HTML tab only). |
-| `lhm-page-scripts.php` | **The page JavaScript**, as a Code Snippets PHP snippet. Loads only on this page. |
-| `lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt` | The same snippet without the opening `<?php` line. **This is the one to paste** into Code Snippets. Regenerate it whenever the .php changes: `tail -n +2 lhm-page-scripts.php > lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt`. |
-| `thank-you-page.html` | The thank-you page. Paste into one Custom HTML block on `/left-hand-mastery-thank-you/`. |
-| `wp-uploads/` | 7 images. Upload them to the Media Library **without renaming them**. |
-| `preview.html` | Preview only (HTML + scripts combined). Never paste it into WordPress. |
+| File | Paste into | First line says | Last line says | When |
+|---|---|---|---|---|
+| [PASTE-MONDAY-Oct12-static.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-MONDAY-Oct12-static.txt) | `/left-hand-mastery/`, Custom HTML block, HTML tab | `MONDAY OCT 12 STATIC VERSION` | `END BLOCK Z` | Live now (Mon Oct 12) |
+| [PASTE-TUESDAY-Oct13-static.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-TUESDAY-Oct13-static.txt) | `/left-hand-mastery/`, same block, HTML tab | `TUESDAY OCT 13+ STATIC VERSION` | `END BLOCK Z` | After midnight ET, Oct 13. Stays from then on. |
+| [PASTE-THANK-YOU-page.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-THANK-YOU-page.txt) | `/left-hand-mastery-thank-you/`, Custom HTML block, HTML tab | `THANK-YOU PAGE` | `END THANK-YOU PAGE` | Already installed. Only if it needs replacing. |
 
-## Why the JavaScript is separate
+The links above open the **Raw** (plain text) view.
 
-The Custom HTML block on this site shows `<script>` tags on the page but never runs them (the console showed `SWP_LHM loaded: false`).
-Without the script, no coupon gets added and the checkout charges $67 while the page says $24.
-Code Snippets prints the script straight into the page, and the coupon part runs in the page header, before SureCart starts.
+## How to paste (every time)
 
-## Install
+1. Open the file's **Raw** link. Press **Cmd+Shift+R** so you get the newest version.
+2. Click the page, **Cmd+A**, **Cmd+C**.
+3. In the Custom HTML block's **HTML** tab: **Cmd+A**, **Cmd+V**. Leave the CSS and JavaScript tabs empty.
+4. Check the **first line** and the **last line** match the table.
+5. **Only save if the preview on the right shows the page.** Blank preview = the paste is incomplete. Don't save.
+6. Click **Update** in the box, then the page's blue **Update** (top right).
+7. Check the live page in an incognito window.
 
-1. **Page HTML:** copy `left-hand-mastery-blocks.html` (GitHub › Copy raw file), replace everything in the block's HTML tab, Update.
-2. **Scripts:** Snippets › Add New. Keep the type on **Functions (PHP)**. Name it "Left Hand Mastery sales page scripts".
-   Paste `lhm-page-scripts-PASTE-INTO-CODE-SNIPPETS.txt`. Set it to **Only run on site front-end**, then **Save Changes and Activate**.
-3. **Check in an incognito window:** the countdown under the first button should be ticking, and the address bar should show `?coupon=LHM-DAY1`
-   (before Sunday) or `LHM-DAY2` (Monday).
-4. **Images:** Media › Add New, drag in all 7 files from `wp-uploads/`. Upload them in October so they land in `/wp-content/uploads/2026/10/`.
-5. **Caching or speed plugin:** if it has "Delay JavaScript", exclude this page, or the coupon won't be in place before SureCart loads.
+Don't copy from the chat's file viewer: it can cut long files short.
 
-## How pricing works
+## What each sales page version shows
 
-The SureCart product is **$67**. Launch prices come from coupons, and the page applies them for the buyer:
+| | Buttons | Price cards | Countdown |
+|---|---|---|---|
+| Monday | $47 | $24 crossed out · **$47 TODAY** · $67 | hidden |
+| Tuesday+ | $67 | $24, $47 crossed out · **$67 TODAY** | hidden |
 
-| When (ET) | Page shows | Coupon added to the URL |
-|---|---|---|
-| Through Sun Oct 11, 11:59 pm | $24 | `LHM-DAY1` |
-| Mon Oct 12 | $47 | `LHM-DAY2` |
-| Oct 13 on | $67, launch ladder and countdown hidden | none |
+These versions have **no code**: the prices are written into the page. The checkout total comes from the coupon in the link (`?coupon=LHM-DAY2`, `?coupon=LHM-VIP-DAY2`, `?coupon=LHM-VIP20`), not from the page.
 
-- SureCart reads `?coupon=` from the page URL. The header script in `lhm-page-scripts.php` puts the right code there.
-- A link carrying an old launch code (a Sunday email clicked on Monday) gets switched to that day's code.
-- **Any other code is left alone.** VIP links like `/left-hand-mastery/?coupon=LHM-VIP-DAY2` and `?coupon=LHM-VIP20` work as is.
-- Coupon codes, prices, and dates are all in `TIERS` and `PRICES` at the top of `lhm-page-scripts.php`. **The codes must match SureCart exactly.**
+## Images
 
-**Test any day before it happens:** add `?swp_now=2026-10-12T09:00:00-04:00` to the URL. This only changes what the page shows. SureCart still checks the coupon's real start and end dates.
+`wp-uploads/` holds the 7 images, already uploaded to the Media Library (`/wp-content/uploads/2026/10/`).
 
-## Coupon test links (confirmed codes)
+## `_dev/` (not for pasting)
 
-| Test | Link | Checkout total |
-|---|---|---|
-| Sunday (everyone) | `/left-hand-mastery/?coupon=LHM-DAY1` | $24.00 |
-| Monday (public) | `/left-hand-mastery/?coupon=LHM-DAY2` | $47.00 |
-| Monday (VIP) | `/left-hand-mastery/?coupon=LHM-VIP-DAY2` | $37.60 |
-| After Monday (VIP) | `/left-hand-mastery/?coupon=LHM-VIP20` | $53.60 |
-| No coupon | `/left-hand-mastery/` | script adds that day's code: $24 Sun, $47 Mon, $67 after |
+- `left-hand-mastery-blocks.html`: working copy of the sales page (same as the Monday file).
+- `lhm-page-scripts.php` / `lhm-page-scripts-for-code-snippets-NOT-INSTALLED.txt`: the Code Snippets script (adds the day's coupon, runs the countdown). Never got installed.
+- `price-labels-source.js`: the date-switching label code. **It broke the live page when pasted in the HTML block. Don't paste it.**
+- `preview.html`: local preview.
 
-VIP links keep their code. The page still shows the public price for that day (for example $47 on Monday) while the checkout shows the lower VIP total.
-
-## Tracking
-
-Every buy button sends a Fathom event: `LHM buy click: hero`, `value`, `final`, or `sticky`. These show up under Fathom › Events, so you can see which button sells.
+Open question for after the launch: why `<script>` tags in this site's Custom HTML block don't run. Until that's solved, use the static versions.

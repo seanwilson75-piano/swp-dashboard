@@ -1,90 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>LHM Sales Page Preview</title><!-- GENERATED from left-hand-mastery-blocks.html + lhm-page-scripts.php. Do not paste into WordPress. --><style>body{margin:0}</style><script>
-/* ===== Shared config + coupon sync. Runs before the SureCart form loads. ===== */
-(function () {
-  'use strict';
-
-  /* ---------- EDIT PRICES, DATES & COUPONS HERE ---------- */
-  /* Each tier ends at midnight Eastern (EDT = -04:00 in October).            */
-  /* coupon = the SureCart code for that day. It must match SureCart exactly. */
-  var TIERS = [
-    { id: 1, price: '$24', coupon: 'LHM-DAY1', endsAt: '2026-10-12T00:00:00-04:00' }, // Oct 11 (and before)
-    { id: 2, price: '$47', coupon: 'LHM-DAY2', endsAt: '2026-10-13T00:00:00-04:00' }, // Oct 12
-    { id: 3, price: '$67', coupon: null,       endsAt: null }                          // Oct 13 and after
-  ];
-
-  /* Fixed prices used in the value stack and elsewhere. */
-  var PRICES = {
-    'tier1': '$24',
-    'tier2': '$47',
-    'tier3': '$67',
-    'regular': '$67',
-    'save1': '$43',
-    'save2': '$20',
-    'rule-each': '$25',
-    'rules': '$150',
-    'charts': '$99',
-    'song-each': '$24',
-    'songs': '$72',
-    'total': '$321'
-  };
-
-  /* Testing: add ?swp_now=2026-10-12T09:00:00-04:00 to the page URL. */
-  var lastOverride = null;
-  var offset = 0;
-
-  function readOverride() {
-    var fromUrl = null;
-    try { fromUrl = new URLSearchParams(window.location.search).get('swp_now'); } catch (e) {}
-    return window.SWP_LHM_NOW || fromUrl || null;
-  }
-
-  function now() {
-    var override = readOverride();
-    if (override !== lastOverride) {
-      lastOverride = override;
-      var t = override ? Date.parse(override) : NaN;
-      offset = isNaN(t) ? 0 : t - Date.now();
-    }
-    return Date.now() + offset;
-  }
-
-  function tierIndex(t) {
-    for (var i = 0; i < TIERS.length; i++) {
-      if (!TIERS[i].endsAt || t < Date.parse(TIERS[i].endsAt)) return i;
-    }
-    return TIERS.length - 1;
-  }
-
-  /* SureCart reads ?coupon= from the page URL when the checkout loads.
-     Put today's launch code in the URL. Swap out a launch code from an
-     earlier day (an old email link). Leave any other code alone, so the
-     VIP codes from the waitlist emails still work. */
-  function syncCoupon(idx) {
-    try {
-      var url = new URL(window.location.href);
-      var current = url.searchParams.get('coupon');
-      var launchCodes = TIERS.map(function (x) { return (x.coupon || '').toUpperCase(); });
-      if (current && launchCodes.indexOf(current.toUpperCase()) === -1) return;
-      var want = TIERS[idx].coupon;
-      if (want && current !== want) url.searchParams.set('coupon', want);
-      else if (!want && current) url.searchParams.delete('coupon');
-      else return;
-      window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
-    } catch (e) {}
-  }
-
-  window.SWP_LHM = {
-    TIERS: TIERS,
-    PRICES: PRICES,
-    now: now,
-    tierIndex: tierIndex,
-    syncCoupon: syncCoupon
-  };
-
-  syncCoupon(tierIndex(now()));
-})();
-</script></head>
-<body><!-- ===== LEFT HAND MASTERY SALES PAGE — paste this whole file into ONE Custom HTML block (HTML tab only).
+<!-- ===== LEFT HAND MASTERY SALES PAGE — MONDAY OCT 12 STATIC VERSION (no code; prices fixed for Monday). Paste into the Custom HTML block (HTML tab only).
      The JavaScript is NOT in this file. It loads from the Code Snippets plugin: see lhm-page-scripts.php.
      (The Custom HTML block on this site shows <script> tags but doesn't run them.) ===== -->
 <!-- ===== BLOCK 0: STYLES ===== -->
@@ -862,7 +776,7 @@ body { overflow-x: hidden; }
   <div class="swp-lhm-wrap">
 
     <!-- Mockup image -->
-    <img class="swp-lhm-mockup" src="wp-uploads/lhm-bundle-mockup.webp" width="1280" height="800" fetchpriority="high" alt="Left Hand Mastery: video lessons, song lessons, and Practice Charts PDF">
+    <img class="swp-lhm-mockup" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-bundle-mockup.webp" width="1280" height="800" fetchpriority="high" alt="Left Hand Mastery: video lessons, song lessons, and Practice Charts PDF">
 
     <!-- Line under the mockup -->
     <p class="swp-lhm-b-line">Over an hour of lessons. 3 full song lessons. Play-along Practice Charts for every rule, in all 12 keys.</p>
@@ -1030,7 +944,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 1 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-1.webp" width="994" height="532" loading="lazy" alt="Rule 1: Heavy Bottom lesson slide" onerror="var n=(+this.getAttribute('data-swp-try')||0)+1;if(n&lt;3){this.setAttribute('data-swp-try',n);this.src='wp-uploads/lhm-rule-1-'+n+'.webp';}">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-1.webp" width="994" height="532" loading="lazy" alt="Rule 1: Heavy Bottom lesson slide" onerror="var n=(+this.getAttribute('data-swp-try')||0)+1;if(n&lt;3){this.setAttribute('data-swp-try',n);this.src='https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-1-'+n+'.webp';}">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">1</span>
@@ -1045,7 +959,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 2 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-2.webp" width="994" height="532" loading="lazy" alt="Rule 2: Root Support lesson slide">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-2.webp" width="994" height="532" loading="lazy" alt="Rule 2: Root Support lesson slide">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">2</span>
@@ -1060,7 +974,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 3 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-3.webp" width="994" height="532" loading="lazy" alt="Rule 3: 2-Note Tritone lesson slide">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-3.webp" width="994" height="532" loading="lazy" alt="Rule 3: 2-Note Tritone lesson slide">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">3</span>
@@ -1075,7 +989,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 4 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-4.webp" width="994" height="532" loading="lazy" alt="Rule 4: 3-Note Tritone lesson slide">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-4.webp" width="994" height="532" loading="lazy" alt="Rule 4: 3-Note Tritone lesson slide">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">4</span>
@@ -1091,7 +1005,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 5 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-5.webp" width="994" height="532" loading="lazy" alt="Rule 5: Target Chords lesson slide">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-5.webp" width="994" height="532" loading="lazy" alt="Rule 5: Target Chords lesson slide">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">5</span>
@@ -1106,7 +1020,7 @@ body { overflow-x: hidden; }
 
       <!-- Rule 6 -->
       <article class="swp-lhm-rule">
-        <img class="swp-lhm-rule-img" src="wp-uploads/lhm-rule-6.webp" width="994" height="532" loading="lazy" alt="Rule 6: Passing Movements lesson slide">
+        <img class="swp-lhm-rule-img" src="https://seanwilsonpiano.com/wp-content/uploads/2026/10/lhm-rule-6.webp" width="994" height="532" loading="lazy" alt="Rule 6: Passing Movements lesson slide">
         <div class="swp-lhm-rule-body">
           <div class="swp-lhm-rule-head">
             <span class="swp-lhm-rule-num">6</span>
@@ -1415,7 +1329,7 @@ body { overflow-x: hidden; }
      WordPress runs shortcodes inside Custom HTML blocks, so the SureCart form renders here.
      If the live page shows the raw [sc_form ...] text instead, split this block in three:
        1. Custom HTML: everything from <section ...> down to <div class="swp-lhm-checkout-box">
-       2. Shortcode block: <div style="padding:40px 16px;border:2px dashed #D4A20A;border-radius:12px;background:#FFF6D4;color:#5E4800;font:600 14px/1.5 ui-monospace,Menlo,monospace;text-align:center">PREVIEW ONLY: the SureCart form [sc_form id=1030412] renders here on WordPress.<br>Coupon in URL right now: <span id="pv-coupon"></span></div><script>setInterval(function(){var c=new URLSearchParams(location.search).get('coupon');document.getElementById('pv-coupon').textContent=c||'(none, full price)';},500);</script>
+       2. Shortcode block: [sc_form id=1030412]
        3. Custom HTML: the closing </div>, the member note, and </section> ===== -->
 <section id="swp-lhm-j" class="swp-lhm swp-lhm-j">
   <!-- Checkout anchor: every button scrolls here. -->
@@ -1440,7 +1354,7 @@ body { overflow-x: hidden; }
 
   <!-- SureCart checkout form -->
   <div class="swp-lhm-checkout-box">
-<div style="padding:40px 16px;border:2px dashed #D4A20A;border-radius:12px;background:#FFF6D4;color:#5E4800;font:600 14px/1.5 ui-monospace,Menlo,monospace;text-align:center">PREVIEW ONLY: the SureCart form [sc_form id=1030412] renders here on WordPress.<br>Coupon in URL right now: <span id="pv-coupon"></span></div><script>setInterval(function(){var c=new URLSearchParams(location.search).get('coupon');document.getElementById('pv-coupon').textContent=c||'(none, full price)';},500);</script>
+[sc_form id=1030412]
   </div>
 
   <!-- Member note -->
@@ -1458,126 +1372,3 @@ body { overflow-x: hidden; }
 
 <!-- ===== END BLOCK Z ===== -->
 
-<!-- ===== PRICE LABELS: follow the date (Eastern time) and VIP coupons. Runs from the image below (this block does not run script tags). The code is base64-encoded so the editor cannot alter it; readable source: price-labels-source.js. Keep it the LAST thing in the block. ===== -->
-<img class="swp-lhm-labels-trigger" alt="" width="1" height="1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onload="new Function(atob('KGZ1bmN0aW9uICgpIHsKICBpZiAod2luZG93LlNXUF9MSE1fTEFCRUxTKSByZXR1cm47CiAgd2luZG93LlNXUF9MSE1fTEFCRUxTID0gdHJ1ZTsKCiAgLyogU2FtZSBkYXRlcyBhcyB0aGUgY291cG9uIHNjcmlwdDogZWFjaCBkYXkgZW5kcyBhdCBtaWRuaWdodCBFYXN0ZXJuLiAqLwogIHZhciBUSUVSUyA9IFsKICAgIHsgaWQ6IDEsIHByaWNlOiAyNCwgZW5kc0F0OiAnMjAyNi0xMC0xMlQwMDowMDowMC0wNDowMCcgfSwKICAgIHsgaWQ6IDIsIHByaWNlOiA0NywgZW5kc0F0OiAnMjAyNi0xMC0xM1QwMDowMDowMC0wNDowMCcgfSwKICAgIHsgaWQ6IDMsIHByaWNlOiA2NywgZW5kc0F0OiBudWxsIH0KICBdOwogIHZhciBSRUdVTEFSID0gNjc7CiAgdmFyIENBUkQgPSB7IHRpZXIxOiAyNCwgdGllcjI6IDQ3LCB0aWVyMzogNjcsIHJlZ3VsYXI6IDY3IH07CgogIGZ1bmN0aW9uIG1vbmV5KG4pIHsgbiA9IE1hdGgucm91bmQobiAqIDEwMCkgLyAxMDA7IHJldHVybiAnJCcgKyAobiAlIDEgPyBuLnRvRml4ZWQoMikgOiBTdHJpbmcobikpOyB9CgogIGZ1bmN0aW9uIG5vdygpIHsKICAgIHZhciBvID0gbnVsbDsKICAgIHRyeSB7IG8gPSBuZXcgVVJMU2VhcmNoUGFyYW1zKHdpbmRvdy5sb2NhdGlvbi5zZWFyY2gpLmdldCgnc3dwX25vdycpOyB9IGNhdGNoIChlKSB7fQogICAgdmFyIHQgPSBvID8gRGF0ZS5wYXJzZShvKSA6IE5hTjsKICAgIGlmIChpc05hTih0KSkgcmV0dXJuIERhdGUubm93KCk7CiAgICBpZiAod2luZG93LlNXUF9MSE1fTEFCRUxfT0ZGU0VUID09PSB1bmRlZmluZWQpIHdpbmRvdy5TV1BfTEhNX0xBQkVMX09GRlNFVCA9IHQgLSBEYXRlLm5vdygpOwogICAgcmV0dXJuIERhdGUubm93KCkgKyB3aW5kb3cuU1dQX0xITV9MQUJFTF9PRkZTRVQ7CiAgfQoKICBmdW5jdGlvbiB0aWVySW5kZXgodCkgewogICAgZm9yICh2YXIgaSA9IDA7IGkgPCBUSUVSUy5sZW5ndGg7IGkrKykgewogICAgICBpZiAoIVRJRVJTW2ldLmVuZHNBdCB8fCB0IDwgRGF0ZS5wYXJzZShUSUVSU1tpXS5lbmRzQXQpKSByZXR1cm4gaTsKICAgIH0KICAgIHJldHVybiBUSUVSUy5sZW5ndGggLSAxOwogIH0KCiAgZnVuY3Rpb24gY291cG9uKCkgewogICAgdHJ5IHsgcmV0dXJuIChuZXcgVVJMU2VhcmNoUGFyYW1zKHdpbmRvdy5sb2NhdGlvbi5zZWFyY2gpLmdldCgnY291cG9uJykgfHwgJycpLnRvVXBwZXJDYXNlKCk7IH0gY2F0Y2ggKGUpIHsgcmV0dXJuICcnOyB9CiAgfQoKICBmdW5jdGlvbiBwYWQobikgeyByZXR1cm4gbiA8IDEwID8gJzAnICsgbiA6IFN0cmluZyhuKTsgfQogIGZ1bmN0aW9uIHJlbWFpbmluZyhtcykgewogICAgdmFyIHMgPSBNYXRoLm1heCgwLCBNYXRoLmZsb29yKG1zIC8gMTAwMCkpOwogICAgdmFyIGQgPSBNYXRoLmZsb29yKHMgLyA4NjQwMCksIGggPSBNYXRoLmZsb29yKChzICUgODY0MDApIC8gMzYwMCksIG0gPSBNYXRoLmZsb29yKChzICUgMzYwMCkgLyA2MCk7CiAgICByZXR1cm4gKGQgPiAwID8gZCArICdkICcgOiAnJykgKyBwYWQoaCkgKyAnaCAnICsgcGFkKG0pICsgJ20gJyArIHBhZChzICUgNjApICsgJ3MnOwogIH0KCiAgZnVuY3Rpb24gZWFjaChzZWwsIGZuKSB7IHZhciBuID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbChzZWwpOyBmb3IgKHZhciBpID0gMDsgaSA8IG4ubGVuZ3RoOyBpKyspIGZuKG5baV0pOyB9CgogIGZ1bmN0aW9uIHJlZnJlc2goKSB7CiAgICB2YXIgdCA9IG5vdygpLCBpZHggPSB0aWVySW5kZXgodCksIHRpZXIgPSBUSUVSU1tpZHhdLCBuZXh0ID0gVElFUlNbaWR4ICsgMV0gfHwgbnVsbDsKCiAgICAvKiBUb2RheSdzIHByaWNlIGZvciB0aGlzIHZpc2l0b3IuIFZJUCBsaW5rcyBzaG93IHRoZWlyIG93biB0b3RhbC4gKi8KICAgIHZhciBjID0gY291cG9uKCksIHByaWNlID0gdGllci5wcmljZTsKICAgIGlmIChjID09PSAnTEhNLVZJUC1EQVkyJyAmJiB0aWVyLmlkIDw9IDIpIHByaWNlID0gMzcuNjsKICAgIGlmIChjID09PSAnTEhNLVZJUDIwJykgcHJpY2UgPSA1My42OwoKICAgIC8qIElmIHRoZSBDb2RlIFNuaXBwZXRzIHNjcmlwdCBpcyBhbHNvIHJ1bm5pbmcsIGtlZXAgaXQgd3JpdGluZyB0aGUgc2FtZSBudW1iZXJzLiAqLwogICAgaWYgKHdpbmRvdy5TV1BfTEhNICYmIHdpbmRvdy5TV1BfTEhNLlRJRVJTICYmIHdpbmRvdy5TV1BfTEhNLlRJRVJTW2lkeF0pIHdpbmRvdy5TV1BfTEhNLlRJRVJTW2lkeF0ucHJpY2UgPSBtb25leShwcmljZSk7CgogICAgZWFjaCgnW2RhdGEtc3dwLXByaWNlXScsIGZ1bmN0aW9uIChlbCkgewogICAgICB2YXIga2V5ID0gZWwuZ2V0QXR0cmlidXRlKCdkYXRhLXN3cC1wcmljZScpOwogICAgICB2YXIgdiA9IG51bGw7CiAgICAgIGlmICgha2V5KSB2ID0gbW9uZXkocHJpY2UpOwogICAgICBlbHNlIGlmIChrZXkgPT09ICduZXh0JykgdiA9IG1vbmV5KG5leHQgPyBuZXh0LnByaWNlIDogcHJpY2UpOwogICAgICBlbHNlIGlmIChrZXkgPT09ICdzYXZlJykgdiA9IG1vbmV5KFJFR1VMQVIgLSBwcmljZSk7CiAgICAgIGVsc2UgaWYgKENBUkRba2V5XSAhPT0gdW5kZWZpbmVkKSB2ID0gbW9uZXkoQ0FSRFtrZXldKTsKICAgICAgaWYgKHYgIT09IG51bGwgJiYgZWwudGV4dENvbnRlbnQgIT09IHYpIGVsLnRleHRDb250ZW50ID0gdjsKICAgIH0pOwoKICAgIC8qIFByaWNlIGNhcmRzOiBwYXN0IGRheXMgY3Jvc3NlZCBvdXQsIHRvZGF5IGhpZ2hsaWdodGVkLCBmdXR1cmUgZGF5cyB1bmNoYW5nZWQuICovCiAgICBlYWNoKCdbZGF0YS1zd3AtdGllcl0nLCBmdW5jdGlvbiAoZWwpIHsKICAgICAgdmFyIGlkID0gTnVtYmVyKGVsLmdldEF0dHJpYnV0ZSgnZGF0YS1zd3AtdGllcicpKTsKICAgICAgZWwuY2xhc3NMaXN0LnRvZ2dsZSgnaXMtY3VycmVudCcsIGlkID09PSB0aWVyLmlkKTsKICAgICAgZWwuY2xhc3NMaXN0LnRvZ2dsZSgnaXMtcGFzdCcsIGlkIDwgdGllci5pZCk7CiAgICB9KTsKCiAgICBlYWNoKCdbZGF0YS1zd3Atc2hvdy10aWVyXScsIGZ1bmN0aW9uIChlbCkgeyBlbC5oaWRkZW4gPSBOdW1iZXIoZWwuZ2V0QXR0cmlidXRlKCdkYXRhLXN3cC1zaG93LXRpZXInKSkgIT09IHRpZXIuaWQ7IH0pOwogICAgZWFjaCgnW2RhdGEtc3dwLWxhdW5jaC1vbmx5XScsIGZ1bmN0aW9uIChlbCkgeyBlbC5oaWRkZW4gPSAhdGllci5lbmRzQXQ7IH0pOwoKICAgIGVhY2goJ1tkYXRhLXN3cC1jb3VudGRvd25dJywgZnVuY3Rpb24gKGVsKSB7CiAgICAgIGlmICghbmV4dCB8fCAhdGllci5lbmRzQXQpIHsgZWwuaGlkZGVuID0gdHJ1ZTsgcmV0dXJuOyB9CiAgICAgIGVsLmhpZGRlbiA9IGZhbHNlOwogICAgICB2YXIgdGUgPSBlbC5xdWVyeVNlbGVjdG9yKCdbZGF0YS1zd3AtY291bnRkb3duLXRpbWVdJyk7CiAgICAgIGlmICh0ZSkgdGUudGV4dENvbnRlbnQgPSByZW1haW5pbmcoRGF0ZS5wYXJzZSh0aWVyLmVuZHNBdCkgLSB0KTsKICAgIH0pOwogIH0KCiAgcmVmcmVzaCgpOwogIHNldEludGVydmFsKHJlZnJlc2gsIDEwMDApOwp9KSgpOw=='))()">
-<!-- ===== END PRICE LABELS ===== -->
-<script>
-(function () {
-  'use strict';
-
-  /* Prices, dates and coupons live in Block 0. */
-  var LHM = window.SWP_LHM;
-  if (!LHM) return;
-  var TIERS = LHM.TIERS;
-  var PRICES = LHM.PRICES;
-  var lastIdx = null;
-
-  function pad(n) { return n < 10 ? '0' + n : String(n); }
-
-  function formatRemaining(ms) {
-    var s = Math.max(0, Math.floor(ms / 1000));
-    var d = Math.floor(s / 86400);
-    var h = Math.floor((s % 86400) / 3600);
-    var m = Math.floor((s % 3600) / 60);
-    var sec = s % 60;
-    return (d > 0 ? d + 'd ' : '') + pad(h) + 'h ' + pad(m) + 'm ' + pad(sec) + 's';
-  }
-
-  function each(selector, fn) {
-    var nodes = document.querySelectorAll(selector);
-    for (var i = 0; i < nodes.length; i++) fn(nodes[i]);
-  }
-
-  function refresh() {
-    var t = LHM.now();
-    var idx = LHM.tierIndex(t);
-    var tier = TIERS[idx];
-    var next = TIERS[idx + 1] || null;
-    var launchOver = !tier.endsAt;
-
-    /* The day changed while the page was open: move the coupon too. */
-    if (lastIdx !== null && idx !== lastIdx) LHM.syncCoupon(idx);
-    lastIdx = idx;
-
-    each('[data-swp-price]', function (el) {
-      var key = el.getAttribute('data-swp-price');
-      if (!key) el.textContent = tier.price;
-      else if (key === 'next') el.textContent = next ? next.price : tier.price;
-      else if (PRICES[key]) el.textContent = PRICES[key];
-    });
-
-    each('[data-swp-tier]', function (el) {
-      var id = Number(el.getAttribute('data-swp-tier'));
-      el.classList.toggle('is-current', id === tier.id);
-      el.classList.toggle('is-past', id < tier.id);
-    });
-
-    each('[data-swp-show-tier]', function (el) {
-      el.hidden = Number(el.getAttribute('data-swp-show-tier')) !== tier.id;
-    });
-
-    each('[data-swp-launch-only]', function (el) {
-      el.hidden = launchOver;
-    });
-
-    each('[data-swp-countdown]', function (el) {
-      if (!next || !tier.endsAt) { el.hidden = true; return; }
-      el.hidden = false;
-      var timeEl = el.querySelector('[data-swp-countdown-time]');
-      if (timeEl) timeEl.textContent = formatRemaining(Date.parse(tier.endsAt) - t);
-    });
-  }
-
-  /* Smooth scroll for every button that points at the checkout. */
-  document.addEventListener('click', function (e) {
-    var link = e.target.closest ? e.target.closest('a[href="#swp-lhm-checkout"]') : null;
-    if (!link) return;
-
-    /* Fathom: count clicks per button (hero, value, final, sticky). */
-    try {
-      if (window.fathom && typeof window.fathom.trackEvent === 'function') {
-        window.fathom.trackEvent('LHM buy click: ' + (link.getAttribute('data-swp-cta') || 'other'));
-      }
-    } catch (err) {}
-
-    var target = document.getElementById('swp-lhm-checkout');
-    if (!target) return;
-    e.preventDefault();
-    var top = target.getBoundingClientRect().top + window.pageYOffset - 24;
-    window.scrollTo({ top: top, behavior: 'smooth' });
-  });
-
-  /* Sticky bar: show it once the first button scrolls away. Hide it at the checkout. */
-  var sticky = document.querySelector('[data-swp-sticky]');
-  var firstCta = document.querySelector('#swp-lhm-b .swp-lhm-cta');
-  var checkout = document.getElementById('swp-lhm-j');
-  var ticking = false;
-
-  function updateSticky() {
-    ticking = false;
-    if (!sticky || !firstCta || !checkout) return;
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var show = firstCta.getBoundingClientRect().bottom < 0 && checkout.getBoundingClientRect().top > vh;
-    sticky.classList.toggle('is-visible', show);
-    sticky.setAttribute('aria-hidden', show ? 'false' : 'true');
-    var btn = sticky.querySelector('a');
-    if (btn) btn.tabIndex = show ? 0 : -1;
-  }
-
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(updateSticky);
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-
-  LHM.refresh = refresh;
-
-  function start() { refresh(); updateSticky(); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
-  setInterval(refresh, 1000);
-})();
-</script></body></html>
