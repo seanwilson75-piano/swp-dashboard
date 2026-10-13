@@ -2,11 +2,10 @@
 
 Only the `PASTE-...` files in this folder go into WordPress. Ignore `_dev/`.
 
-| File | Paste into | First line says | Last line says | When |
-|---|---|---|---|---|
-| [PASTE-MONDAY-Oct12-static.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-MONDAY-Oct12-static.txt) | `/left-hand-mastery/`, Custom HTML block, HTML tab | `MONDAY OCT 12 STATIC VERSION` | `END BLOCK Z` | Live now (Mon Oct 12) |
-| [PASTE-TUESDAY-Oct13-static.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-TUESDAY-Oct13-static.txt) | `/left-hand-mastery/`, same block, HTML tab | `TUESDAY OCT 13+ STATIC VERSION` | `END BLOCK Z` | After midnight ET, Oct 13. Stays from then on. |
-| [PASTE-THANK-YOU-page.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-THANK-YOU-page.txt) | `/left-hand-mastery-thank-you/`, Custom HTML block, HTML tab | `THANK-YOU PAGE` | `END THANK-YOU PAGE` | Already installed. Only if it needs replacing. |
+| File | Paste into | First line says | Last line says |
+|---|---|---|---|
+| [PASTE-FINAL-sales-page.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-FINAL-sales-page.txt) | `/left-hand-mastery/`, Custom HTML block, HTML tab | `FINAL VERSION (no code; price $67)` | `END OF PAGE` |
+| [PASTE-THANK-YOU-page.txt](https://github.com/seanwilson75-piano/swp-dashboard/raw/claude/vibrant-clarke-7th5nf/sales-pages/left-hand-mastery/PASTE-THANK-YOU-page.txt) | `/left-hand-mastery-thank-you/`, Custom HTML block, HTML tab | `THANK-YOU PAGE` | `END THANK-YOU PAGE` |
 
 The links above open the **Raw** (plain text) view.
 
@@ -22,14 +21,10 @@ The links above open the **Raw** (plain text) view.
 
 Don't copy from the chat's file viewer: it can cut long files short.
 
-## What each sales page version shows
+## Final sales page
 
-| | Buttons | Price cards | Countdown |
-|---|---|---|---|
-| Monday | $47 | $24 crossed out · **$47 TODAY** · $67 | hidden |
-| Tuesday+ | $67 | $24, $47 crossed out · **$67 TODAY** | hidden |
-
-These versions have **no code**: the prices are written into the page. The checkout total comes from the coupon in the link (`?coupon=LHM-DAY2`, `?coupon=LHM-VIP-DAY2`, `?coupon=LHM-VIP20`), not from the page.
+One price everywhere: **$67** (buttons, value card, checkout header). No launch dates, day prices, price cards, or countdown. No code.
+The Monday and Tuesday launch versions are archived in `_dev/launch-archive/`.
 
 ## Images
 
@@ -37,9 +32,9 @@ These versions have **no code**: the prices are written into the page. The check
 
 ## `_dev/` (not for pasting)
 
-- `left-hand-mastery-blocks.html`: working copy of the sales page (same as the Monday file).
-- `lhm-page-scripts.php` / `lhm-page-scripts-for-code-snippets-NOT-INSTALLED.txt`: the Code Snippets script (adds the day's coupon, runs the countdown). Never got installed.
+- `left-hand-mastery-blocks.html`: working copy of the sales page (same as the final file).
+- `lhm-page-scripts.php` / `lhm-page-scripts-for-code-snippets-NOT-INSTALLED.txt`: a script written for the Code Snippets plugin, which is **not** on this site. Never installed; not needed for the final page.
 - `price-labels-source.js`: the date-switching label code. **It broke the live page when pasted in the HTML block. Don't paste it.**
 - `preview.html`: local preview.
 
-Open question for after the launch: why `<script>` tags in this site's Custom HTML block don't run. Until that's solved, use the static versions.
+Open question for after the launch: why `<script>` tags in this site's Custom HTML block don't run. The final page needs no code, so this only matters for future launches.

@@ -84,9 +84,8 @@
   syncCoupon(tierIndex(now()));
 })();
 </script></head>
-<body><!-- ===== LEFT HAND MASTERY SALES PAGE — MONDAY OCT 12 STATIC VERSION (no code; prices fixed for Monday). Paste into the Custom HTML block (HTML tab only).
-     The JavaScript is NOT in this file. It loads from the Code Snippets plugin: see lhm-page-scripts.php.
-     (The Custom HTML block on this site shows <script> tags but doesn't run them.) ===== -->
+<body><!-- ===== LEFT HAND MASTERY SALES PAGE — FINAL VERSION (no code; price $67). Paste into the Custom HTML block (HTML tab only).
+     First line of this file: this comment. Last line: END OF PAGE. ===== -->
 <!-- ===== BLOCK 0: STYLES ===== -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -869,34 +868,10 @@ body { overflow-x: hidden; }
 
     <div class="swp-lhm-b-price">
 
-      <!-- Price ladder: title (hidden after launch) -->
-      <p class="swp-lhm-ladder-title" data-swp-launch-only><span data-swp-show-tier="1" hidden>Launch price goes up every day.</span><span data-swp-show-tier="2">Last day of launch pricing.</span></p>
-
-      <!-- Price ladder: tiers (current tier highlights automatically; past days are hidden) -->
-      <ul class="swp-lhm-ladder">
-        <li class="swp-lhm-tier is-past" data-swp-tier="1">
-          <span class="swp-lhm-tier-flag">Today</span>
-          <span class="swp-lhm-tier-date">Oct 11</span>
-          <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
-        </li>
-        <li class="swp-lhm-tier is-current" data-swp-tier="2">
-          <span class="swp-lhm-tier-flag">Today</span>
-          <span class="swp-lhm-tier-date">Oct 12</span>
-          <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
-        </li>
-        <li class="swp-lhm-tier" data-swp-tier="3">
-          <span class="swp-lhm-tier-flag">Today</span>
-          <span class="swp-lhm-tier-date">Oct 13+</span>
-          <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$67</span></span>
-        </li>
-      </ul>
 
       <div class="swp-lhm-cta">
         <!-- Button -->
-        <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="hero">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
-
-        <!-- Countdown -->
-        <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+        <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="hero">👉 Get Left Hand Mastery: <span data-swp-price>$67</span></a>
       </div>
 
     </div>
@@ -1242,47 +1217,22 @@ body { overflow-x: hidden; }
       </table>
 
       <!-- Value summary -->
-      <p class="swp-lhm-stack-sum">Total value: <span data-swp-price="total">$321</span>. Regular price: <span data-swp-price="regular">$67</span>.</p>
+      <p class="swp-lhm-stack-sum">Total value: <span data-swp-price="total">$321</span>.</p>
 
       <div class="swp-lhm-ladder-wrap">
 
-        <!-- Price ladder: tiers (hidden after launch) -->
-        <ul class="swp-lhm-ladder">
-          <li class="swp-lhm-tier is-past" data-swp-tier="1">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 11</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
-          </li>
-          <li class="swp-lhm-tier is-current" data-swp-tier="2">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 12</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
-          </li>
-          <li class="swp-lhm-tier" data-swp-tier="3">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 13+</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$67</span></span>
-          </li>
-        </ul>
 
-        <!-- Today line (shows on Oct 11 and earlier) -->
-        <p class="swp-lhm-today" data-swp-show-tier="1" hidden>Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$43</span> off the regular price.</p>
 
-        <!-- Today line (shows on Oct 12) -->
-        <p class="swp-lhm-today" data-swp-show-tier="2">Today: <span data-swp-price>$47</span>. That's <span data-swp-price="save">$20</span> off the regular price.</p>
 
-        <!-- Today line (shows after launch) -->
-        <p class="swp-lhm-today" data-swp-show-tier="3" hidden>One payment of <span data-swp-price>$67</span>. Yours forever.</p>
+        <!-- Price line -->
+        <p class="swp-lhm-today">One payment of <span data-swp-price>$67</span>. Yours forever.</p>
 
         <!-- Closing line -->
         <p class="swp-lhm-use">You'll use this in every song you play.</p>
 
         <div class="swp-lhm-cta">
           <!-- Button -->
-          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="value">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
-
-          <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="value">👉 Get Left Hand Mastery: <span data-swp-price>$67</span></a>
         </div>
 
       </div>
@@ -1338,7 +1288,7 @@ body { overflow-x: hidden; }
       <!-- FAQ 5 -->
       <details>
         <summary>I'm already a member. Should I buy this?</summary>
-        <p>No. It's included in your membership. You'll find it in your Intermediate Roadmap starting Oct 13.</p>
+        <p>No. It's included in your membership. You'll find it in your Intermediate Roadmap.</p>
       </details>
 
       <!-- FAQ 6 -->
@@ -1359,12 +1309,6 @@ body { overflow-x: hidden; }
         <p>No. All sales are final. Watch the two free lessons on this page first, so you know exactly how I teach.</p>
       </details>
 
-      <!-- FAQ 9 (hidden after launch) -->
-      <details data-swp-launch-only>
-        <summary>Why is the price going up?</summary>
-        <p><span data-swp-show-tier="1" hidden>This is launch pricing for two days only. It goes to <span data-swp-price="tier2">$47</span> on Oct 12, then <span data-swp-price="tier3">$67</span>.</span><span data-swp-show-tier="2">This is launch pricing, and today is the last day. It goes to <span data-swp-price="tier3">$67</span> on Oct 13.</span></p>
-      </details>
-
     </div>
   </div>
 
@@ -1377,31 +1321,10 @@ body { overflow-x: hidden; }
 
       <div class="swp-lhm-ladder-wrap">
 
-        <!-- Price ladder: tiers (hidden after launch) -->
-        <ul class="swp-lhm-ladder">
-          <li class="swp-lhm-tier is-past" data-swp-tier="1">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 11</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier1">$24</span></span>
-          </li>
-          <li class="swp-lhm-tier is-current" data-swp-tier="2">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 12</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier2">$47</span></span>
-          </li>
-          <li class="swp-lhm-tier" data-swp-tier="3">
-            <span class="swp-lhm-tier-flag">Today</span>
-            <span class="swp-lhm-tier-date">Oct 13+</span>
-            <span class="swp-lhm-tier-price"><span data-swp-price="tier3">$67</span></span>
-          </li>
-        </ul>
 
         <div class="swp-lhm-cta">
           <!-- Button -->
-          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="final">👉 Get Left Hand Mastery: <span data-swp-price>$47</span></a>
-
-          <!-- Countdown -->
-          <p class="swp-lhm-countdown" data-swp-countdown hidden>Price goes to <span data-swp-price="next">$67</span> in <span class="swp-lhm-countdown-time" data-swp-countdown-time></span></p>
+          <a class="swp-lhm-btn" href="#swp-lhm-checkout" data-swp-cta="final">👉 Get Left Hand Mastery: <span data-swp-price>$67</span></a>
         </div>
 
       </div>
@@ -1425,8 +1348,8 @@ body { overflow-x: hidden; }
     <p class="swp-lhm-eyebrow">Last step</p>
     <h2 class="swp-lhm-h2">Get <em>Left Hand Mastery</em></h2>
 
-    <!-- Price (regular price is struck through during launch only) -->
-    <p class="swp-lhm-checkout-price">Today: <span data-swp-price>$47</span><s data-swp-launch-only><span data-swp-price="regular">$67</span></s></p>
+    <!-- Price -->
+    <p class="swp-lhm-checkout-price">One payment of <span data-swp-price>$67</span></p>
 
     <!-- Reassurance -->
     <ul class="swp-lhm-assure">
@@ -1434,8 +1357,6 @@ body { overflow-x: hidden; }
       <li>Yours forever</li>
       <li>Secure checkout</li>
     </ul>
-
-    <p class="swp-lhm-small swp-lhm-checkout-note" data-swp-launch-only>Today's launch price is applied below for you.</p>
   </div>
 
   <!-- SureCart checkout form -->
@@ -1444,20 +1365,12 @@ body { overflow-x: hidden; }
   </div>
 
   <!-- Member note -->
-  <p class="swp-lhm-member-note">Already a member? Don't buy this. It's included in your membership, in your Intermediate Roadmap starting Oct 13.</p>
+  <p class="swp-lhm-member-note">Already a member? Don't buy this. It's included in your membership, in your Intermediate Roadmap.</p>
 </section>
 <!-- ===== END BLOCK J ===== -->
 
 
-<!-- ===== BLOCK Z: STICKY BAR (its script is in lhm-page-scripts.php) ===== -->
-<!-- Sticky buy bar (phones only) -->
-<div class="swp-lhm-sticky" data-swp-sticky aria-hidden="true">
-  <span class="swp-lhm-sticky-text"><strong>Left Hand Mastery</strong><span><span data-swp-price>$47</span> today</span></span>
-  <a class="swp-lhm-sticky-btn" href="#swp-lhm-checkout" data-swp-cta="sticky" tabindex="-1">👉 Get it now</a>
-</div>
-
-<!-- ===== END BLOCK Z ===== -->
-
+<!-- ===== END OF PAGE ===== -->
 <script>
 (function () {
   'use strict';
