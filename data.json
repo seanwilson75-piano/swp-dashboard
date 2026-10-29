@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-10-28T17:13:49.244Z",
-  "date": "2026-10-27",
+  "generatedAt": "2026-10-29T17:29:16.152Z",
+  "date": "2026-10-28",
   "yesterday": {
-    "orders": 17,
-    "revenueCents": 217700,
+    "orders": 25,
+    "revenueCents": 57975,
     "topProducts": [
       {
-        "name": "13-Week Ongoing Sessions with Sean",
-        "orders": 2,
-        "revenueCents": 170000
-      },
-      {
         "name": "Basic Membership",
-        "orders": 7,
-        "revenueCents": 19900
+        "orders": 11,
+        "revenueCents": 29175
       },
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 5,
-        "revenueCents": 11700
+        "orders": 7,
+        "revenueCents": 14700
+      },
+      {
+        "name": "Premium Membership",
+        "orders": 3,
+        "revenueCents": 14100
       }
     ]
   },
   "week": {
-    "orders": 91,
-    "revenueCents": 394375
+    "orders": 106,
+    "revenueCents": 426250
   },
   "month": {
-    "orders": 499,
-    "revenueCents": 1350030
+    "orders": 525,
+    "revenueCents": 1410905
   },
   "ytd": {
-    "orders": 5874,
-    "revenueCents": 13254630
+    "orders": 5900,
+    "revenueCents": 13315505
   }
 }
