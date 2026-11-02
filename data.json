@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-11-01T17:12:16.994Z",
-  "date": "2026-10-31",
+  "generatedAt": "2026-11-02T20:51:02.183Z",
+  "date": "2026-11-01",
   "yesterday": {
-    "orders": 7,
-    "revenueCents": 14100,
+    "orders": 19,
+    "revenueCents": 36400,
     "topProducts": [
       {
         "name": "Basic Membership",
-        "orders": 3,
-        "revenueCents": 8300
+        "orders": 8,
+        "revenueCents": 22000
       },
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 2,
-        "revenueCents": 5800
+        "orders": 5,
+        "revenueCents": 11700
       },
       {
-        "name": "Hear Any Chord — Free Ear Training Chart",
-        "orders": 2,
-        "revenueCents": 0
+        "name": "27 Musicians Pro Musicians Bundle Pack",
+        "orders": 1,
+        "revenueCents": 2700
       }
     ]
   },
   "week": {
-    "orders": 96,
-    "revenueCents": 403550
+    "orders": 99,
+    "revenueCents": 408250
   },
   "month": {
-    "orders": 553,
-    "revenueCents": 1484105
+    "orders": 19,
+    "revenueCents": 36400
   },
   "ytd": {
-    "orders": 5928,
-    "revenueCents": 13388705
+    "orders": 5947,
+    "revenueCents": 13425105
   }
 }
