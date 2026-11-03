@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-11-02T20:51:02.183Z",
-  "date": "2026-11-01",
+  "generatedAt": "2026-11-03T18:30:40.418Z",
+  "date": "2026-11-02",
   "yesterday": {
-    "orders": 19,
-    "revenueCents": 36400,
+    "orders": 16,
+    "revenueCents": 37500,
     "topProducts": [
       {
-        "name": "Basic Membership",
-        "orders": 8,
-        "revenueCents": 22000
-      },
-      {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 5,
-        "revenueCents": 11700
+        "orders": 6,
+        "revenueCents": 17400
       },
       {
-        "name": "27 Musicians Pro Musicians Bundle Pack",
+        "name": "Basic Membership",
+        "orders": 3,
+        "revenueCents": 8700
+      },
+      {
+        "name": "Left Hand Mastery Course",
         "orders": 1,
-        "revenueCents": 2700
+        "revenueCents": 6700
       }
     ]
   },
   "week": {
-    "orders": 99,
-    "revenueCents": 408250
+    "orders": 101,
+    "revenueCents": 411175
   },
   "month": {
-    "orders": 19,
-    "revenueCents": 36400
+    "orders": 35,
+    "revenueCents": 73900
   },
   "ytd": {
-    "orders": 5947,
-    "revenueCents": 13425105
+    "orders": 5964,
+    "revenueCents": 13465505
   }
 }
