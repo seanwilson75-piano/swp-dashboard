@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-11-04T18:44:43.245Z",
-  "date": "2026-11-03",
+  "generatedAt": "2026-11-05T18:52:16.080Z",
+  "date": "2026-11-04",
   "yesterday": {
-    "orders": 15,
-    "revenueCents": 37300,
+    "orders": 12,
+    "revenueCents": 27200,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 7,
-        "revenueCents": 17500
-      },
-      {
-        "name": "Premium Membership",
-        "orders": 2,
-        "revenueCents": 9400
+        "orders": 4,
+        "revenueCents": 11600
       },
       {
         "name": "Basic Membership",
-        "orders": 3,
-        "revenueCents": 8700
+        "orders": 4,
+        "revenueCents": 10900
+      },
+      {
+        "name": "Premium Membership",
+        "orders": 1,
+        "revenueCents": 4700
       }
     ]
   },
   "week": {
-    "orders": 99,
-    "revenueCents": 230775
+    "orders": 85,
+    "revenueCents": 195300
   },
   "month": {
-    "orders": 50,
-    "revenueCents": 111200
+    "orders": 62,
+    "revenueCents": 138400
   },
   "ytd": {
-    "orders": 5979,
-    "revenueCents": 13502805
+    "orders": 5991,
+    "revenueCents": 13530005
   }
 }
