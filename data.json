@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-11-14T17:14:05.696Z",
-  "date": "2026-11-13",
+  "generatedAt": "2026-11-15T17:53:28.758Z",
+  "date": "2026-11-14",
   "yesterday": {
-    "orders": 15,
-    "revenueCents": 39200,
+    "orders": 12,
+    "revenueCents": 70200,
     "topProducts": [
       {
-        "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 8,
-        "revenueCents": 23200
+        "name": "Annual Premium Membership",
+        "orders": 1,
+        "revenueCents": 42300
       },
       {
         "name": "Basic Membership",
-        "orders": 6,
-        "revenueCents": 16000
+        "orders": 5,
+        "revenueCents": 14500
       },
       {
-        "name": "Sean's Free Harmony Framework",
-        "orders": 1,
-        "revenueCents": 0
+        "name": "Basic Membership — 7 Day $1 Trial",
+        "orders": 3,
+        "revenueCents": 8700
       }
     ]
   },
   "week": {
-    "orders": 94,
-    "revenueCents": 244200
+    "orders": 98,
+    "revenueCents": 295200
   },
   "month": {
-    "orders": 188,
-    "revenueCents": 460700
+    "orders": 200,
+    "revenueCents": 530900
   },
   "ytd": {
-    "orders": 6119,
-    "revenueCents": 13857705
+    "orders": 6131,
+    "revenueCents": 13927905
   }
 }
