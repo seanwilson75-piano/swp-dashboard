@@ -1,37 +1,37 @@
 {
-  "generatedAt": "2026-11-22T18:35:54.191Z",
-  "date": "2026-11-21",
+  "generatedAt": "2026-11-24T21:23:51.656Z",
+  "date": "2026-11-23",
   "yesterday": {
-    "orders": 10,
-    "revenueCents": 26100,
+    "orders": 11,
+    "revenueCents": 28900,
     "topProducts": [
       {
         "name": "Basic Membership — 7 Day $1 Trial",
-        "orders": 7,
-        "revenueCents": 20300
+        "orders": 4,
+        "revenueCents": 11600
       },
       {
         "name": "Basic Membership",
-        "orders": 2,
-        "revenueCents": 5800
+        "orders": 4,
+        "revenueCents": 11600
       },
       {
-        "name": "Hear Any Chord — Free Ear Training Chart",
+        "name": "Left Hand Mastery Course",
         "orders": 1,
-        "revenueCents": 0
+        "revenueCents": 5700
       }
     ]
   },
   "week": {
-    "orders": 92,
-    "revenueCents": 228200
+    "orders": 90,
+    "revenueCents": 223300
   },
   "month": {
-    "orders": 294,
-    "revenueCents": 764900
+    "orders": 313,
+    "revenueCents": 817000
   },
   "ytd": {
-    "orders": 6225,
-    "revenueCents": 14161905
+    "orders": 6244,
+    "revenueCents": 14214005
   }
 }
